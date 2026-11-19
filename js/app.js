@@ -420,12 +420,13 @@
       } else if (beat.typing) {
         // keep the tap point as the centre while the text grows
         var cx = x, cy = y, full = beat.text || "", i = 0;
+        var chars = Array.from(full);        // whole characters, so emoji are never split
         // typeFrom: everything before that phrase is there at once, only the rest is typed
         var pause = 0;
         if (beat.typeFrom) {
           var from = full.indexOf(beat.typeFrom);
           if (from > 0) {
-            i = from;
+            i = Array.from(full.slice(0, from)).length;
             renderInto(s.inner, full.slice(0, from), beat, false);
             later(function () { maybeHint(item, s.inner, beat, 250); }, 0);
             pause = beat.typePause != null ? beat.typePause : TYPE_PAUSE; // breath before the typing
@@ -437,11 +438,11 @@
         var typeNext = function () {
           if (item.dead) return;
           i++;
-          renderInto(s.inner, full.slice(0, i), beat, false);
+          renderInto(s.inner, chars.slice(0, i).join(""), beat, false);
           maybeHint(item, s.inner, beat, 150);
           if (anchored) refit(item);
           else place(item, cx - s.el.offsetWidth / 2, cy - s.el.offsetHeight / 2);
-          if (i < full.length) later(typeNext, reduceMotion ? 0 : speed);
+          if (i < chars.length) later(typeNext, reduceMotion ? 0 : speed);
           else {
             later(function () { s.inner.classList.remove("caret"); }, beat.strike ? 0 : 1200);
             if (beat.strike) strikeOut(s.inner, full, beat);

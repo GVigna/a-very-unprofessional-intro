@@ -210,7 +210,7 @@ window.STORY = [
 
   // tap: in the free space (never over the title or the meme)
   { free: true, type: "text", style: "body", typing: true, typeFrom: "London it is.", speed: 55, tilt: 0,
-    text: "Visa expires. I only speak English. Where do I go?\nLondon it is. Vámonos." },
+    text: "Visa expires. I only speak English. Where do I go?\nLondon it is. Vámonos. 💃" },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

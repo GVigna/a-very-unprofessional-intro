@@ -144,7 +144,7 @@ window.STORY = [
   },
 
   // tap: summer jobs, with two tiny photos
-  { type: "text", text: "Summer jobs: Resort entertainer in Greece & Egypt", tilt: 0, color: "secondary",
+  { type: "text", text: "SUMMER JOBS: RESORT ENTERTAINER IN GREECE & EGYPT", tilt: 0, color: "secondary",
     also: [
       { below: true, type: "text", style: "body", color: "secondary", tilt: 0, gap: 10, delay: 350,
         text: "More or less 18 years old.\nIn charge of teenagers aged 14–16.\nSomehow, this involved dancing on tables in Bar Street." },

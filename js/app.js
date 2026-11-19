@@ -297,6 +297,27 @@
     return strikeEl;
   }
 
+  // a little mouse cursor that glides onto the first link of a text, clicks twice, fades away
+  var CURSOR_SVG = '<svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">' +
+    '<path d="M4 2 L4 19 L8.6 14.8 L11.6 21.5 L14.4 20.3 L11.4 13.7 L17.6 13.4 Z" ' +
+    'fill="#FFFFFF" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  function cursorHint(item, inner, delay) {
+    if (reduceMotion) return;
+    later(function () {
+      if (item.dead) return;
+      var a = inner.querySelector("a");
+      if (!a) return;
+      var ir = item.el.getBoundingClientRect(), ar = a.getBoundingClientRect();
+      var c = document.createElement("span");
+      c.className = "cursor-hint";
+      c.innerHTML = CURSOR_SVG + '<i class="ring"></i>';
+      c.style.left = (ar.left - ir.left + ar.width * 0.55) + "px";
+      c.style.top = (ar.top - ir.top + ar.height * 0.45) + "px";
+      item.el.appendChild(c);
+      setTimeout(function () { c.remove(); }, 3200);
+    }, delay);
+  }
+
   // draw a line through one phrase of a text (after a short pause)
   function strikeOut(inner, full, beat) {
     var span = renderInto(inner, full, beat, true);
@@ -377,6 +398,7 @@
         if (anchor) place(item, item.x, item.y); // keep it on screen at its final size
       }
       if (!beat.typing && beat.strike) strikeOut(s.inner, beat.text || "", beat);
+      if (!beat.typing && beat.links && beat.linkHint !== false) cursorHint(item, s.inner, 1200);
       if (beat.lines) {
         var lines = s.inner.querySelectorAll(".line");
         var lgap = reduceMotion ? 0 : (beat.speed || 650);
@@ -416,6 +438,8 @@
             later(function () { s.inner.classList.remove("caret"); }, beat.strike ? 0 : 1200);
             if (beat.strike) strikeOut(s.inner, full, beat);
             else renderInto(s.inner, full, beat, false);
+            if (beat.links && beat.linkHint !== false)
+              cursorHint(item, s.inner, beat.strike ? (beat.strikeDelay || 600) + 900 : 700);
             playThen(beat, item);
           }
         };

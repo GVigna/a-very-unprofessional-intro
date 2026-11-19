@@ -36,7 +36,9 @@
              typePause ms of pause before the typing starts (default 900)
              strike   "a phrase" → after typing, a line crosses it out
              links    { "phrase": "https://…" } → that phrase becomes a link
-                      (opens in a new tab; tapping it never advances the story)
+                      (opens in a new tab; tapping it never advances the story);
+                      a little cursor clicks on it once to show it's clickable
+                      (linkHint: false → no cursor)
              id       a name for this text, so a later beat can replace it
              into     "id" → this text takes the place of that earlier text
              then     beats that start BY THEMSELVES when the typing ends

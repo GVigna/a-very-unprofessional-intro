@@ -5,8 +5,8 @@
 
    COMMON OPTIONS (any beat)
    clear     true → this tap first wipes everything off the screen
-   free      true → (photos/videos/stacks) placed in the free space around
-             the texts instead of at the tap
+   free      true → placed in the free space instead of at the tap
+             (photos/videos/stacks: around the texts; texts: around everything)
    tilt      rotation in degrees. Omit for a small random tilt, 0 for straight.
    lifespan  how many MORE taps it survives before disappearing.
              Omit it and the beat stays forever.
@@ -207,6 +207,10 @@ window.STORY = [
         size: "m", delay: 450 }
     ]
   },
+
+  // tap: in the free space (never over the title or the meme)
+  { free: true, type: "text", style: "body", typing: true, typeFrom: "London it is.", speed: 55, tilt: 0,
+    text: "Visa expires. I only speak English. Where do I go?\nLondon it is. Vámonos." },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

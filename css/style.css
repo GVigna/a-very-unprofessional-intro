@@ -415,28 +415,18 @@ body {
   touch-action: manipulation;
 }
 
-/* cursor that shows a link is clickable: glides in, clicks twice, fades */
+/* cursor that shows a link is clickable: pixel arrow glides in, clicks twice, fades */
 .cursor-hint {
   position: absolute;
-  width: 22px;
-  height: 22px;
-  margin: -2px 0 0 -4px;      /* the arrow tip sits on the point */
+  width: 22px;              /* 11 × 17 pixel grid → 2 px per square */
+  height: 34px;
+  margin: 0;                /* the arrow tip (top-left square) sits on the point */
   pointer-events: none;
   z-index: 2;
+  image-rendering: pixelated;
   animation: cursor-move 3s ease-out forwards;
 }
-.cursor-hint svg { display: block; animation: cursor-press 3s ease-in-out forwards; transform-origin: 20% 10%; }
-.cursor-hint .ring {
-  position: absolute;
-  left: -9px;
-  top: -9px;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--secondary);
-  border-radius: 50%;
-  opacity: 0;
-  animation: cursor-ring 3s ease-out forwards;
-}
+.cursor-hint svg { display: block; animation: cursor-press 3s ease-in-out forwards; transform-origin: 0 0; }
 @keyframes cursor-move {
   0%   { opacity: 0; transform: translate(34px, 30px); }
   12%  { opacity: 1; }
@@ -447,14 +437,6 @@ body {
 @keyframes cursor-press {
   0%, 36%, 46%, 56%, 66%, 100% { transform: scale(1); }
   41%, 61% { transform: scale(.82); }
-}
-@keyframes cursor-ring {
-  0%, 40% { opacity: 0; transform: scale(.3); }
-  42% { opacity: 1; transform: scale(.4); }
-  52% { opacity: 0; transform: scale(1.6); }
-  60% { opacity: 0; transform: scale(.3); }
-  62% { opacity: 1; transform: scale(.4); }
-  72%, 100% { opacity: 0; transform: scale(1.6); }
 }
 
 /* text colour override */

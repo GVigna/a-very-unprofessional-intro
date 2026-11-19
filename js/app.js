@@ -298,9 +298,8 @@
   }
 
   // a little mouse cursor that glides onto the first link of a text, clicks twice, fades away
-  var CURSOR_SVG = '<svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">' +
-    '<path d="M4 2 L4 19 L8.6 14.8 L11.6 21.5 L14.4 20.3 L11.4 13.7 L17.6 13.4 Z" ' +
-    'fill="#FFFFFF" stroke="#111111" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  // pixel-art arrow (black outline, white fill), drawn square by square
+  var CURSOR_SVG = '<svg viewBox="0 0 11 17" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="1" height="1" fill="#000"/><rect x="0" y="1" width="1" height="1" fill="#000"/><rect x="1" y="1" width="1" height="1" fill="#000"/><rect x="0" y="2" width="1" height="1" fill="#000"/><rect x="1" y="2" width="1" height="1" fill="#FFF"/><rect x="2" y="2" width="1" height="1" fill="#000"/><rect x="0" y="3" width="1" height="1" fill="#000"/><rect x="1" y="3" width="1" height="1" fill="#FFF"/><rect x="2" y="3" width="1" height="1" fill="#FFF"/><rect x="3" y="3" width="1" height="1" fill="#000"/><rect x="0" y="4" width="1" height="1" fill="#000"/><rect x="1" y="4" width="1" height="1" fill="#FFF"/><rect x="2" y="4" width="1" height="1" fill="#FFF"/><rect x="3" y="4" width="1" height="1" fill="#FFF"/><rect x="4" y="4" width="1" height="1" fill="#000"/><rect x="0" y="5" width="1" height="1" fill="#000"/><rect x="1" y="5" width="1" height="1" fill="#FFF"/><rect x="2" y="5" width="1" height="1" fill="#FFF"/><rect x="3" y="5" width="1" height="1" fill="#FFF"/><rect x="4" y="5" width="1" height="1" fill="#FFF"/><rect x="5" y="5" width="1" height="1" fill="#000"/><rect x="0" y="6" width="1" height="1" fill="#000"/><rect x="1" y="6" width="1" height="1" fill="#FFF"/><rect x="2" y="6" width="1" height="1" fill="#FFF"/><rect x="3" y="6" width="1" height="1" fill="#FFF"/><rect x="4" y="6" width="1" height="1" fill="#FFF"/><rect x="5" y="6" width="1" height="1" fill="#FFF"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="0" y="7" width="1" height="1" fill="#000"/><rect x="1" y="7" width="1" height="1" fill="#FFF"/><rect x="2" y="7" width="1" height="1" fill="#FFF"/><rect x="3" y="7" width="1" height="1" fill="#FFF"/><rect x="4" y="7" width="1" height="1" fill="#FFF"/><rect x="5" y="7" width="1" height="1" fill="#FFF"/><rect x="6" y="7" width="1" height="1" fill="#FFF"/><rect x="7" y="7" width="1" height="1" fill="#000"/><rect x="0" y="8" width="1" height="1" fill="#000"/><rect x="1" y="8" width="1" height="1" fill="#FFF"/><rect x="2" y="8" width="1" height="1" fill="#FFF"/><rect x="3" y="8" width="1" height="1" fill="#FFF"/><rect x="4" y="8" width="1" height="1" fill="#FFF"/><rect x="5" y="8" width="1" height="1" fill="#FFF"/><rect x="6" y="8" width="1" height="1" fill="#FFF"/><rect x="7" y="8" width="1" height="1" fill="#FFF"/><rect x="8" y="8" width="1" height="1" fill="#000"/><rect x="0" y="9" width="1" height="1" fill="#000"/><rect x="1" y="9" width="1" height="1" fill="#FFF"/><rect x="2" y="9" width="1" height="1" fill="#FFF"/><rect x="3" y="9" width="1" height="1" fill="#FFF"/><rect x="4" y="9" width="1" height="1" fill="#FFF"/><rect x="5" y="9" width="1" height="1" fill="#FFF"/><rect x="6" y="9" width="1" height="1" fill="#FFF"/><rect x="7" y="9" width="1" height="1" fill="#FFF"/><rect x="8" y="9" width="1" height="1" fill="#FFF"/><rect x="9" y="9" width="1" height="1" fill="#000"/><rect x="0" y="10" width="1" height="1" fill="#000"/><rect x="1" y="10" width="1" height="1" fill="#FFF"/><rect x="2" y="10" width="1" height="1" fill="#FFF"/><rect x="3" y="10" width="1" height="1" fill="#FFF"/><rect x="4" y="10" width="1" height="1" fill="#FFF"/><rect x="5" y="10" width="1" height="1" fill="#FFF"/><rect x="6" y="10" width="1" height="1" fill="#000"/><rect x="7" y="10" width="1" height="1" fill="#000"/><rect x="8" y="10" width="1" height="1" fill="#000"/><rect x="9" y="10" width="1" height="1" fill="#000"/><rect x="10" y="10" width="1" height="1" fill="#000"/><rect x="0" y="11" width="1" height="1" fill="#000"/><rect x="1" y="11" width="1" height="1" fill="#FFF"/><rect x="2" y="11" width="1" height="1" fill="#FFF"/><rect x="3" y="11" width="1" height="1" fill="#000"/><rect x="4" y="11" width="1" height="1" fill="#FFF"/><rect x="5" y="11" width="1" height="1" fill="#FFF"/><rect x="6" y="11" width="1" height="1" fill="#000"/><rect x="0" y="12" width="1" height="1" fill="#000"/><rect x="1" y="12" width="1" height="1" fill="#FFF"/><rect x="2" y="12" width="1" height="1" fill="#000"/><rect x="4" y="12" width="1" height="1" fill="#000"/><rect x="5" y="12" width="1" height="1" fill="#FFF"/><rect x="6" y="12" width="1" height="1" fill="#FFF"/><rect x="7" y="12" width="1" height="1" fill="#000"/><rect x="0" y="13" width="1" height="1" fill="#000"/><rect x="1" y="13" width="1" height="1" fill="#000"/><rect x="4" y="13" width="1" height="1" fill="#000"/><rect x="5" y="13" width="1" height="1" fill="#FFF"/><rect x="6" y="13" width="1" height="1" fill="#FFF"/><rect x="7" y="13" width="1" height="1" fill="#000"/><rect x="0" y="14" width="1" height="1" fill="#000"/><rect x="5" y="14" width="1" height="1" fill="#000"/><rect x="6" y="14" width="1" height="1" fill="#FFF"/><rect x="7" y="14" width="1" height="1" fill="#FFF"/><rect x="8" y="14" width="1" height="1" fill="#000"/><rect x="5" y="15" width="1" height="1" fill="#000"/><rect x="6" y="15" width="1" height="1" fill="#FFF"/><rect x="7" y="15" width="1" height="1" fill="#FFF"/><rect x="8" y="15" width="1" height="1" fill="#000"/><rect x="6" y="16" width="1" height="1" fill="#000"/><rect x="7" y="16" width="1" height="1" fill="#000"/></svg>';
   function cursorHint(item, inner, delay) {
     if (reduceMotion) return;
     later(function () {
@@ -310,7 +309,7 @@
       var ir = item.el.getBoundingClientRect(), ar = a.getBoundingClientRect();
       var c = document.createElement("span");
       c.className = "cursor-hint";
-      c.innerHTML = CURSOR_SVG + '<i class="ring"></i>';
+      c.innerHTML = CURSOR_SVG;
       c.style.left = (ar.left - ir.left + ar.width * 0.55) + "px";
       c.style.top = (ar.top - ir.top + ar.height * 0.45) + "px";
       item.el.appendChild(c);
@@ -576,8 +575,15 @@
       timers = [];
     }
 
-    if (beat.free) { var fm = freeSpotFor(beat); x = fm.x; y = fm.y; } // keep clear of the texts
-    playBeat(beat, x, y, step);
+    var anchorMain;
+    if (beat.free && beat.type === "text") {
+      // a text in the free space: measure its final size, find room around everything
+      var fsz = finalSize(beat);
+      var spot = clearSpot(fsz.w, fsz.h, textRects().concat(mediaRects()), { x: x, y: y }, 1)
+              || freeSpot(fsz.w, fsz.h, textRects());
+      x = spot.x - fsz.w / 2; y = spot.y - fsz.h / 2; anchorMain = "topleft";
+    } else if (beat.free) { var fm = freeSpotFor(beat); x = fm.x; y = fm.y; } // keep clear of the texts
+    playBeat(beat, x, y, step, anchorMain);
     var main = live[live.length - 1];
 
     // extra things that come with the same tap ("also"):
@@ -680,18 +686,23 @@
 
   // avoid EVERYTHING on screen: scan the screen for the biggest size that fits
   // without touching any text or photo (falls back to the text-only method)
-  function clearSpot(w, h, rects) {
-    var v = viewport(), m = 12, top = EDGE + 30;
-    for (var sc = 1; sc >= 0.4; sc -= 0.05) {
-      var bw = w * sc, bh = h * sc, best = null;
+  // pref = the point it would like to be near (the tap, or the screen centre);
+  // minScale = 1 for texts (they never shrink)
+  function clearSpot(w, h, rects, pref, minScale) {
+    var v = viewport(), m = 12, top = EDGE + 40;
+    pref = pref || { x: v.w / 2, y: v.h / 2 };
+    for (var sc = 1; sc >= (minScale || 0.4) - 0.001; sc -= 0.05) {
+      var bw = w * sc, bh = h * sc, best = null, bestD = Infinity;
       for (var y = top; y + bh <= v.h - EDGE; y += 12) {
         for (var x = EDGE; x + bw <= v.w - EDGE; x += 12) {
           var hit = rects.some(function (r) {
             return x < r.r + m && x + bw > r.l - m && y < r.b + m && y + bh > r.t - m;
           });
-          if (!hit) { best = { x: x + bw / 2, y: y + bh / 2, scale: sc, side: "below" }; break; }
+          if (hit) continue;
+          var cx = x + bw / 2, cy = y + bh / 2;
+          var d = (cx - pref.x) * (cx - pref.x) + (cy - pref.y) * (cy - pref.y);
+          if (d < bestD) { bestD = d; best = { x: cx, y: cy, scale: sc, side: "below" }; }
         }
-        if (best) break;
       }
       if (best) return best;
     }

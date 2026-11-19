@@ -34,6 +34,8 @@
                       only that phrase and what follows is typed
              typePause ms of pause before the typing starts (default 900)
              strike   "a phrase" → after typing, a line crosses it out
+             links    { "phrase": "https://…" } → that phrase becomes a link
+                      (opens in a new tab; tapping it never advances the story)
              id       a name for this text, so a later beat can replace it
              into     "id" → this text takes the place of that earlier text
              then     beats that start BY THEMSELVES when the typing ends
@@ -159,6 +161,7 @@ window.STORY = [
     also: [
       { below: true, id: "ny-text", type: "text", style: "body", typing: true, typeFrom: "I was wrong.",
         speed: 60, tilt: 0, gap: 14, delay: 600, strike: "I was wrong.",
+        links: { "Suzanne Rae": "https://suzannerae.com/" },
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
         // right after the crossing-out line: the three screenshots slide up by themselves
         // (in the free space) and stay

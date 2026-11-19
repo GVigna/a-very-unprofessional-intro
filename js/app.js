@@ -262,17 +262,45 @@
     });
   }
 
+  // write `shown` into a text, turning link phrases into links (once fully written)
+  // and, if asked, the strike phrase into a span that can be crossed out
+  function renderInto(inner, shown, beat, withStrike) {
+    var marks = [];
+    Object.keys(beat.links || {}).forEach(function (phrase) {
+      var at = shown.indexOf(phrase);
+      if (at >= 0) marks.push({ at: at, len: phrase.length, href: beat.links[phrase] });
+    });
+    if (withStrike && beat.strike) {
+      var sAt = shown.lastIndexOf(beat.strike);
+      if (sAt >= 0) marks.push({ at: sAt, len: beat.strike.length, strike: true });
+    }
+    marks.sort(function (a, b) { return a.at - b.at; });
+    inner.textContent = "";
+    var pos = 0, strikeEl = null;
+    marks.forEach(function (m) {
+      if (m.at < pos) return;
+      inner.appendChild(document.createTextNode(shown.slice(pos, m.at)));
+      var el;
+      if (m.href) {
+        el = document.createElement("a");
+        el.href = m.href; el.target = "_blank"; el.rel = "noopener";
+      } else {
+        el = document.createElement("span");
+        el.className = "strike";
+        strikeEl = el;
+      }
+      el.textContent = shown.substr(m.at, m.len);
+      inner.appendChild(el);
+      pos = m.at + m.len;
+    });
+    inner.appendChild(document.createTextNode(shown.slice(pos)));
+    return strikeEl;
+  }
+
   // draw a line through one phrase of a text (after a short pause)
   function strikeOut(inner, full, beat) {
-    var phrase = beat.strike, at = full.lastIndexOf(phrase);
-    if (at < 0) return;
-    inner.textContent = "";
-    inner.appendChild(document.createTextNode(full.slice(0, at)));
-    var span = document.createElement("span");
-    span.className = "strike";
-    span.textContent = phrase;
-    inner.appendChild(span);
-    inner.appendChild(document.createTextNode(full.slice(at + phrase.length)));
+    var span = renderInto(inner, full, beat, true);
+    if (!span) return;
     later(function () { span.classList.add("on"); }, reduceMotion ? 0 : (beat.strikeDelay || 600));
   }
 
@@ -298,8 +326,10 @@
         span.textContent = part;
         s.inner.appendChild(span);
       });
+    } else if (beat.typing) {
+      s.inner.textContent = "";
     } else {
-      s.inner.textContent = beat.typing ? "" : (beat.text || "");
+      renderInto(s.inner, beat.text || "", beat, false);
     }
     return s;
   }
@@ -368,7 +398,7 @@
           var from = full.indexOf(beat.typeFrom);
           if (from > 0) {
             i = from;
-            s.inner.textContent = full.slice(0, from);
+            renderInto(s.inner, full.slice(0, from), beat, false);
             pause = beat.typePause != null ? beat.typePause : TYPE_PAUSE; // breath before the typing
           }
         }
@@ -378,13 +408,14 @@
         var typeNext = function () {
           if (item.dead) return;
           i++;
-          s.inner.textContent = full.slice(0, i);
+          renderInto(s.inner, full.slice(0, i), beat, false);
           if (anchored) refit(item);
           else place(item, cx - s.el.offsetWidth / 2, cy - s.el.offsetHeight / 2);
           if (i < full.length) later(typeNext, reduceMotion ? 0 : speed);
           else {
             later(function () { s.inner.classList.remove("caret"); }, beat.strike ? 0 : 1200);
             if (beat.strike) strikeOut(s.inner, full, beat);
+            else renderInto(s.inner, full, beat, false);
             playThen(beat, item);
           }
         };
@@ -698,7 +729,7 @@
   // ======================================================================
   stage.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 && e.pointerType === "mouse") return;
-    if (e.target.closest(".sound")) return; // let the button do its job
+    if (e.target.closest(".sound, a")) return; // let buttons and links do their job
     var itemEl = e.target.closest(".item");
 
     // a second finger lands: cancel any pending tap (no accidental reveals)

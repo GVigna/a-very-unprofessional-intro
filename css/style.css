@@ -405,6 +405,16 @@ body {
   pointer-events: none;
 }
 
+/* links inside texts */
+.item.text a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
 /* text colour override */
 .item.text.color-secondary .inner { color: var(--secondary); }
 .item.text.color-primary .inner { color: var(--primary); }

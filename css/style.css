@@ -406,8 +406,8 @@ body {
 }
 
 /* text colour override */
-.item.color-secondary .inner { color: var(--secondary); }
-.item.color-primary .inner { color: var(--primary); }
+.item.text.color-secondary .inner { color: var(--secondary); }
+.item.text.color-primary .inner { color: var(--primary); }
 
 /* =========================================================
    FIXED CONTROLS

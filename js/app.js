@@ -155,7 +155,7 @@
       vid.src = spec.src;
       if (spec.poster) vid.poster = spec.poster;
       vid.muted = true; vid.defaultMuted = true;          // never any sound
-      vid.loop = true; vid.autoplay = !reduceMotion;
+      vid.loop = spec.loop !== false; vid.autoplay = !reduceMotion;   // loop: false → plays once, stops on the last frame
       vid.playsInline = true;
       vid.setAttribute("muted", ""); vid.setAttribute("playsinline", "");
       vid.preload = "auto";

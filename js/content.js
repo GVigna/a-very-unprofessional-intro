@@ -63,6 +63,7 @@
 
    "video"   src: "file.mp4" → a real video: muted, loops, plays inline
              poster: "file.jpg" → still frame shown while it loads
+             loop: false → plays once and stops on the last frame
              sound: true → tries to play WITH audio; if the browser blocks it,
                      it plays muted with a small SOUND ON button
              subs: [{ from: 2.0, to: 4.5, text: "…" }] → subtitles (seconds)
@@ -160,9 +161,9 @@ window.STORY = [
         speed: 60, tilt: 0, gap: 14, delay: 600, strike: "I was wrong.",
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
         // right after the crossing-out line: the three screenshots slide up by themselves
-        // (in the free space); they stay until the next tap, then slide away
+        // (in the free space) and stay
         then: [
-          { free: true, type: "stack", size: "m", interval: 900, lifespan: 1, delay: 1200,
+          { free: true, type: "stack", size: "m", interval: 900, delay: 1200,
             photos: [
               { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
               { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06
@@ -179,6 +180,7 @@ window.STORY = [
     then: [
       { free: true, type: "video", src: "media/02_CAPITOLO_2/girls.mp4", poster: "media/02_CAPITOLO_2/girls_poster.jpg",
         ratio: 16 / 9, size: "l", tilt: 0, delay: 300,
+        loop: false,          // plays once (with its sound), then stops on the last frame
         sound: true,          // tries to play with audio; if the browser blocks it → muted + SOUND ON button
         subs: [               // subtitles (seconds from the start of the clip)
           { from: 1,  to: 3,  text: "I don't wanna freak you out" },

@@ -17,6 +17,7 @@
                at: [x, y]      → fixed spot, as a share of the screen
                free: true      → goes in the free space around the texts
                                  (shrinks if needed, never covers them)
+               free: "all"     → avoids texts AND photos/videos already there
                below: true     → stuck right under the main item (left-aligned)
                above: true     → stuck right above it
                gap: px         space from the main item (with below/above)
@@ -181,7 +182,7 @@ window.STORY = [
   { type: "text", into: "ny-text", style: "body", typing: true, typeFrom: "Main character syndrome", speed: 45, tilt: 0,
     text: "Stumbled upon the set of Girls on my way to work.\nMain character syndrome, basically.",
     then: [
-      { free: true, type: "video", src: "media/02_CAPITOLO_2/girls.mp4", poster: "media/02_CAPITOLO_2/girls_poster.jpg",
+      { free: "all", type: "video", src: "media/02_CAPITOLO_2/girls.mp4", poster: "media/02_CAPITOLO_2/girls_poster.jpg",
         ratio: 16 / 9, size: "l", tilt: 0, delay: 300,
         loop: false,          // plays once (with its sound), then stops on the last frame
         sound: true,          // tries to play with audio; if the browser blocks it → muted + SOUND ON button

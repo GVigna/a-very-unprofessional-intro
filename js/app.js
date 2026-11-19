@@ -646,12 +646,41 @@
     });
   }
 
+  function mediaRects() {
+    return live.filter(function (it) {
+      return it.el.classList.contains("media") && !it.dead;
+    }).map(function (it) {
+      return { l: it.x, t: it.y, r: it.x + it.el.offsetWidth, b: it.y + it.el.offsetHeight };
+    });
+  }
+
+  // avoid EVERYTHING on screen: scan the screen for the biggest size that fits
+  // without touching any text or photo (falls back to the text-only method)
+  function clearSpot(w, h, rects) {
+    var v = viewport(), m = 12, top = EDGE + 30;
+    for (var sc = 1; sc >= 0.4; sc -= 0.05) {
+      var bw = w * sc, bh = h * sc, best = null;
+      for (var y = top; y + bh <= v.h - EDGE; y += 12) {
+        for (var x = EDGE; x + bw <= v.w - EDGE; x += 12) {
+          var hit = rects.some(function (r) {
+            return x < r.r + m && x + bw > r.l - m && y < r.b + m && y + bh > r.t - m;
+          });
+          if (!hit) { best = { x: x + bw / 2, y: y + bh / 2, scale: sc, side: "below" }; break; }
+        }
+        if (best) break;
+      }
+      if (best) return best;
+    }
+    return null;
+  }
+
   function freeSpotFor(beat) {
     var spec = beat.photos ? beat.photos[0] : beat;
     var ratio = spec.ratio || 1;
     var w = mediaWidth(beat.size || spec.size || "m", ratio, spec.scale);
     var h = w / ratio;
-    var f = freeSpot(w, h, textRects());
+    var f = (beat.free === "all" && clearSpot(w, h, textRects().concat(mediaRects())))
+            || freeSpot(w, h, textRects());
     beat._fit = f.scale;
     beat._side = f.side;
     return f;

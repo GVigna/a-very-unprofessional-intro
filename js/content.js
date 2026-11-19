@@ -185,7 +185,7 @@ window.STORY = [
     text: "Stumbled upon the set of Girls on my way to work.\nMain character syndrome, basically.",
     then: [
       { free: "all", type: "video", src: "media/02_CAPITOLO_2/girls.mp4", poster: "media/02_CAPITOLO_2/girls_poster.jpg",
-        ratio: 16 / 9, size: "l", tilt: 0, delay: 300,
+        ratio: 16 / 9, size: "l", tilt: -3, delay: 300,
         loop: false,          // plays once (with its sound), then stops on the last frame
         sound: true,          // tries to play with audio; if the browser blocks it → muted + SOUND ON button
         subs: [               // subtitles (seconds from the start of the clip)

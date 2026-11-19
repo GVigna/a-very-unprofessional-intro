@@ -300,6 +300,13 @@
   // a little mouse cursor that glides onto the first link of a text, clicks twice, fades away
   // pixel-art arrow (black outline, white fill), drawn square by square
   var CURSOR_SVG = '<svg viewBox="0 0 11 17" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="1" height="1" fill="#000"/><rect x="0" y="1" width="1" height="1" fill="#000"/><rect x="1" y="1" width="1" height="1" fill="#000"/><rect x="0" y="2" width="1" height="1" fill="#000"/><rect x="1" y="2" width="1" height="1" fill="#FFF"/><rect x="2" y="2" width="1" height="1" fill="#000"/><rect x="0" y="3" width="1" height="1" fill="#000"/><rect x="1" y="3" width="1" height="1" fill="#FFF"/><rect x="2" y="3" width="1" height="1" fill="#FFF"/><rect x="3" y="3" width="1" height="1" fill="#000"/><rect x="0" y="4" width="1" height="1" fill="#000"/><rect x="1" y="4" width="1" height="1" fill="#FFF"/><rect x="2" y="4" width="1" height="1" fill="#FFF"/><rect x="3" y="4" width="1" height="1" fill="#FFF"/><rect x="4" y="4" width="1" height="1" fill="#000"/><rect x="0" y="5" width="1" height="1" fill="#000"/><rect x="1" y="5" width="1" height="1" fill="#FFF"/><rect x="2" y="5" width="1" height="1" fill="#FFF"/><rect x="3" y="5" width="1" height="1" fill="#FFF"/><rect x="4" y="5" width="1" height="1" fill="#FFF"/><rect x="5" y="5" width="1" height="1" fill="#000"/><rect x="0" y="6" width="1" height="1" fill="#000"/><rect x="1" y="6" width="1" height="1" fill="#FFF"/><rect x="2" y="6" width="1" height="1" fill="#FFF"/><rect x="3" y="6" width="1" height="1" fill="#FFF"/><rect x="4" y="6" width="1" height="1" fill="#FFF"/><rect x="5" y="6" width="1" height="1" fill="#FFF"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="0" y="7" width="1" height="1" fill="#000"/><rect x="1" y="7" width="1" height="1" fill="#FFF"/><rect x="2" y="7" width="1" height="1" fill="#FFF"/><rect x="3" y="7" width="1" height="1" fill="#FFF"/><rect x="4" y="7" width="1" height="1" fill="#FFF"/><rect x="5" y="7" width="1" height="1" fill="#FFF"/><rect x="6" y="7" width="1" height="1" fill="#FFF"/><rect x="7" y="7" width="1" height="1" fill="#000"/><rect x="0" y="8" width="1" height="1" fill="#000"/><rect x="1" y="8" width="1" height="1" fill="#FFF"/><rect x="2" y="8" width="1" height="1" fill="#FFF"/><rect x="3" y="8" width="1" height="1" fill="#FFF"/><rect x="4" y="8" width="1" height="1" fill="#FFF"/><rect x="5" y="8" width="1" height="1" fill="#FFF"/><rect x="6" y="8" width="1" height="1" fill="#FFF"/><rect x="7" y="8" width="1" height="1" fill="#FFF"/><rect x="8" y="8" width="1" height="1" fill="#000"/><rect x="0" y="9" width="1" height="1" fill="#000"/><rect x="1" y="9" width="1" height="1" fill="#FFF"/><rect x="2" y="9" width="1" height="1" fill="#FFF"/><rect x="3" y="9" width="1" height="1" fill="#FFF"/><rect x="4" y="9" width="1" height="1" fill="#FFF"/><rect x="5" y="9" width="1" height="1" fill="#FFF"/><rect x="6" y="9" width="1" height="1" fill="#FFF"/><rect x="7" y="9" width="1" height="1" fill="#FFF"/><rect x="8" y="9" width="1" height="1" fill="#FFF"/><rect x="9" y="9" width="1" height="1" fill="#000"/><rect x="0" y="10" width="1" height="1" fill="#000"/><rect x="1" y="10" width="1" height="1" fill="#FFF"/><rect x="2" y="10" width="1" height="1" fill="#FFF"/><rect x="3" y="10" width="1" height="1" fill="#FFF"/><rect x="4" y="10" width="1" height="1" fill="#FFF"/><rect x="5" y="10" width="1" height="1" fill="#FFF"/><rect x="6" y="10" width="1" height="1" fill="#000"/><rect x="7" y="10" width="1" height="1" fill="#000"/><rect x="8" y="10" width="1" height="1" fill="#000"/><rect x="9" y="10" width="1" height="1" fill="#000"/><rect x="10" y="10" width="1" height="1" fill="#000"/><rect x="0" y="11" width="1" height="1" fill="#000"/><rect x="1" y="11" width="1" height="1" fill="#FFF"/><rect x="2" y="11" width="1" height="1" fill="#FFF"/><rect x="3" y="11" width="1" height="1" fill="#000"/><rect x="4" y="11" width="1" height="1" fill="#FFF"/><rect x="5" y="11" width="1" height="1" fill="#FFF"/><rect x="6" y="11" width="1" height="1" fill="#000"/><rect x="0" y="12" width="1" height="1" fill="#000"/><rect x="1" y="12" width="1" height="1" fill="#FFF"/><rect x="2" y="12" width="1" height="1" fill="#000"/><rect x="4" y="12" width="1" height="1" fill="#000"/><rect x="5" y="12" width="1" height="1" fill="#FFF"/><rect x="6" y="12" width="1" height="1" fill="#FFF"/><rect x="7" y="12" width="1" height="1" fill="#000"/><rect x="0" y="13" width="1" height="1" fill="#000"/><rect x="1" y="13" width="1" height="1" fill="#000"/><rect x="4" y="13" width="1" height="1" fill="#000"/><rect x="5" y="13" width="1" height="1" fill="#FFF"/><rect x="6" y="13" width="1" height="1" fill="#FFF"/><rect x="7" y="13" width="1" height="1" fill="#000"/><rect x="0" y="14" width="1" height="1" fill="#000"/><rect x="5" y="14" width="1" height="1" fill="#000"/><rect x="6" y="14" width="1" height="1" fill="#FFF"/><rect x="7" y="14" width="1" height="1" fill="#FFF"/><rect x="8" y="14" width="1" height="1" fill="#000"/><rect x="5" y="15" width="1" height="1" fill="#000"/><rect x="6" y="15" width="1" height="1" fill="#FFF"/><rect x="7" y="15" width="1" height="1" fill="#FFF"/><rect x="8" y="15" width="1" height="1" fill="#000"/><rect x="6" y="16" width="1" height="1" fill="#000"/><rect x="7" y="16" width="1" height="1" fill="#000"/></svg>';
+  function maybeHint(item, inner, beat, delay) {
+    if (item.hinted || !beat.links || beat.linkHint === false) return;
+    if (!inner.querySelector("a")) return;          // the link isn't complete yet
+    item.hinted = true;
+    cursorHint(item, inner, delay);
+  }
+
   function cursorHint(item, inner, delay) {
     if (reduceMotion) return;
     later(function () {
@@ -397,7 +404,7 @@
         if (anchor) place(item, item.x, item.y); // keep it on screen at its final size
       }
       if (!beat.typing && beat.strike) strikeOut(s.inner, beat.text || "", beat);
-      if (!beat.typing && beat.links && beat.linkHint !== false) cursorHint(item, s.inner, 1200);
+      if (!beat.typing) maybeHint(item, s.inner, beat, 400);
       if (beat.lines) {
         var lines = s.inner.querySelectorAll(".line");
         var lgap = reduceMotion ? 0 : (beat.speed || 650);
@@ -420,6 +427,7 @@
           if (from > 0) {
             i = from;
             renderInto(s.inner, full.slice(0, from), beat, false);
+            later(function () { maybeHint(item, s.inner, beat, 250); }, 0);
             pause = beat.typePause != null ? beat.typePause : TYPE_PAUSE; // breath before the typing
           }
         }
@@ -430,6 +438,7 @@
           if (item.dead) return;
           i++;
           renderInto(s.inner, full.slice(0, i), beat, false);
+          maybeHint(item, s.inner, beat, 150);
           if (anchored) refit(item);
           else place(item, cx - s.el.offsetWidth / 2, cy - s.el.offsetHeight / 2);
           if (i < full.length) later(typeNext, reduceMotion ? 0 : speed);
@@ -437,8 +446,7 @@
             later(function () { s.inner.classList.remove("caret"); }, beat.strike ? 0 : 1200);
             if (beat.strike) strikeOut(s.inner, full, beat);
             else renderInto(s.inner, full, beat, false);
-            if (beat.links && beat.linkHint !== false)
-              cursorHint(item, s.inner, beat.strike ? (beat.strikeDelay || 600) + 900 : 700);
+            maybeHint(item, s.inner, beat, 300);
             playThen(beat, item);
           }
         };

@@ -197,9 +197,9 @@ window.STORY = [
   },
 
   /* ===== CHAPTER 3 — LONDON ===== */
-  // tap: everything goes, "2013 London" + the Queen meme (in the free space)
+  // tap: everything goes, "London" + the Queen meme (in the free space)
   { clear: true,
-    type: "text", text: "2013 London", style: "big", tilt: 0,
+    type: "text", text: "London", style: "big", tilt: 0,
     also: [
       { free: true, type: "image", src: "media/03_CAPITOLO_3/queen_meme.webp", ratio: 1.5873,
         size: "m", delay: 450 }

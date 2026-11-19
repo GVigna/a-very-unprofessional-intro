@@ -610,7 +610,7 @@
           x = item.x + item.el.offsetWidth / 2;
           y = item.y + item.el.offsetHeight + unit * 0.35;
         }
-        playBeat(next, x, y, step);
+        playBeat(next, x, y, step - 1); // counts as part of the tap that started it
       }, reduceMotion ? 0 : (next.delay || 0));
     });
   }

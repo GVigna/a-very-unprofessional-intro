@@ -158,18 +158,20 @@ window.STORY = [
     also: [
       { below: true, id: "ny-text", type: "text", style: "body", typing: true, typeFrom: "I was wrong.",
         speed: 60, tilt: 0, gap: 14, delay: 600, strike: "I was wrong.",
-        text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong." }
+        text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
+        // right after the crossing-out line: the three screenshots slide up by themselves
+        // (in the free space); they stay until the next tap, then slide away
+        then: [
+          { free: true, type: "stack", size: "m", interval: 900, lifespan: 1, delay: 1200,
+            photos: [
+              { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
+              { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06
+              { src: "media/02_CAPITOLO_2/ny_02.webp", ratio: 0.6667 }    // 2013-09-16 15.22.02
+          ]}
+        ]
+      }
     ]
   },
-
-  // tap: three screenshots slide up one on top of the other (in the free space);
-  //      they stay until the next tap, then slide away
-  { free: true, type: "stack", size: "m", interval: 900, lifespan: 1,
-    photos: [
-      { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
-      { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06
-      { src: "media/02_CAPITOLO_2/ny_02.webp", ratio: 0.6667 }    // 2013-09-16 15.22.02
-  ]},
 
   // tap: the small text becomes something else, then the video appears by itself
   { type: "text", into: "ny-text", style: "body", typing: true, typeFrom: "Main character syndrome", speed: 45, tilt: 0,

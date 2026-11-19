@@ -94,7 +94,7 @@ window.INTRO = {
   gap: 18,            // px between lines
   items: [
     { type: "text", style: "title", align: "center", tilt: 0,
-      text: "A VERY UNPROFESSIONAL INTRODUCTION TO MY PROFESSIONAL LIFE." },
+      text: "A VERY UNPROFESSIONAL INTRO TO MY PROFESSIONAL LIFE." },
     { type: "text", style: "sub", align: "center", tilt: 0,
       text: "Click and drag anywhere. Things might get weird." }
   ]

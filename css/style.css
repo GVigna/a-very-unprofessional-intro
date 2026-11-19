@@ -306,10 +306,12 @@ body {
 }
 
 @keyframes wash-loop {
-  0%, 10%   { -webkit-mask-position: 0 100%; mask-position: 0 100%; animation-timing-function: cubic-bezier(.45,0,.55,1); }
-  42%, 62%  { -webkit-mask-position: 0 0;    mask-position: 0 0;    animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  0%, 18%   { -webkit-mask-position: 0 100%; mask-position: 0 100%; animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  46%, 64%  { -webkit-mask-position: 0 0;    mask-position: 0 0;    animation-timing-function: cubic-bezier(.45,0,.55,1); }
   94%, 100% { -webkit-mask-position: 0 100%; mask-position: 0 100%; }
 }
+/* photo hidden until its coloured silhouette is ready */
+.inner.waiting .pic, .inner.waiting .wash { visibility: hidden; }
 @keyframes wash-once {
   0%, 15% { -webkit-mask-position: 0 100%; mask-position: 0 100%; animation-timing-function: cubic-bezier(.45,0,.55,1); }
   100%    { -webkit-mask-position: 0 0;    mask-position: 0 0; }

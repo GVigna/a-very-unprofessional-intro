@@ -223,8 +223,20 @@
     wash.style.setProperty("--wash", r.color || "var(--primary)");
     if (r.duration) wash.style.animationDuration = r.duration + "ms";
     if (r.mask) {
-      // a ready-made silhouette image (e.g. blocky/pixel edges), already in its colour
-      wash.appendChild(makeImg(r.mask, "mask"));
+      // a ready-made silhouette image (e.g. blocky/pixel edges), already in its colour.
+      // Until it has loaded, the photo stays hidden: it must always START orange.
+      var m = makeImg(r.mask, "mask");
+      wash.appendChild(m);
+      if (!m.complete) {
+        s.inner.classList.add("waiting");
+        var ready = function () {
+          s.inner.classList.remove("waiting");
+          wash.style.animation = "none"; void wash.offsetWidth; wash.style.animation = ""; // restart from orange
+          if (r.duration) wash.style.animationDuration = r.duration + "ms";
+        };
+        m.addEventListener("load", ready);
+        m.addEventListener("error", ready);
+      }
     } else if (r.cutout !== false) {
       // silhouette: the same image, pushed out of the box, casting a coloured shadow back in
       var sil = makeImg(spec.src, "sil");
@@ -764,6 +776,7 @@
   function preload(list) {
     (list || []).forEach(function (b) {
       if (b.src) new Image().src = b.src;
+      if (b.reveal && b.reveal.mask) new Image().src = b.reveal.mask;
       preload(b.photos); preload(b.also); preload(b.then);
     });
   }

@@ -425,7 +425,7 @@ body {
 .ui {
   position: fixed;
   z-index: 100000;
-  font: 700 12px/1 var(--font);
+  font: 700 clamp(15px, 4vw, 21px)/1 var(--font);   /* same size as the body texts */
   letter-spacing: 0.06em;
   color: var(--secondary);
 }

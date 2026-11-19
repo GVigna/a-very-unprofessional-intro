@@ -1,0 +1,474 @@
+/* =========================================================
+   THEME
+   ========================================================= */
+:root {
+  /* COLOURS — change them here, they update everywhere */
+  --primary: #7D00FF;    /* violet: main texts, big words, my chat bubbles */
+  --secondary: #FF5500;  /* orange: small texts, counter, restart, hints */
+  --bg: #FFFFFF;
+
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --edge: 8px; /* minimum gap between items and the screen edge */
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+
+/* =========================================================
+   NO SCROLL, EVER
+   ========================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+  color: var(--primary);
+  font-family: var(--font);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  position: fixed;   /* stops iOS rubber-band scrolling */
+  inset: 0;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: none;       /* we handle all gestures ourselves */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: crosshair;
+  outline: none;
+}
+#stage:focus-visible { box-shadow: inset 0 0 0 3px var(--primary); }
+
+/* =========================================================
+   ITEMS
+   .item   = position (moved by JS with translate)
+   .inner  = tilt + appear animation
+   ========================================================= */
+.item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  touch-action: none;
+  cursor: grab;
+  will-change: transform;
+}
+.item.dragging { cursor: grabbing; }
+
+.inner {
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: center;
+  animation: pop-in 420ms cubic-bezier(.2, 1.6, .4, 1) both;
+  transition: transform 160ms ease;
+}
+.item.dragging .inner {
+  transform: rotate(var(--tilt, 0deg)) scale(1.04);
+}
+.item.leaving .inner {
+  animation: pop-out 320ms ease-in forwards;
+}
+
+/* text beats */
+.item.text .inner {
+  font-size: clamp(18px, 4.6vw, 30px);
+  line-height: 1.05;
+  font-weight: 700;
+  white-space: pre-line;
+  max-width: min(80vw, 520px);
+  padding: 2px 4px;
+}
+.item.text.big .inner {
+  font-size: clamp(34px, 11vw, 96px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  max-width: 90vw;
+}
+.item.text.small .inner {
+  font-size: clamp(13px, 3.4vw, 16px);
+  font-weight: 400;
+  color: var(--secondary);
+}
+
+/* image / video placeholders */
+.item.media .inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--fill, #ddd);
+  overflow: hidden;
+}
+.media .tag {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.media .tag small { font-weight: 400; opacity: .7; }
+
+/* video placeholder extras: play triangle + looping progress bar */
+.video .play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-35%, -50%);
+  border-style: solid;
+  border-width: 16px 0 16px 26px;
+  border-color: transparent transparent transparent var(--primary);
+}
+.video .bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: var(--secondary);
+  transform-origin: left;
+  animation: loop-bar 4s linear infinite;
+}
+
+/* typed text: blinking caret while typing */
+.inner.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.08em;
+  height: 0.9em;
+  margin-left: 0.05em;
+  vertical-align: -0.08em;
+  background: var(--primary);
+  animation: blink 0.8s steps(2, start) infinite;
+}
+
+/* burst photos: snappier entrance, quicker exit */
+.item.quick .inner { animation-duration: 260ms; }
+.item.leaving-fast .inner { animation: pop-out 200ms ease-in forwards; }
+
+/* chat */
+.item.chat .inner {
+  width: min(78vw, 320px);
+  padding: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 14px;
+  font-size: clamp(14px, 3.8vw, 16px);
+  line-height: 1.25;
+}
+.chat-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 0 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--secondary);
+  color: var(--secondary);
+}
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bubble {
+  max-width: 80%;
+  padding: 7px 11px;
+  border-radius: 16px;
+  word-wrap: break-word;
+  animation: bubble-in 240ms cubic-bezier(.2, 1.5, .4, 1) both;
+}
+.bubble.them {
+  align-self: flex-start;
+  color: var(--secondary);
+  border: 1.5px solid var(--secondary);
+  border-bottom-left-radius: 4px;
+}
+.bubble.me {
+  align-self: flex-end;
+  background: var(--primary);
+  color: var(--bg);
+  border-bottom-right-radius: 4px;
+}
+.bubble.dots { display: flex; gap: 4px; padding: 10px 12px; }
+.bubble.dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dot 1s ease-in-out infinite;
+}
+.bubble.dots i:nth-child(2) { animation-delay: .15s; }
+.bubble.dots i:nth-child(3) { animation-delay: .3s; }
+
+/* intro title: big but a bit smaller than "big" so the whole title fits */
+.item.text.title .inner {
+  font-size: clamp(30px, 8.6vw, 76px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  max-width: min(90vw, 1000px);
+}
+
+/* subtitle under the title: orange, readable */
+.item.text.sub .inner {
+  font-size: clamp(16px, 4.4vw, 24px);
+  font-weight: 500;
+  color: var(--secondary);
+}
+.item.align-center .inner { text-align: center; }
+
+/* body copy: regular weight, comfortable reading width */
+.item.text.body .inner {
+  font-size: clamp(15px, 4vw, 21px);
+  font-weight: 400;
+  line-height: 1.25;
+  max-width: min(82vw, 460px);
+}
+/* small orange note, e.g. a year */
+.item.text.note .inner {
+  font-size: clamp(13px, 3.4vw, 16px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+}
+
+/* lines that appear one at a time */
+.line { display: block; visibility: hidden; }
+.line.on { visibility: visible; }
+
+/* words that appear one at a time */
+.word { visibility: hidden; }
+.word.on { visibility: visible; }
+
+/* real photos */
+.item.photo .inner { position: relative; width: 100%; height: 100%; overflow: hidden; background: none; }
+.item.photo img {
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+.item.photo .pic { width: 100%; height: 100%; object-fit: cover; }
+.item.polaroid .inner {
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 4px 14px rgba(0,0,0,.14);
+}
+.item.pixelated img { image-rendering: pixelated; image-rendering: crisp-edges; image-rendering: pixelated; }
+
+/* REVEAL — the colour wash that slides off the photo and back, like the GANNI gif.
+   The mask is a soft-edged gradient twice the photo's height that slides up/down. */
+.wash {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 45.45%, #000 54.55%);
+          mask-image: linear-gradient(to bottom, transparent 45.45%, #000 54.55%);
+  -webkit-mask-size: 100% 220%;   /* soft edge = 20% of the photo, fully off-photo at both ends */
+          mask-size: 100% 220%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: 0 100%;
+          mask-position: 0 100%;
+  animation: wash-loop 4.5s infinite;
+}
+.wash.once { animation-name: wash-once; animation-duration: 1.6s; animation-iteration-count: 1; animation-fill-mode: forwards; }
+.wash.solid { background: var(--wash); }
+.wash .mask {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+.wash .sil {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: drop-shadow(var(--w) 0 0 var(--wash));
+}
+
+@keyframes wash-loop {
+  0%, 10%   { -webkit-mask-position: 0 100%; mask-position: 0 100%; animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  42%, 62%  { -webkit-mask-position: 0 0;    mask-position: 0 0;    animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  94%, 100% { -webkit-mask-position: 0 100%; mask-position: 0 100%; }
+}
+@keyframes wash-once {
+  0%, 15% { -webkit-mask-position: 0 100%; mask-position: 0 100%; animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  100%    { -webkit-mask-position: 0 0;    mask-position: 0 0; }
+}
+
+/* strike-through: a line drawn across a phrase */
+.strike { position: relative; }
+.strike::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 52%;
+  height: 0.1em;
+  min-height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.strike.on::after { animation: strike 420ms cubic-bezier(.6,0,.3,1) forwards; }
+@keyframes strike { to { transform: scaleX(1); } }
+
+/* STACK — photos slide up from below in stop-motion steps, then leave upwards */
+.item.stacked .inner { animation: stack-in 760ms both; }
+.item.leaving-stack .inner { animation: stack-out 640ms both; }
+@keyframes stack-in {
+  0%   { transform: translateY(110vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  14%  { transform: translateY(62vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  28%  { transform: translateY(32vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  42%  { transform: translateY(14vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  56%  { transform: translateY(5vh)   rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  70%  { transform: translateY(1.5vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  84%, 100% { transform: translateY(0) rotate(var(--tilt)); }
+}
+@keyframes stack-out {
+  0%   { transform: translateY(0)      rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  16%  { transform: translateY(-1.5vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  32%  { transform: translateY(-6vh)   rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  48%  { transform: translateY(-18vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  64%  { transform: translateY(-40vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  80%  { transform: translateY(-75vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  100% { transform: translateY(-130vh) rotate(var(--tilt)); }
+}
+
+/* stack variants: arrive from the top / leave downwards (away from the texts) */
+.item.stacked.from-top .inner { animation-name: stack-in-top; }
+.item.leaving-stack.down .inner { animation-name: stack-out-down; }
+@keyframes stack-in-top {
+  0%   { transform: translateY(-110vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  14%  { transform: translateY(-62vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  28%  { transform: translateY(-32vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  42%  { transform: translateY(-14vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  56%  { transform: translateY(-5vh)   rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  70%  { transform: translateY(-1.5vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  84%, 100% { transform: translateY(0) rotate(var(--tilt)); }
+}
+@keyframes stack-out-down {
+  0%   { transform: translateY(0)     rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  16%  { transform: translateY(1.5vh) rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  32%  { transform: translateY(6vh)   rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  48%  { transform: translateY(18vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  64%  { transform: translateY(40vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  80%  { transform: translateY(75vh)  rotate(var(--tilt)); animation-timing-function: steps(1, end); }
+  100% { transform: translateY(130vh) rotate(var(--tilt)); }
+}
+
+/* video: sound button + subtitles */
+.sound {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  padding: 6px 8px;
+  border: 0;
+  background: var(--secondary);
+  color: #FFFFFF;
+  font: 700 11px/1 var(--font);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.subs {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 8%;
+  text-align: center;
+  font: 700 clamp(12px, 3.4vw, 18px)/1.2 var(--font);
+  color: #FFFFFF;
+  text-shadow: 0 0 4px rgba(0,0,0,.9), 0 1px 2px rgba(0,0,0,.9);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* text colour override */
+.item.color-secondary .inner { color: var(--secondary); }
+.item.color-primary .inner { color: var(--primary); }
+
+/* =========================================================
+   FIXED CONTROLS
+   ========================================================= */
+.ui {
+  position: fixed;
+  z-index: 100000;
+  font: 700 12px/1 var(--font);
+  letter-spacing: 0.06em;
+  color: var(--secondary);
+}
+.ui-progress {
+  top: calc(var(--safe-t) + 12px);
+  left: calc(var(--safe-l) + 12px);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.ui-progress.bump { animation: bump 300ms ease; }
+.ui-restart {
+  top: calc(var(--safe-t) + 4px);
+  right: calc(var(--safe-r) + 4px);
+  padding: 8px;               /* bigger tap target than it looks */
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ui-restart:hover, .ui-restart:focus-visible { text-decoration: underline; outline: none; }
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+@keyframes pop-in {
+  0%   { opacity: 0; transform: rotate(calc(var(--tilt, 0deg) * -2)) scale(.3); }
+  100% { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+}
+@keyframes pop-out {
+  0%   { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+  30%  { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1.08); }
+  100% { opacity: 0; transform: rotate(calc(var(--tilt, 0deg) + 12deg)) scale(.2); }
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(6px) scale(.85); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes loop-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes blink { to { visibility: hidden; } }
+@keyframes bump {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wash { display: none; }
+  .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .bubble,
+  .bubble.dots i, .inner.caret::after, .video .bar, .ui-progress.bump {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .inner { transition: none; }
+}

@@ -123,7 +123,7 @@ window.STORY = [
         text: "At 18, I decided to study Fashion Design at IED in Rome.\nI learned a lot.\nSome of it I even remember.",
         // as soon as the typing ends: burst of IED photos (no tap needed), then they vanish
         then: [
-          { type: "burst", size: "s", speed: 190, spread: 0.45, vanish: 350, delay: 400, photos: [
+          { type: "burst", size: "s", speed: 110, spread: 0.45, vanish: 350, delay: 400, photos: [
               { src: "media/01_CAPITOLO_1/ied_01.webp", ratio: 1.3387 },
               { src: "media/01_CAPITOLO_1/ied_02.webp", ratio: 1.3387 },
               { src: "media/01_CAPITOLO_1/ied_03.webp", ratio: 0.747 },

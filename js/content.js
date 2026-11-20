@@ -5,6 +5,8 @@
 
    COMMON OPTIONS (any beat)
    clear     true → this tap first wipes everything off the screen
+   bg        "var(--primary)" / "#hex" → the whole page changes colour
+             (stays until another bg, or RESTART)
    free      true → placed in the free space instead of at the tap
              (photos/videos/stacks: around the texts; texts: around everything)
    tilt      rotation in degrees. Omit for a small random tilt, 0 for straight.
@@ -29,7 +31,7 @@
              style    "title" | "big" | "sub" | "body" | "note" | "small"
                       (default: normal bold)
              align    "center" → centred lines
-             color    "secondary" (orange) | "primary" (violet)
+             color    "secondary" (orange) | "primary" (violet) | "white"
              boxed    true → white label behind (readable on top of images)
              bold     ["phrase", …] → those phrases in bold
              typing   true → typed out letter by letter (speed: ms per letter)
@@ -293,6 +295,16 @@ window.STORY = [
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
         text: "Turns out, fashion isn't exactly sustainable.\nAnd that has always mattered to me.\n\n15 years vegetarian. (Yes, I know I should probably go vegan.)\n\nDoing my best. 😮‍💨" }
+    ]
+  },
+
+  /* ===== 2016 — BACK TO ITALY ===== */
+  // tap: everything goes, the whole page turns violet
+  { clear: true, bg: "var(--primary)",
+    type: "text", text: "2016", style: "big", color: "white", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", color: "white", typing: true, speed: 50, tilt: 0, gap: 14, delay: 500,
+        text: "Ok I'm done, time to go back to Italy" }
     ]
   },
 

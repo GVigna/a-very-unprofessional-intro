@@ -22,6 +22,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
+  background: var(--page, var(--bg)) !important;
+  transition: background-color .35s ease;
   margin: 0;
   width: 100%;
   height: 100%;
@@ -540,6 +542,9 @@ strong { font-weight: 800; }
 /* text colour override */
 .item.text.color-secondary .inner { color: var(--secondary); }
 .item.text.color-primary .inner { color: var(--primary); }
+.item.text.color-white .inner { color: #FFFFFF; }
+body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns white */
+.item.text.color-white .inner.caret::after { background: #FFFFFF; }
 
 /* =========================================================
    FIXED CONTROLS

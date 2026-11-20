@@ -774,6 +774,9 @@
 
     var beat = STORY[step];
 
+    // "bg": change the whole background colour (stays until another bg or restart)
+    if (beat.bg) setBg(beat.bg);
+
     // "clear": wipe the screen (intro included) before this beat
     if (beat.clear) {
       live.slice().forEach(function (it) { removeItem(it); });
@@ -986,7 +989,14 @@
     setTimeout(function () { item.el.remove(); }, reduceMotion ? 0 : ms);
   }
 
+  function setBg(color) {
+    if (color === "default") document.documentElement.style.removeProperty("--page");
+    else document.documentElement.style.setProperty("--page", color);
+    document.body.classList.toggle("dark-page", color !== "default");
+  }
+
   function restart() {
+    setBg("default");
     timers.forEach(clearTimeout);
     timers = [];
     live.forEach(function (item) { item.dead = true; item.el.remove(); });

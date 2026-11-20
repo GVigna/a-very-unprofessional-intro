@@ -385,7 +385,7 @@ window.STORY = [
       "2021  Residency • Viaraffineria & Fondazione Oelle • Catania, Italy",
       "## GRANTS & COMMISSIONS",
       "2024  Corrispondenze • curated by Daniele De Luigi & Chiara Dall'Olio • FMAV Fondazione Modena Arti Visive • Modena • 2024",
-      "2023  Come si fa la marmellata • curated by Associazionbe Arteco & JEST • Pinacoteca G.A. Levis • Chiomonte, TO, Italy",
+      "2023  Come si fa la marmellata • curated by Associazione Arteco & JEST • Pinacoteca G.A. Levis • Chiomonte, TO, Italy",
       "2023  Gli Aspetti Familiari • curated by Anna Catalano • Fotografia Calabria Festival • Fiumefreddo, Italy",
       "2022  13 fotografi per 13 Musei • Committenza Direzione Regionale Musei Lombardia / MUFOCO - Museo di Fotografia Contemporanea",
       "## BOOKS",

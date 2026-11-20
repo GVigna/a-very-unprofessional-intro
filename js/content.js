@@ -160,7 +160,7 @@ window.STORY = [
     ]
   },
 
-  /* ===== CHAPTER 1 — IED / SUMMER JOBS ===== */
+  /* ===== CHAPTER 1 — IED ===== */
   // tap: the screen is wiped, then the IED block appears
   { clear: true,
     type: "text", text: "IED Fashion School", style: "big", tilt: 0,
@@ -168,9 +168,9 @@ window.STORY = [
       { above: true, type: "text", text: "2010", style: "note", tilt: 0, gap: 6, delay: 350 },
       { below: true, type: "text", style: "body", typing: true, typeFrom: "Some of it", speed: 45, tilt: 0, gap: 14, delay: 700,
         text: "At 18, I decided to study Fashion Design at IED in Rome.\nI learned a lot.\nSome of it I even remember.",
-        // as soon as the typing ends: burst of IED photos (no tap needed), then they vanish
+        // as soon as the typing ends: burst of IED photos (no tap needed); they stay
         then: [
-          { type: "burst", size: "s", speed: 110, spread: 0.45, vanish: 350, delay: 400, photos: [
+          { type: "burst", size: "s", speed: 110, spread: 0.45, delay: 400, photos: [   // they stay
               { src: "media/01_CAPITOLO_1/ied_01.webp", ratio: 1.3387 },
               { src: "media/01_CAPITOLO_1/ied_02.webp", ratio: 1.3387 },
               { src: "media/01_CAPITOLO_1/ied_03.webp", ratio: 0.747 },
@@ -186,18 +186,6 @@ window.STORY = [
     ]
   },
 
-  // tap: summer jobs, with two tiny photos
-  { type: "text", text: "SUMMER JOBS: RESORT ENTERTAINER IN GREECE & EGYPT", tilt: 0, color: "secondary",
-    also: [
-      { below: true, type: "text", style: "body", color: "secondary", tilt: 0, gap: 10, delay: 350,
-        text: "More or less 18 years old.\nIn charge of teenagers aged 14–16.\nSomehow, this involved dancing on tables in Bar Street." },
-      { above: true, type: "image", src: "media/01_CAPITOLO_1/summer_01.webp", ratio: 0.75,
-        size: "xxs", tilt: -5, gap: 12, delay: 800 },
-      { above: true, type: "image", src: "media/01_CAPITOLO_1/summer_02.webp", ratio: 0.7471,
-        size: "xxs", scale: 0.8, tilt: 6, gap: 20, shift: 0.22, delay: 1100 }
-    ]
-  },
-
   /* ===== CHAPTER 2 — NEW YORK ===== */
   // tap: screen wiped → title + text (only "I was wrong." is typed, then crossed out)
   { clear: true,
@@ -209,9 +197,9 @@ window.STORY = [
         // when the little cursor clicks the name: 3 Google-image cards (Vogue) are dealt like a deck
         hintThen: [
           { type: "deck", size: "m", fan: 0.36, interval: 130, cards: [
-              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.79 },
-              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.661 },
-              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.79 }
+              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.7453 },
+              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.6236 },
+              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.7453 }
           ]}
         ],
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
@@ -248,8 +236,8 @@ window.STORY = [
   },
 
   /* ===== CHAPTER 3 — LONDON ===== */
-  // tap: everything goes, "London" + the Queen meme (in the free space)
-  { clear: true,
+  // tap: everything goes, the page turns violet (white texts from here on), "London" + the Queen meme
+  { clear: true, bg: "var(--primary)",
     type: "text", text: "London", style: "big", tilt: 0,
     also: [
       { free: true, type: "image", src: "media/03_CAPITOLO_3/queen_meme.webp", ratio: 1.5873,
@@ -266,23 +254,22 @@ window.STORY = [
   //      then the cities are typed and each one drops its postcard
   { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 300, speed: 35, tilt: 0,
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
-    // once every postcard is in, the cycling part starts by itself (no tap needed)
-    then: [ { advance: true, delay: 1400 } ],
+    // the postcards stay until the next tap
     also: [
       { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
     ],
     // postcards fill the whole page, one per city as it's typed; the text stays on top.
     // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
-        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
           postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
-        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
           postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
-        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
           postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
-        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
           postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
-        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
           postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
     }
   },
@@ -307,7 +294,7 @@ window.STORY = [
     also: [   // the text is there straight away; the giant words scroll underneath
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
-        text: "Turns out, fashion isn't exactly sustainable.\nAnd that has always mattered to me.\n\n15 years vegetarian. (Yes, I know I should probably go vegan.)\n\nDoing my best. 😮‍💨" }
+        text: "Turns out, fashion isn't exactly sustainable. And that has always mattered to me.\n\n15 years vegetarian. (Yes, I know I should probably go vegan.)\n\nDoing my best. 😮‍💨" }
     ]
   },
 

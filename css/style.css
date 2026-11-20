@@ -623,6 +623,11 @@ body:not(.dark-page) .codecol { color: var(--primary); }
 .item.text.color-primary .inner { color: var(--primary); }
 .item.text.color-white .inner { color: #FFFFFF; }
 body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns white */
+/* …and so do texts, the caret and the marquee */
+body.dark-page .item.text:not(.color-secondary) .inner { color: #FFFFFF; }
+body.dark-page .inner.caret::after { background: #FFFFFF; }
+body.dark-page .marquee:not(.color-secondary) { color: #FFFFFF; }
+body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow: 0 0 0 2px #FFFFFF; }
 .item.text.color-white .inner.caret::after { background: #FFFFFF; }
 
 /* =========================================================
@@ -631,7 +636,7 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
 .ui {
   position: fixed;
   z-index: 100000;
-  font: 700 var(--fs-s)/1 var(--font);   /* small size */
+  font: 400 var(--fs-s)/1 var(--font);   /* small size, regular weight */
   letter-spacing: 0.03em;
   color: var(--secondary);
 }

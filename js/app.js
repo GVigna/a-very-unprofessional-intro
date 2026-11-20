@@ -1055,7 +1055,9 @@
       var openAt = reduceMotion ? 0 : 400, openMs = reduceMotion ? 0 : 1300;
       var scrollMs = reduceMotion ? 0 : (beat.scrollTime || 6) * 1000;
       later(function () { s.el.classList.add("open"); }, openAt);
+      if (beat.scroll === false) scrollMs = 0;
       later(function () {                                    // scroll the site to the bottom
+        if (!scrollMs) return;                               // scroll: false → the site just sits there
         var travel = Math.max(0, img.offsetHeight - screen.clientHeight);
         img.style.transition = "transform " + scrollMs + "ms cubic-bezier(.45,0,.55,1)";
         img.style.transform = "translateY(" + (-travel) + "px)";

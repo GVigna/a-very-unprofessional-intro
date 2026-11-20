@@ -422,7 +422,7 @@ window.STORY = [
     // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
       { type: "laptop", delay: 200, image: "media/00_OPENING/giuliavigna_site.webp", alt: "giuliavigna.com scrolling on a laptop",
-        scrollTime: 6,
+        scroll: false, holdEnd: 3500,   // the site stays still, then the lid closes
         // Behance gallery features, as ribbons on the screen
         awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
                   { label: "Xd", bg: "#470137", fg: "#FF61F6" } ] }

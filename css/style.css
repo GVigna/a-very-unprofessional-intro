@@ -439,6 +439,15 @@ body {
   41%, 61% { transform: scale(.82); }
 }
 
+/* DECK — cards fly out of a point and land fanned out */
+.item.card .inner { box-shadow: 0 1px 2px rgba(0,0,0,.14), 0 6px 18px rgba(0,0,0,.16); }
+.item.dealt .inner { animation: deal 520ms cubic-bezier(.2,.9,.25,1.05) both; }
+@keyframes deal {
+  0%   { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)) rotate(0deg) scale(.15); }
+  25%  { opacity: 1; }
+  100% { opacity: 1; transform: rotate(var(--tilt)) scale(1); }
+}
+
 /* text colour override */
 .item.text.color-secondary .inner { color: var(--secondary); }
 .item.text.color-primary .inner { color: var(--primary); }
@@ -501,7 +510,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .wash { display: none; }
-  .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .bubble,
+  .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .item.dealt .inner, .bubble,
   .bubble.dots i, .inner.caret::after, .video .bar, .ui-progress.bump {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;

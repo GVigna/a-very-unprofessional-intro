@@ -304,10 +304,14 @@
     if (item.hinted || !beat.links || beat.linkHint === false) return;
     if (!inner.querySelector("a")) return;          // the link isn't complete yet
     item.hinted = true;
-    cursorHint(item, inner, delay);
+    var at = step - 1;
+    cursorHint(item, inner, delay, beat.hintThen && function (pt) {
+      // things that pop out of the link when the little cursor "clicks" it
+      beat.hintThen.forEach(function (next) { playBeat(next, pt.x, pt.y, at); });
+    });
   }
 
-  function cursorHint(item, inner, delay) {
+  function cursorHint(item, inner, delay, onClick) {
     if (reduceMotion) return;
     later(function () {
       if (item.dead) return;
@@ -321,6 +325,9 @@
       c.style.top = (ar.top - ir.top + ar.height * 0.45) + "px";
       item.el.appendChild(c);
       setTimeout(function () { c.remove(); }, 3200);
+      if (onClick) later(function () {
+        if (!item.dead) onClick({ x: ar.left + ar.width / 2, y: ar.top + ar.height / 2 });
+      }, 1230);
     }, delay);
   }
 
@@ -525,6 +532,36 @@
           }, start + n * (reduceMotion ? 0 : (beat.leaveInterval || 220)));
         });
       }
+    },
+
+    // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
+    deck: function (beat, x, y, diesAt) {
+      var cards = beat.cards || [];
+      if (!cards.length) return;
+      var n = cards.length, size = beat.size || "s";
+      var r0 = cards[0].ratio || 1;
+      var cw = mediaWidth(size, r0), ch = cw / r0;
+      var offs = cw * (beat.fan != null ? beat.fan : 0.42);        // horizontal offset per card
+      var bw = cw + offs * (n - 1), bh = ch * 1.12;
+      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, 0.5)
+              || { x: viewport().w / 2, y: viewport().h / 2, scale: 0.7 };
+      var sc = spot.scale, origin = { x: x, y: y };
+      var gap = reduceMotion ? 0 : (beat.interval || 130);
+      cards.forEach(function (spec, k) {
+        later(function () {
+          if (step >= diesAt) return;
+          var mid = (n - 1) / 2, rel = k - mid;
+          var tilt = spec.tilt != null ? spec.tilt : rel * (beat.spread || 7);
+          var el = buildMedia(Object.assign({ _fit: sc }, spec), "image", size, tilt);
+          el.classList.add("card", "dealt");
+          // centre of this card in the fan
+          var cx = spot.x + rel * offs * sc, cy = spot.y + Math.abs(rel) * ch * 0.05 * sc;
+          var it = addItem(el, cx, cy, diesAt);
+          // fly in from the link
+          el.style.setProperty("--fx", (origin.x - (it.x + el.offsetWidth / 2)) + "px");
+          el.style.setProperty("--fy", (origin.y - (it.y + el.offsetHeight / 2)) + "px");
+        }, k * gap);
+      });
     },
 
     // message bubbles that appear one by one, with "typing…" dots
@@ -881,7 +918,7 @@
     (list || []).forEach(function (b) {
       if (b.src) new Image().src = b.src;
       if (b.reveal && b.reveal.mask) new Image().src = b.reveal.mask;
-      preload(b.photos); preload(b.also); preload(b.then);
+      preload(b.photos); preload(b.also); preload(b.then); preload(b.cards); preload(b.hintThen);
     });
   }
   preload(STORY);

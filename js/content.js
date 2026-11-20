@@ -39,6 +39,7 @@
                       (opens in a new tab; tapping it never advances the story);
                       a little cursor clicks on it once to show it's clickable
                       (linkHint: false → no cursor)
+             hintThen beats that pop out of the link when that cursor clicks
              id       a name for this text, so a later beat can replace it
              into     "id" → this text takes the place of that earlier text
              then     beats that start BY THEMSELVES when the typing ends
@@ -78,6 +79,10 @@
              leave    ms after the last one → they slide away by themselves
                       (leaveInterval: ms between each one leaving)
              lifespan: 1 instead → they stay until the next tap, then slide away
+
+   "deck"    cards    photos dealt like a deck of cards from a point, fanning
+                      out in the free space nearby (interval: ms between cards,
+                      spread: degrees of tilt between cards, fan: overlap)
 
    "burst"   photos   list of photos, same options as "image"
              size     default size of every photo in the burst
@@ -165,11 +170,19 @@ window.STORY = [
       { below: true, id: "ny-text", type: "text", style: "body", typing: true, typeFrom: "I was wrong.",
         speed: 60, tilt: 0, gap: 14, delay: 600, strike: "I was wrong.",
         links: { "Suzanne Rae": "https://suzannerae.com/" },
+        // when the little cursor clicks the name: 3 Google-image cards (Vogue) are dealt like a deck
+        hintThen: [
+          { type: "deck", size: "s", interval: 130, cards: [
+              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.987 },
+              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.796 },
+              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.988 }
+          ]}
+        ],
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
         // right after the crossing-out line: the three screenshots slide up by themselves
         // (in the free space) and stay
         then: [
-          { free: true, type: "stack", size: "m", interval: 900, delay: 1200,
+          { free: "all", type: "stack", size: "m", interval: 900, delay: 1200,
             photos: [
               { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
               { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06

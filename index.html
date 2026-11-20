@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#FFFFFF">
   <title>A Very Unprofessional Intro</title>
+  <!-- retro postcard fonts (city names) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bungee+Inline&family=Pinyon+Script&family=Shrikhand&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,6 +18,10 @@
 
   <!-- Fixed controls (never trigger reveals) -->
   <div class="ui ui-progress" id="progress" aria-live="polite"></div>
+  <nav class="ui ui-contact" aria-label="Contact">
+    <a class="ui-link ui-portfolio" id="link-portfolio" target="_blank" rel="noopener" hidden>ACTUAL PORTFOLIO</a>
+    <a class="ui-link ui-email" id="link-email" hidden>EMAIL ME</a>
+  </nav>
   <button class="ui ui-restart" id="restart" type="button">RESTART</button>
 
   <script src="js/content.js"></script>

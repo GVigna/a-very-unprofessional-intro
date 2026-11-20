@@ -30,10 +30,12 @@
                       (default: normal bold)
              align    "center" → centred lines
              color    "secondary" (orange) | "primary" (violet)
+             boxed    true → white label behind (readable on top of images)
              typing   true → typed out letter by letter (speed: ms per letter)
              typeFrom "a phrase" → the text before it appears at once,
                       only that phrase and what follows is typed
              typePause ms of pause before the typing starts (default 900)
+             typeDelay ms before typing starts (the text box is already there)
              strike   "a phrase" → after typing, a line crosses it out
              links    { "phrase": "https://…" } → that phrase becomes a link
                       (opens in a new tab; tapping it never advances the story);
@@ -51,8 +53,11 @@
              lines    true → appears one line at a time (speed: ms per line)
 
    "image"   src      the photo, e.g. "media/00_OPENING/test1.webp"
-             postcard { city, frame: "#hex", ink: "#hex", field: "css colour" }
-                      → a vintage "Greetings from CITY" postcard; src = its photo
+             postcard { city, shape: "rect"|"wavy", frame: "#hex", font: "…",
+                        fill: "#hex", shade: "#hex", upper: true, scale: n }
+                      → a retro postcard: src = its photo, the city name on top
+                        in its own font (fill colour + solid shadow)
+             fill     0,1,2… (on cue beats) → spots that together cover the screen
    "video"            (no src → a coloured placeholder box with a label)
              label    placeholder caption
              ratio    width / height of the photo, e.g. 4/5, 16/9
@@ -74,6 +79,7 @@
    "video"   src: "file.mp4" → a real video: muted, loops, plays inline
              poster: "file.jpg" → still frame shown while it loads
              loop: false → plays once and stops on the last frame
+             frame: "phone" → rounded black phone-like frame (screen recordings)
              sound: true → tries to play WITH audio; if the browser blocks it,
                      it plays muted with a small SOUND ON button
              subs: [{ from: 2.0, to: 4.5, text: "…" }] → subtitles (seconds)
@@ -97,10 +103,21 @@
              vanish   ms → after the last photo lands, wait this long, then
                       they all disappear together
 
+   "marquee" text     one phrase, stretched to the full screen height, scrolling
+                      sideways forever (stretch: vertical stretch, speed: px/s);
+                      its "then" starts when the whole phrase has come in;
+                      taps pass through it
+
    "chat"    title    optional name at the top of the chat
              messages list of { from: "me" | "them", text: "…" }
                       optional per message: typing (ms of "…"), pause (ms after)
    ========================================================= */
+
+/* ---------- always-visible contact links (empty = hidden) */
+window.CONTACT = {
+  portfolio: "",   // e.g. "https://…"  → ACTUAL PORTFOLIO
+  email: ""        // e.g. "name@domain.com" → EMAIL ME
+};
 
 /* ---------- already on screen when the site opens (draggable, always stay) */
 window.INTRO = {
@@ -236,24 +253,42 @@ window.STORY = [
     also: [
       { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
     ],
-    // postcards: photos still to come from Giulia — a colour field stands in for now
+    // postcards fill the whole page, one per city as it's typed; the text stays on top.
+    // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
-          "Istanbul": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
-            postcard: { city: "Istanbul", frame: "#F7C6D3", ink: "var(--secondary)",
-                        field: "linear-gradient(#f6c48a 0 50%, #2f6f8f 50% 100%)" } },
-          "Milan": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
-            postcard: { city: "Milan", frame: "#D8642C", ink: "#FFFFFF",
-                        field: "linear-gradient(#cfd8de 0 58%, #9a8f86 58% 100%)" } },
-          "Copenhagen": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
-            postcard: { city: "Copenhagen", frame: "#F2EBDD", ink: "var(--secondary)",
-                        field: "linear-gradient(#a9d3f0 0 45%, #e9b44c 45% 70%, #2d5d7b 70% 100%)" } },
-          "Paris": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
-            postcard: { city: "Paris", frame: "#F5B323", ink: "#FFFFFF",
-                        field: "linear-gradient(#bcd6ea 0 60%, #7f9a6a 60% 100%)" } },
-          "Florence": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
-            postcard: { city: "Florence", frame: "#CFE5D3", ink: "var(--secondary)",
-                        field: "linear-gradient(#f3d9a8 0 50%, #c56a3c 50% 100%)" } }
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", fill: 0, jitter: 0.03, tilt: -7,
+          postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#F7D046", shade: "#E5432A" } },
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", fill: 1, jitter: 0.03, tilt: 6,
+          postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#F7D046", shade: "#1B1B1B", upper: true } },
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", fill: 2, jitter: 0.03, tilt: -4,
+          postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#F7D046", shade: "#E5432A", upper: true, scale: 1.25 } },
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", fill: 3, jitter: 0.03, tilt: 8,
+          postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#F7D046", shade: "#1B1B1B", scale: 2.1 } },
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", fill: 4, jitter: 0.03, tilt: -5,
+          postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F7D046", shade: "#E5432A" } }
     }
+  },
+
+  /* tap: the postcards (and everything) go; the cycling text is typed,
+     and meanwhile the Instagram screen recording appears */
+  { clear: true,
+    type: "text", text: "ALSO, I GOT REALLY INTO CYCLING.", style: "big", typing: true, speed: 45, tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, typeDelay: 1700, speed: 45, tilt: 0, gap: 14,
+        text: "Still obsessed.\nCycling in London? Easy.\nTRY ROME." },
+      { free: "all", type: "video", src: "media/03_CAPITOLO_3/bici.mp4", poster: "media/03_CAPITOLO_3/bici_poster.jpg",
+        ratio: 0.4624, size: "m", frame: "phone", tilt: 3, delay: 800 }
+    ]
+  },
+
+  /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways;
+     as soon as the whole phrase has come in, the rest of the text appears */
+  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650,
+    then: [
+      { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
+        typing: true, typeFrom: "Doing my best.", speed: 60,
+        text: "Turns out, fashion isn't exactly sustainable.\nAnd sustainability has always mattered to me.\n15 years vegetarian. (Yes, I know I should probably go vegan.)\nDoing my best." }
+    ]
   },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }

@@ -75,6 +75,7 @@
   }
 
   function place(item, x, y) {
+    if (item.fixed) return;
     var p = clamp(item, x, y);
     item.x = p.x;
     item.y = p.y;
@@ -150,30 +151,37 @@
     }
 
     if (spec.postcard) {
-      // POSTCARD: coloured frame, photo (or a colour field until there is one), "Greetings from CITY"
+      // POSTCARD: "rect" = coloured frame, "wavy" = cream card with a stamp-like scalloped edge.
+      // The city name sits on the photo, in its own retro font.
       var pc = spec.postcard;
-      s.el.classList.add("postcard");
+      s.el.classList.add("postcard", "pc-" + (pc.shape || "rect"));
       s.inner.style.setProperty("--frame", pc.frame || "#F7C6D3");
-      s.inner.style.setProperty("--ink", pc.ink || "var(--secondary)");
       var pic = document.createElement("div");
       pic.className = "pc-pic";
       if (spec.src) pic.appendChild(makeImg(spec.src, "pic"));
-      else pic.style.background = pc.field || "linear-gradient(#9fd0f5 0 55%, #7fb069 55% 100%)";
-      var cap = document.createElement("div");
-      cap.className = "pc-cap";
-      cap.innerHTML = "<i>Greetings from</i> <b></b>";
-      cap.querySelector("b").textContent = (pc.city || "").toUpperCase();
-      var stamp = document.createElement("span");
-      stamp.className = "pc-stamp";
-      stamp.textContent = pc.stamp || "GV";
-      s.inner.appendChild(pic); s.inner.appendChild(cap); s.inner.appendChild(stamp);
+      else pic.style.background = pc.field || "#cfd8de";
+      var name = document.createElement("div");
+      name.className = "pc-name";
+      name.textContent = pc.city || "";
+      name.style.fontFamily = pc.font || "Georgia, serif";
+      name.style.color = pc.fill || "#F7D046";
+      name.style.setProperty("--shade", pc.shade || "#E5432A");
+      if (pc.upper) name.style.textTransform = "uppercase";
+      // size the name to the card: longer names get smaller
+      var len = Math.max(4, (pc.city || "").length);
+      var base = Math.min(h * 0.42, (w * (pc.scale || 1.55)) / len);
+      name.style.fontSize = base + "px";
+      name.dataset.base = base;
+      pic.appendChild(name);
+      s.inner.appendChild(pic);
       s.el.setAttribute("role", "img");
-      s.el.setAttribute("aria-label", "Postcard: greetings from " + (pc.city || ""));
+      s.el.setAttribute("aria-label", "Postcard from " + (pc.city || ""));
       return s.el;
     }
 
     if (spec.src && kind === "video") {
       s.el.classList.add("photo", "clip");
+      if (spec.frame === "phone") s.el.classList.add("phone");
       var vid = document.createElement("video");
       vid.src = spec.src;
       if (spec.poster) vid.poster = spec.poster;
@@ -323,6 +331,14 @@
   // a little mouse cursor that glides onto the first link of a text, clicks twice, fades away
   // pixel-art arrow (black outline, white fill), drawn square by square
   var CURSOR_SVG = '<svg viewBox="0 0 11 17" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="1" height="1" fill="#000"/><rect x="0" y="1" width="1" height="1" fill="#000"/><rect x="1" y="1" width="1" height="1" fill="#000"/><rect x="0" y="2" width="1" height="1" fill="#000"/><rect x="1" y="2" width="1" height="1" fill="#FFF"/><rect x="2" y="2" width="1" height="1" fill="#000"/><rect x="0" y="3" width="1" height="1" fill="#000"/><rect x="1" y="3" width="1" height="1" fill="#FFF"/><rect x="2" y="3" width="1" height="1" fill="#FFF"/><rect x="3" y="3" width="1" height="1" fill="#000"/><rect x="0" y="4" width="1" height="1" fill="#000"/><rect x="1" y="4" width="1" height="1" fill="#FFF"/><rect x="2" y="4" width="1" height="1" fill="#FFF"/><rect x="3" y="4" width="1" height="1" fill="#FFF"/><rect x="4" y="4" width="1" height="1" fill="#000"/><rect x="0" y="5" width="1" height="1" fill="#000"/><rect x="1" y="5" width="1" height="1" fill="#FFF"/><rect x="2" y="5" width="1" height="1" fill="#FFF"/><rect x="3" y="5" width="1" height="1" fill="#FFF"/><rect x="4" y="5" width="1" height="1" fill="#FFF"/><rect x="5" y="5" width="1" height="1" fill="#000"/><rect x="0" y="6" width="1" height="1" fill="#000"/><rect x="1" y="6" width="1" height="1" fill="#FFF"/><rect x="2" y="6" width="1" height="1" fill="#FFF"/><rect x="3" y="6" width="1" height="1" fill="#FFF"/><rect x="4" y="6" width="1" height="1" fill="#FFF"/><rect x="5" y="6" width="1" height="1" fill="#FFF"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="0" y="7" width="1" height="1" fill="#000"/><rect x="1" y="7" width="1" height="1" fill="#FFF"/><rect x="2" y="7" width="1" height="1" fill="#FFF"/><rect x="3" y="7" width="1" height="1" fill="#FFF"/><rect x="4" y="7" width="1" height="1" fill="#FFF"/><rect x="5" y="7" width="1" height="1" fill="#FFF"/><rect x="6" y="7" width="1" height="1" fill="#FFF"/><rect x="7" y="7" width="1" height="1" fill="#000"/><rect x="0" y="8" width="1" height="1" fill="#000"/><rect x="1" y="8" width="1" height="1" fill="#FFF"/><rect x="2" y="8" width="1" height="1" fill="#FFF"/><rect x="3" y="8" width="1" height="1" fill="#FFF"/><rect x="4" y="8" width="1" height="1" fill="#FFF"/><rect x="5" y="8" width="1" height="1" fill="#FFF"/><rect x="6" y="8" width="1" height="1" fill="#FFF"/><rect x="7" y="8" width="1" height="1" fill="#FFF"/><rect x="8" y="8" width="1" height="1" fill="#000"/><rect x="0" y="9" width="1" height="1" fill="#000"/><rect x="1" y="9" width="1" height="1" fill="#FFF"/><rect x="2" y="9" width="1" height="1" fill="#FFF"/><rect x="3" y="9" width="1" height="1" fill="#FFF"/><rect x="4" y="9" width="1" height="1" fill="#FFF"/><rect x="5" y="9" width="1" height="1" fill="#FFF"/><rect x="6" y="9" width="1" height="1" fill="#FFF"/><rect x="7" y="9" width="1" height="1" fill="#FFF"/><rect x="8" y="9" width="1" height="1" fill="#FFF"/><rect x="9" y="9" width="1" height="1" fill="#000"/><rect x="0" y="10" width="1" height="1" fill="#000"/><rect x="1" y="10" width="1" height="1" fill="#FFF"/><rect x="2" y="10" width="1" height="1" fill="#FFF"/><rect x="3" y="10" width="1" height="1" fill="#FFF"/><rect x="4" y="10" width="1" height="1" fill="#FFF"/><rect x="5" y="10" width="1" height="1" fill="#FFF"/><rect x="6" y="10" width="1" height="1" fill="#000"/><rect x="7" y="10" width="1" height="1" fill="#000"/><rect x="8" y="10" width="1" height="1" fill="#000"/><rect x="9" y="10" width="1" height="1" fill="#000"/><rect x="10" y="10" width="1" height="1" fill="#000"/><rect x="0" y="11" width="1" height="1" fill="#000"/><rect x="1" y="11" width="1" height="1" fill="#FFF"/><rect x="2" y="11" width="1" height="1" fill="#FFF"/><rect x="3" y="11" width="1" height="1" fill="#000"/><rect x="4" y="11" width="1" height="1" fill="#FFF"/><rect x="5" y="11" width="1" height="1" fill="#FFF"/><rect x="6" y="11" width="1" height="1" fill="#000"/><rect x="0" y="12" width="1" height="1" fill="#000"/><rect x="1" y="12" width="1" height="1" fill="#FFF"/><rect x="2" y="12" width="1" height="1" fill="#000"/><rect x="4" y="12" width="1" height="1" fill="#000"/><rect x="5" y="12" width="1" height="1" fill="#FFF"/><rect x="6" y="12" width="1" height="1" fill="#FFF"/><rect x="7" y="12" width="1" height="1" fill="#000"/><rect x="0" y="13" width="1" height="1" fill="#000"/><rect x="1" y="13" width="1" height="1" fill="#000"/><rect x="4" y="13" width="1" height="1" fill="#000"/><rect x="5" y="13" width="1" height="1" fill="#FFF"/><rect x="6" y="13" width="1" height="1" fill="#FFF"/><rect x="7" y="13" width="1" height="1" fill="#000"/><rect x="0" y="14" width="1" height="1" fill="#000"/><rect x="5" y="14" width="1" height="1" fill="#000"/><rect x="6" y="14" width="1" height="1" fill="#FFF"/><rect x="7" y="14" width="1" height="1" fill="#FFF"/><rect x="8" y="14" width="1" height="1" fill="#000"/><rect x="5" y="15" width="1" height="1" fill="#000"/><rect x="6" y="15" width="1" height="1" fill="#FFF"/><rect x="7" y="15" width="1" height="1" fill="#FFF"/><rect x="8" y="15" width="1" height="1" fill="#000"/><rect x="6" y="16" width="1" height="1" fill="#000"/><rect x="7" y="16" width="1" height="1" fill="#000"/></svg>';
+  // spots that together cover the screen (postcards "filling the page")
+  var FILL_TALL = [[0.32, 0.17], [0.70, 0.36], [0.30, 0.56], [0.70, 0.74], [0.38, 0.90], [0.62, 0.10]];
+  var FILL_WIDE = [[0.20, 0.30], [0.52, 0.22], [0.82, 0.34], [0.32, 0.76], [0.68, 0.72], [0.50, 0.50]];
+  function fillSpot(k) {
+    var v = viewport(), list = v.h > v.w ? FILL_TALL : FILL_WIDE, p = list[k % list.length];
+    return { x: p[0] * v.w, y: p[1] * v.h };
+  }
+
   // "cues": { "word": beat } → that beat plays the moment "word" has been typed
   function fireCues(beat, item, shown) {
     if (!beat.cues) return;
@@ -332,9 +348,16 @@
       if (item.fired[word] || shown.indexOf(word) < 0) return;
       item.fired[word] = true;
       var next = beat.cues[word], v = viewport(), unit = Math.min(v.w, v.h);
-      var f = next.free ? freeSpotFor(next) : { x: item.x + item.el.offsetWidth / 2, y: item.y - unit * 0.2 };
+      var f;
+      if (next.fill != null) f = fillSpot(next.fill);           // cover the whole screen
+      else if (next.free) f = freeSpotFor(next);
+      else f = { x: item.x + item.el.offsetWidth / 2, y: item.y - unit * 0.2 };
       var j = next.jitter != null ? next.jitter : 0;      // scatter, so a pile looks tossed
       playBeat(next, f.x + (Math.random() * 2 - 1) * j * unit, f.y + (Math.random() * 2 - 1) * j * unit, at);
+      if (beat.onTop !== false) {                          // the text stays readable above
+        toFront(item);
+        item.el.classList.add("boxed");
+      }
     });
   }
 
@@ -381,6 +404,7 @@
     if (beat.style) s.el.classList.add(beat.style);
     if (beat.align) s.el.classList.add("align-" + beat.align);
     if (beat.color) s.el.classList.add("color-" + beat.color);
+    if (beat.boxed) s.el.classList.add("boxed");
     if (beat.lines) {
       // every line is in place from the start (so the size doesn't jump), just hidden
       (beat.text || "").split("\n").forEach(function (line) {
@@ -406,18 +430,35 @@
     return s;
   }
 
+  // shrink postcard city names until they fit their photo (fonts differ in width)
+  function fitNames(root) {
+    Array.prototype.forEach.call(root.querySelectorAll(".pc-name"), function (n) {
+      var size = parseFloat(n.dataset.base) || parseFloat(n.style.fontSize);
+      n.style.fontSize = size + "px";
+      for (var k = 0; k < 40 && n.scrollWidth > n.clientWidth + 1; k++) {   // overflowing → smaller
+        size *= 0.94;
+        n.style.fontSize = size + "px";
+      }
+    });
+  }
+  if (document.fonts && document.fonts.addEventListener) {
+    document.fonts.addEventListener("loadingdone", function () { fitNames(stage); });
+  }
+
   // add an element to the stage as a live, draggable item
   function addItem(el, x, y, diesAt, anchor) {
     el.style.visibility = "hidden";       // measure before showing
     stage.appendChild(el);
+    if (el.classList.contains("postcard")) fitNames(el);
     var item = { el: el, x: 0, y: 0, diesAt: diesAt };
     el._item = item;
     live.push(item);
     if (anchor && anchor.ref) {
       // stick to another item: right below it, or right above it, aligned left
       var ref = anchor.ref, g = anchor.gap != null ? anchor.gap : 10;
+      var refH = Math.max(ref.el.offsetHeight, ref.fh || 0);
       var ay = anchor.mode === "above" ? ref.y - el.offsetHeight - g
-                                       : ref.y + ref.el.offsetHeight + g;
+                                       : ref.y + refH + g;
       place(item, ref.x + (anchor.dx || 0), ay);
     } else if (anchor === "topleft") place(item, x, y);
     else place(item, x - el.offsetWidth / 2, y - el.offsetHeight / 2); // centred on the tap
@@ -440,13 +481,20 @@
           removeItem(old, "fast");
         }
       }
+      var fs = beat.typing ? finalSize(beat) : null;
+      if (fs && !anchor) {
+        // centre the FINAL text on the tap, then let it grow inside that box
+        x = x - fs.w / 2; y = y - fs.h / 2; anchor = "topleft";
+      }
       var s = buildText(beat);
       var item = addItem(s.el, x, y, diesAt, anchor);
       item.id = beat.id || beat.into;
-      if (beat.typing) {
-        var fs = finalSize(beat);
+      if (fs) {
         item.fw = fs.w; item.fh = fs.h;
-        if (anchor) place(item, item.x, item.y); // keep it on screen at its final size
+        var keep = { x: item.x, y: item.y };
+        s.el.style.minWidth = fs.w + "px"; s.el.style.minHeight = fs.h + "px";
+        place(item, keep.x, keep.y);           // keep it on screen at its final size
+        s.el.style.minWidth = ""; s.el.style.minHeight = "";
       }
       if (!beat.typing && beat.strike) strikeOut(s.inner, beat.text || "", beat);
       if (!beat.typing) maybeHint(item, s.inner, beat, 400);
@@ -498,7 +546,8 @@
             playThen(beat, item);
           }
         };
-        if (pause && !reduceMotion) later(typeNext, pause); else typeNext();
+        var wait = (pause || 0) + (beat.typeDelay || 0);
+        if (wait && !reduceMotion) later(typeNext, wait); else typeNext();
       }
     },
 
@@ -602,6 +651,32 @@
           el.style.setProperty("--fy", (origin.y - (it.y + el.offsetHeight / 2)) + "px");
         }, k * gap);
       });
+    },
+
+    // MARQUEE — one word/phrase in the site font, stretched to the full screen height,
+    // scrolling sideways forever. Taps go straight through it.
+    marquee: function (beat, x, y, diesAt) {
+      var el = document.createElement("div");
+      el.className = "marquee";
+      if (beat.color) el.classList.add("color-" + beat.color);
+      var span = document.createElement("span");
+      span.textContent = beat.text || "";
+      el.appendChild(span);
+      stage.appendChild(el);
+      var v = viewport();
+      var stretch = (beat.stretch || 3.2) * (v.h > v.w ? 1.6 : 1);   // tall phone screens: even taller, narrower letters
+      span.style.fontSize = (v.h / (0.72 * stretch)) * 0.96 + "px";   // capitals fill the height
+      span.style.setProperty("--sy", stretch);
+      var tw = span.offsetWidth, speed = beat.speed || 650;          // px per second
+      span.style.setProperty("--from", v.w + "px");
+      span.style.setProperty("--to", -tw + "px");
+      span.style.animationDuration = (v.w + tw) / speed + "s";
+      var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
+      el._item = item;
+      el.style.zIndex = ++z;
+      live.push(item);
+      // "then" starts when the whole phrase has come into view
+      later(function () { playThen(beat, item); }, reduceMotion ? 300 : (tw / speed) * 1000);
     },
 
     // message bubbles that appear one by one, with "typing…" dots
@@ -751,6 +826,7 @@
       later(function () {
         if (item.dead) return;
         var v = viewport(), unit = Math.min(v.w, v.h), x, y;
+        if (next.below) { playBeat(next, 0, 0, step - 1, { mode: "below", ref: item, gap: next.gap }); return; }
         if (next.free) { var f0 = freeSpotFor(next); x = f0.x; y = f0.y; }
         else if (next.at) { x = next.at[0] * v.w; y = next.at[1] * v.h; }   // share of the screen
         else {                                                          // just below the text
@@ -774,8 +850,11 @@
   // without touching any text or photo (falls back to the text-only method)
   // pref = the point it would like to be near (the tap, or the screen centre);
   // minScale = 1 for texts (they never shrink)
+  function bottomBar() { var v = viewport(); return v.h > v.w ? 44 : 0; } // phone: contact links at the bottom
+
   function clearSpot(w, h, rects, pref, minScale) {
     var v = viewport(), m = 12, top = EDGE + 40;
+    v = { w: v.w, h: v.h - bottomBar() };
     pref = pref || { x: v.w / 2, y: v.h / 2 };
     for (var sc = 1; sc >= (minScale || 0.4) - 0.001; sc -= 0.05) {
       var bw = w * sc, bh = h * sc, best = null, bestD = Infinity;
@@ -962,6 +1041,14 @@
     });
   }
   preload(STORY);
+
+  // contact links in the corner (hidden until filled in, in content.js → CONTACT)
+  (function () {
+    var cfg = window.CONTACT || {};
+    var p = document.getElementById("link-portfolio"), m = document.getElementById("link-email");
+    if (p && cfg.portfolio) { p.href = cfg.portfolio; p.hidden = false; }
+    if (m && cfg.email) { m.href = "mailto:" + cfg.email; m.hidden = false; }
+  })();
 
   updateProgress();
   showIntro();

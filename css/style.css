@@ -685,6 +685,8 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
 }
 .ui-contact .ui-email { order: -1; }
 .ui-cv { margin-left: auto; margin-right: 1.6em; }   /* CV sits right before ACTUAL PORTFOLIO */
+.ui-link { white-space: nowrap; }
+@media (max-width: 600px) { .ui-cv { margin-right: .6em; } .ui-link { padding-left: 4px; padding-right: 4px; } }
 .ui-portfolio { order: 1; }
 .ui-link {
   color: inherit;

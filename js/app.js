@@ -1121,7 +1121,12 @@
       text.split("\n").forEach(function (ln, i) {
         if (i) paper.appendChild(document.createTextNode("\n"));
         var m = ln.match(/^\*\*(.*)\*\*$/);
-        if (m && m[1]) { var b = document.createElement("b"); b.textContent = m[1]; paper.appendChild(b); }
+        if (m && m[1]) {                                   // the total: bigger, label left, amount right
+          var b = document.createElement("b"); b.className = "rc-total";
+          var parts = m[1].trim().split(/\s{2,}/);
+          parts.forEach(function (p) { var sp = document.createElement("span"); sp.textContent = p; b.appendChild(sp); });
+          paper.appendChild(b);
+        }
         else paper.appendChild(document.createTextNode(ln));
       });
       s.inner.appendChild(paper);
@@ -1132,7 +1137,7 @@
       var spot = clearSpot(w * 1.08, h * 1.02, textRects().concat(mediaRects()), { x: x, y: y }, 0.6) || freeSpot(w, h, textRects());
       if (spot.scale && spot.scale < 1) paper.style.fontSize = (fs * spot.scale).toFixed(2) + "px";
       var it = addItem(s.el, spot.x, spot.y, diesAt);
-      it.onTap = function () { s.el.classList.toggle("crumpled"); };   // tap: paper ball (tap again: flat)
+      it.onTap = function () { s.el.classList.add("crumpled"); };   // tap: crumples into a paper ball
     },
 
     // FLIPBOOK — an open magazine seen from above: it opens in a flash (no cover), then the
@@ -1862,6 +1867,12 @@
       // a tap (no real movement) on an item that reacts to taps, e.g. the zine turns a page
       var moved = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy);
       if (!cancelled && drag.item.onTap && moved <= TAP_SLOP) drag.item.onTap();
+      else if (!cancelled && moved <= TAP_SLOP && !drag.item.flick) {     // a tap (not a drag) on a photo/magazine/etc → next
+        var tp = { x: e.clientX, y: e.clientY };
+        drag.item.el.classList.remove("dragging"); drag = null;
+        reveal(tp.x, tp.y);
+        return;
+      }
       else if (!cancelled && drag.item.flick && moved > 60)        // a flick: keep going the same way, off screen
         fling(drag.item, (e.clientX - drag.sx) * 4, (e.clientY - drag.sy) * 4);
       drag = null;

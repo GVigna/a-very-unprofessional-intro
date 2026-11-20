@@ -395,12 +395,27 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3 },
+            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1 },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4 }
+            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1 }
     }
   },
+
+  // tap: the books go; a burst of work photos 0–9 (like IED, a bit bigger) — they stay.
+  //      Presentation may change once Giulia sends a reference.
+  { type: "burst", size: "m", speed: 110, spread: 0.5, photos: [
+      { src: "media/04_CAPITOLO_4/work_0.webp", ratio: 0.7503 },
+      { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_3.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_4.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_5.webp", ratio: 1.8289 },
+      { src: "media/04_CAPITOLO_4/work_6.webp", ratio: 0.737 },
+      { src: "media/04_CAPITOLO_4/work_7.webp", ratio: 1.4993 },
+      { src: "media/04_CAPITOLO_4/work_8.webp", ratio: 0.812 },
+      { src: "media/04_CAPITOLO_4/work_9.webp", ratio: 1.0 }
+  ]},
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

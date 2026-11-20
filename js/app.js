@@ -22,6 +22,7 @@
   var SIZE = { xxs: 0.13, xs: 0.2, s: 0.30, m: 0.46, l: 0.66 }; // share of the screen's short side…
   var SIZE_CAP = { xxs: 100, xs: 150, s: 220, m: 340, l: 520 };  // …but never wider than this (px)
   var TYPE_SPEED = 45;      // ms per letter for typed text
+  var TYPE_FACTOR = 0.85;   // global typing pace (0.85 = 15% faster)
   var TYPE_PAUSE = 900;     // ms of silence before a "typeFrom" phrase starts typing
   var CHAT_PAUSE = 500;     // ms between chat messages
   var CHAT_TYPING = 900;    // ms the "…" dots show before a message
@@ -673,7 +674,7 @@
           }
         }
         var anchored = !!anchor; // stuck under/above something, or top-left: grow from there
-        var speed = beat.speed || TYPE_SPEED;
+        var speed = (beat.speed || TYPE_SPEED) * TYPE_FACTOR;   // all typing 15% faster
         s.inner.classList.add("caret");
         var typeNext = function () {
           if (item.dead) return;

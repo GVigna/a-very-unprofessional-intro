@@ -221,6 +221,10 @@
       vid.setAttribute("muted", ""); vid.setAttribute("playsinline", "");
       vid.preload = "auto";
       vid.className = "pic";
+      if (spec.rate) {                       // e.g. 1.2 → 20% faster
+        vid.defaultPlaybackRate = spec.rate; vid.playbackRate = spec.rate;
+        vid.addEventListener("loadedmetadata", function () { vid.playbackRate = spec.rate; });
+      }
       s.inner.appendChild(vid);
 
       if (spec.subs) addSubs(s.inner, vid, spec.subs);

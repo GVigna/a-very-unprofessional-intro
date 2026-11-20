@@ -84,6 +84,7 @@
              poster: "file.jpg" → still frame shown while it loads
              loop: false → plays once and stops on the last frame
              frame: "phone" → rounded black phone-like frame (screen recordings)
+             rate: 1.2 → playback speed (1.2 = 20% faster)
              sound: true → tries to play WITH audio; if the browser blocks it,
                      it plays muted with a small SOUND ON button
              subs: [{ from: 2.0, to: 4.5, text: "…" }] → subtitles (seconds)
@@ -284,13 +285,14 @@ window.STORY = [
         bold: ["TRY ROME."],
         text: "Still obsessed.\n\nCycling in London? Easy.\n\nTRY ROME." },
       { free: "all", type: "video", src: "media/03_CAPITOLO_3/bici.mp4", poster: "media/03_CAPITOLO_3/bici_poster.jpg",
-        ratio: 0.4624, size: "m", frame: "phone", tilt: 3, delay: 800 }
+        ratio: 0.4624, size: "m", frame: "phone", tilt: 3, delay: 800,
+        rate: 1.2, loop: false }   // 20% faster, plays once, freezes on the last frame
     ]
   },
 
   /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways;
      as soon as the whole phrase has come in, the rest of the text appears */
-  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650, direction: "right",
+  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650,
     then: [
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
@@ -309,7 +311,7 @@ window.STORY = [
   },
 
   // tap: the chat with Leo (bubbles type themselves)
-  { type: "chat", title: "Leo", tilt: -2, free: true, messages: [
+  { type: "chat", title: "Leonardo Magrelli", tilt: -2, free: true, messages: [
       { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?" },
       { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
       { from: "me",   text: "Yes! Amazing!" }

@@ -101,7 +101,7 @@ body {
   max-width: 90vw;
 }
 .item.text.small .inner {
-  font-size: clamp(13px, 3.4vw, 16px);
+  font-size: clamp(16px, 4.1vw, 19px);
   font-weight: 400;
   color: var(--secondary);
 }
@@ -170,7 +170,7 @@ body {
   background: var(--bg);
   border: 1.5px solid var(--primary);
   border-radius: 14px;
-  font-size: clamp(14px, 3.8vw, 16px);
+  font-size: clamp(17px, 4.6vw, 19px);
   line-height: 1.25;
 }
 .chat-title {
@@ -229,7 +229,7 @@ body {
 
 /* subtitle under the title: orange, readable */
 .item.text.sub .inner {
-  font-size: clamp(16px, 4.4vw, 24px);
+  font-size: clamp(19px, 5.3vw, 29px);
   font-weight: 500;
   color: var(--secondary);
 }
@@ -237,14 +237,14 @@ body {
 
 /* body copy: regular weight, comfortable reading width */
 .item.text.body .inner {
-  font-size: clamp(15px, 4vw, 21px);
+  font-size: clamp(18px, 4.8vw, 25px);
   font-weight: 400;
   line-height: 1.25;
   max-width: min(82vw, 460px);
 }
 /* small orange note, e.g. a year */
 .item.text.note .inner {
-  font-size: clamp(13px, 3.4vw, 16px);
+  font-size: clamp(16px, 4.1vw, 19px);
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--secondary);
@@ -552,7 +552,7 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
 .ui {
   position: fixed;
   z-index: 100000;
-  font: 700 clamp(15px, 4vw, 21px)/1 var(--font);   /* same size as the body texts */
+  font: 700 clamp(18px, 4.8vw, 25px)/1 var(--font);   /* same size as the body texts */
   letter-spacing: 0.06em;
   color: var(--secondary);
 }

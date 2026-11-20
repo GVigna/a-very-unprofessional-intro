@@ -614,7 +614,7 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
   position: fixed;
   z-index: 100000;
   font: 700 clamp(18px, 4.8vw, 25px)/1 var(--font);   /* same size as the body texts */
-  letter-spacing: 0.06em;
+  letter-spacing: 0.03em;
   color: var(--secondary);
 }
 .ui-progress {
@@ -624,6 +624,10 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
   font-variant-numeric: tabular-nums;
 }
 .ui-progress.bump { animation: bump 300ms ease; }
+/* desktop / tablet landscape: UI 10% smaller than the body texts */
+@media (orientation: landscape) and (min-width: 601px) {
+  .ui { font-size: clamp(16px, 4.3vw, 22.5px); }
+}
 
 /* contact links: next to the counter on wide screens, at the bottom on phones */
 .ui-contact {

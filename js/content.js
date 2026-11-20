@@ -114,6 +114,13 @@
                       taps pass through it; direction: "right" → enters from
                       the left (default: from the right)
 
+   "code"    lines    the CV, one line each ("## TITLE" = section, "2024  …" = entry);
+                      streams line by line like code (speed: ms per line), behind
+                      everything; cues: { lineNumber: beat } → plays at that line
+
+   "book"    front, back  cover images; ratio, depth (thickness), spine colour,
+                      rest (resting angle in degrees) → a 3D book that spins in
+
    "chat"    title    optional name at the top of the chat
              messages list of { from: "me" | "them", text: "…" }
                       optional per message: typing (ms of "…"), pause (ms after)
@@ -316,6 +323,84 @@ window.STORY = [
       { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
       { from: "me",   text: "Yes! Amazing!" }
   ]},
+
+  // tap: the Vaste Programme CV streams like code (behind everything; half screen on
+  //      wide screens, full screen on phones); meanwhile the two books spin in, in 3D
+  { type: "code", speed: 110,
+    lines: [
+      "## EXHIBITIONS & FESTIVALS",
+      "2026  Ghostland - Fotografia Europea • curated by Arianna Catania • Palazzo da Mosto, Reggio Emilia, IT",
+      "2026  MMMMMMM KM • Permanent Installation • Museo Tam • Matera, Italy",
+      "2025  Una Boccata d'Arta • curated by Roberta Mansueto • Miglionico, Italy",
+      "2025  Calentamiento • Istituto Italiano di Cultura • Stockholm, Sweden",
+      "2024  Fast Forward • Eleven Ten Studio • Basel, Switzerland",
+      "2024  Calentamiento • curated by Irene Angenica • CONDOMINIO • Milan, Italy",
+      "2024  What We Already Think We Know • Istituto Italiano di Cultura • Londra, United Kingdom",
+      "2024  Corrispondenze • curated by Daniele De Luigi & Chiara Dall'Olio • FMAV Fondazione Modena Arti Visive • Modena • 2024",
+      "2024  That’s Contemporary! A call for Video Arts • curated by Bianca Basile and Camilla Remondina • Real Collegio • Lucca, Italy",
+      "2024  That’s Contemporary! A call for Video Arts • curated by Bianca Basile and Camilla Remondina • Cremona Art Fair • Cremona, Italy",
+      "2023  Le nostre radici • Charta Festival • Galleria 291 Est • Rome, Italy",
+      "2023  Calentamiento • curated by Irene Angenica • CAMERA - Centro italiano per la fotografia • Turin, Italy",
+      "2023  Calentamiento • curated by Irene Angenica • Manifattura Tabacchi • Florence, Italy",
+      "2023  Cascasse il cielo • curated by Giulia Tornesello • 1/9unosunove • Rome, Italy",
+      "2023  D3C4M3R0N3 • curated by maurizio Coccia and Mara Predicatori • Palazzo Lucarini • Trevi, PG Italy",
+      "2023  But it did happen • curated by Giulia Gaibisso • Spazio In Situ • Rome, Italy",
+      "2023  13 fotografi per 13 Musei • curated by Matteo Balduzzi • Palazzo Reale • Milan, Italy",
+      "2022  Princìpi - Costruire per le Generazioni / Biennale Tecnologia • Torino, Italy",
+      "2022  Senso Comune • curated by Adiacenze • Habitat Ottantatre • Verona, Italy",
+      "2022  Screening at Spazio In Situ during RAW Rome Art Week • Rome, Italy",
+      "2022  Calentamiento • curated by Irene Angenica • Fondazione smART - polo per l'arte • Rome, Italy",
+      "2022  Calentamiento • curated by Irene Angenica • viaraffineria • Catania, Italy",
+      "2022  Helsinki Photo Festival • Helsinki, Finland",
+      "2022  Tales • Racconti dal tempo che viviamo • Bergamo, Italy",
+      "2022  Eyes On Tomorrow. Giovane Fotografia Italiana nel Mondo • Algeri, Algeria",
+      "2022  The Expanded body • curated by Angelica Gatto and Simone Zacchini • 1/9unosunove • Rome, Italy",
+      "2021  Cortona on the Move • Cortona, Italy",
+      "2020  Photo Open Up • curated by Carlo Sala • Padova, Italy",
+      "2020  Spazio libero. Immagini per riabitare la città - Comune di Reggio Emilia • Reggio Emilia, Italy",
+      "2019  Odesa Photo Days • Odesa Museum of Western & Eastern Art • Odesa, Ukraine",
+      "2019  Odesa Photo Days • Maslo Gallery • Khmelnitskiy, Ukraine",
+      "2018  Fotoroom X Gnomic Book • (Shortlisted)",
+      "2017  Latent • (Shortlisted) • Materia Gallery • Rome, Italy",
+      "## AWARDS",
+      "2026  Prima Materia 0.2 / Finalist • Palazzo Sforza Cesarini • Genzano, Italy",
+      "2024  Contemporanea Prize / Winner • Tagliacozzo, Italy",
+      "2023  Talent Prize / 2nd Place • Rome, Italy",
+      "2023  Premio Combat / Section Winner / Photography • Livorno, Italy",
+      "2023  Premio E.ART.H. / Finalist • curated by Treti Galaxie • Verona, Italy",
+      "2022  Premio Combat / Finalist / Video • Livorno, Italy",
+      "2022  Premio Marco Bastianelli / Jury Award – Special Mention Italian Author • Rome, Italy",
+      "2021  Premio Francesco Fabbri / Jury Award – Special Mention • Soligo, Italy",
+      "2021  Etherea Art Prize • Genova, Italy",
+      "2020  Giovane Fotografia Italiana #08 - Fotografia Europea / Winners • curated by Ilaria Campioli and Daniele de Luigi • Reggio Emilia, Italy",
+      "2019  Unseen Dummy Award / Shortlisted • Amsterdam, Netherlands",
+      "2019  Premio Francesco Fabbri / Finalist • Pieve di Soligo, Italy",
+      "2019  Skinnerboox Book Award / Shortlisted • Jesi, Italy",
+      "## RESIDENCIES & WORKSHOPS",
+      "2022  Workshop • Fail Again, Fail Better • in collaborazione con Agnese Fieno Spolverini • a cura di Irene Angenica • Fondazione Elpis • Milano, Italy",
+      "2022  Workshop • Loft Workshop • Luiss Guido Carli • Rome, Italy",
+      "2022  Workshop • Quasar Institute • Rome, Italy",
+      "2022  Workshop • Esaurire/Altrimenti • with CampoBase • Fondazione smART - polo per l'arte • Rome, Italy",
+      "2022  Residency • D3CAM3R0N3 • Trevi, Italy",
+      "2021  Residency • Viaraffineria & Fondazione Oelle • Catania, Italy",
+      "## GRANTS & COMMISSIONS",
+      "2024  Corrispondenze • curated by Daniele De Luigi & Chiara Dall'Olio • FMAV Fondazione Modena Arti Visive • Modena • 2024",
+      "2023  Come si fa la marmellata • curated by Associazionbe Arteco & JEST • Pinacoteca G.A. Levis • Chiomonte, TO, Italy",
+      "2023  Gli Aspetti Familiari • curated by Anna Catalano • Fotografia Calabria Festival • Fiumefreddo, Italy",
+      "2022  13 fotografi per 13 Musei • Committenza Direzione Regionale Musei Lombardia / MUFOCO - Museo di Fotografia Contemporanea",
+      "## BOOKS",
+      "2023  How to make Jam • Witty Books",
+      "2021  The Long Way Home of Ivan Putnik, Truck Driver • The Eriskay Connection"
+    ],
+    cues: {
+      19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
+            front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
+            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3 },
+      39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
+            front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
+            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4 }
+    }
+  },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

@@ -728,6 +728,84 @@
       later(function () { playThen(beat, item); }, reduceMotion ? 300 : (tw / speed) * 1000);
     },
 
+    // CODE — a column of text streaming line by line like code; it scrolls by itself.
+    // Half the screen on wide screens (on the side away from the chat), full screen on phones,
+    // always BEHIND the other things. Taps go through it.
+    code: function (beat, x, y, diesAt) {
+      var v = viewport(), wide = v.w > v.h && v.w > 700;
+      var col = document.createElement("div");
+      col.className = "codecol" + (wide ? " half" : " full");
+      if (wide) {
+        // the half of the screen with the least stuff on it (texts + chat)
+        var load = { left: 0, right: 0 };
+        textRects().forEach(function (r) {
+          var a = (r.r - r.l) * (r.b - r.t), cx = (r.l + r.r) / 2;
+          load[cx < v.w / 2 ? "left" : "right"] += a;
+        });
+        col.classList.add(load.left <= load.right ? "left" : "right");
+      }
+      var feed = document.createElement("div");
+      feed.className = "codefeed";
+      col.appendChild(feed);
+      stage.appendChild(col);
+      col.style.zIndex = 0;
+      var item = { el: col, x: 0, y: 0, diesAt: diesAt, fixed: true };
+      if (wide) item.obstacle = function () { var r = col.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
+      col._item = item;
+      // texts that would sit on top of the code (unreadable) bow out; the chat stays
+      var cr = col.getBoundingClientRect();
+      live.slice().forEach(function (it) {
+        if (!it.el.classList.contains("text")) return;
+        var r = it.el.getBoundingClientRect();
+        if (r.left < cr.right && r.right > cr.left && r.top < cr.bottom && r.bottom > cr.top) removeItem(it);
+      });
+      live.push(item);
+
+      var lines = beat.lines || [], speed = reduceMotion ? 0 : (beat.speed || 120), at = step;
+      lines.forEach(function (line, n) {
+        later(function () {
+          if (item.dead) return;
+          var el = document.createElement("div");
+          if (line.indexOf("## ") === 0) { el.className = "c-head"; el.textContent = "// " + line.slice(3); }
+          else {
+            var m = line.match(/^(\d{4})\s+(.*)$/);
+            if (m) { el.innerHTML = '<span class="c-year"></span> '; el.firstChild.textContent = m[1]; el.appendChild(document.createTextNode(m[2])); }
+            else el.textContent = line;
+          }
+          feed.appendChild(el);
+          var over = feed.scrollHeight - col.clientHeight;     // keep the newest line in view
+          feed.style.transform = "translateY(" + (over > 0 ? -over : 0) + "px)";
+          var cue = beat.cues && beat.cues[n];
+          if (cue) {
+            var f = cue.free ? freeSpotFor(cue) : { x: x, y: y };
+            playBeat(cue, f.x, f.y, at);
+          }
+        }, n * speed);
+      });
+    },
+
+    // BOOK — a real 3D book (front, back, spine, page edges) that spins in, then sways
+    book: function (beat, x, y, diesAt) {
+      var ratio = beat.ratio || 0.7;
+      var w = Math.round(mediaWidth(beat.size || "s", ratio) * (beat._fit || 1)), h = Math.round(w / ratio);
+      var d = Math.max(8, Math.round(w * (beat.depth || 0.09)));
+      var s = shell("book media", beat.tilt != null ? beat.tilt : 0);
+      s.el.style.width = w + "px"; s.el.style.height = h + "px";
+      s.el.style.setProperty("--w", w + "px"); s.el.style.setProperty("--h", h + "px"); s.el.style.setProperty("--d", d + "px");
+      s.el.style.setProperty("--spine", beat.spine || "#7a5533");
+      s.el.style.setProperty("--rest", (beat.rest != null ? beat.rest : -28) + "deg");
+      var b = document.createElement("div");
+      b.className = "book3d";
+      b.innerHTML = '<div class="bf front"></div><div class="bf back"></div><div class="bf spine"></div>' +
+                    '<div class="bf pages-r"></div><div class="bf pages-t"></div><div class="bf pages-b"></div>';
+      b.querySelector(".front").appendChild(makeImg(beat.front, "cover"));
+      b.querySelector(".back").appendChild(makeImg(beat.back || beat.front, "cover"));
+      s.inner.appendChild(b);
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", beat.alt || "Book");
+      addItem(s.el, x, y, diesAt);
+    },
+
     // message bubbles that appear one by one, with "typing…" dots
     chat: function (beat, x, y, diesAt) {
       var s = shell("chat", beat.tilt != null ? beat.tilt : randomTilt() * 0.5);
@@ -856,12 +934,13 @@
   }
 
   function textRects() {
-    return live.filter(function (it) {
-      return it.el.classList.contains("text") && !it.dead;
+    var extra = live.filter(function (it) { return it.obstacle && !it.dead; }).map(function (it) { return it.obstacle(); });
+    return extra.concat(live.filter(function (it) {
+      return (it.el.classList.contains("text") || it.el.classList.contains("chat")) && !it.dead;
     }).map(function (it) {
       var w = Math.max(it.el.offsetWidth, it.fw || 0), h = Math.max(it.el.offsetHeight, it.fh || 0);
       return { l: it.x, t: it.y, r: it.x + w, b: it.y + h };
-    });
+    }));
   }
 
   // the roomiest area around the texts that fits a w×h box: returns centre, scale, side
@@ -942,6 +1021,12 @@
   }
 
   function freeSpotFor(beat) {
+    if (beat.type === "book") {
+      var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7), bh0 = bw0 / (beat.ratio || 0.7);
+      var fb = clearSpot(bw0 * 1.15, bh0 * 1.1, textRects().concat(mediaRects()), null, 0.4) || freeSpot(bw0, bh0, textRects());
+      beat._fit = fb.scale;
+      return fb;
+    }
     var spec = beat.photos ? beat.photos[0] : beat;
     var ratio = spec.ratio || 1;
     var w = mediaWidth(beat.size || spec.size || "m", ratio, spec.scale);
@@ -1112,6 +1197,8 @@
       if (b.src) new Image().src = b.src;
       if (b.reveal && b.reveal.mask) new Image().src = b.reveal.mask;
       preload(b.photos); preload(b.also); preload(b.then); preload(b.cards); preload(b.hintThen);
+      if (b.front) { new Image().src = b.front; if (b.back) new Image().src = b.back; }
+      if (b.cues && b.type === "code") preload(Object.keys(b.cues).map(function (k) { return b.cues[k]; }));
     });
   }
   preload(STORY);

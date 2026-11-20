@@ -262,7 +262,7 @@ window.STORY = [
 
   // tap: work text (in the free space, near the tap) + the bar photo right away;
   //      then the cities are typed and each one drops its postcard
-  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 700, speed: 70, tilt: 0,
+  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 300, speed: 35, tilt: 0,
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
     also: [
       { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
@@ -270,15 +270,15 @@ window.STORY = [
     // postcards fill the whole page, one per city as it's typed; the text stays on top.
     // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
-        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
           postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
-        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
           postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
-        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
           postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
-        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
           postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
-        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.75, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
           postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
     }
   },

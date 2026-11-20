@@ -50,6 +50,7 @@
              cues     { "word": beat } → that beat plays the moment "word" is typed
                       (free: true + jitter: 0.12 → tossed in a loose pile)
              then     beats that start BY THEMSELVES when the typing ends
+                      ({ advance: true, delay: ms } → the story moves on by itself)
                       (delay: ms; at: [x, y] share of the screen, default
                       = just below the text)
              words    true → appears one word at a time (speed: ms per word)
@@ -264,6 +265,8 @@ window.STORY = [
   //      then the cities are typed and each one drops its postcard
   { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 300, speed: 35, tilt: 0,
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
+    // once every postcard is in, the cycling part starts by itself (no tap needed)
+    then: [ { advance: true, delay: 1400 } ],
     also: [
       { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
     ],
@@ -297,10 +300,10 @@ window.STORY = [
     ]
   },
 
-  /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways;
-     as soon as the whole phrase has come in, the rest of the text appears */
-  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650,
-    then: [
+  /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways,
+     the text sits on top of it from the start */
+  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 1050,
+    also: [   // the text is there straight away; the giant words scroll underneath
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
         text: "Turns out, fashion isn't exactly sustainable.\nAnd that has always mattered to me.\n\n15 years vegetarian. (Yes, I know I should probably go vegan.)\n\nDoing my best. 😮‍💨" }
@@ -319,7 +322,7 @@ window.STORY = [
 
   // tap: the chat with Leo (bubbles type themselves)
   { type: "chat", title: "Leonardo Magrelli", tilt: -2, free: true, messages: [
-      { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?" },
+      { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?", typing: 300, pause: 400 },
       { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
       { from: "me",   text: "Yes! Amazing!" }
   ]},

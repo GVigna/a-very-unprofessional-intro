@@ -968,7 +968,17 @@
 
   // "then": beats that start by themselves when a typed text has finished
   function playThen(beat, item) {
+    var atNow = step;
     (beat.then || []).forEach(function (next) {
+      if (next.advance) {
+        // go on to the next beat by itself, unless the visitor already tapped on
+        later(function () {
+          if (step !== atNow) return;
+          var v0 = viewport();
+          reveal(v0.w / 2, v0.h / 2);
+        }, reduceMotion ? 300 : (next.delay || 0));
+        return;
+      }
       later(function () {
         if (item.dead) return;
         var v = viewport(), unit = Math.min(v.w, v.h), x, y;

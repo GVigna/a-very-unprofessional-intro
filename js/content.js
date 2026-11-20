@@ -308,5 +308,12 @@ window.STORY = [
     ]
   },
 
+  // tap: the chat with Leo (bubbles type themselves)
+  { type: "chat", title: "Leo", tilt: -2, free: true, messages: [
+      { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?" },
+      { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
+      { from: "me",   text: "Yes! Amazing!" }
+  ]},
+
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

@@ -736,7 +736,22 @@
       var list = document.createElement("div");
       list.className = "chat-list";
       s.inner.appendChild(list);
-      var item = addItem(s.el, x, y, diesAt);
+      var anchorAt;
+      if (beat.free) {
+        // measure the finished conversation, then reserve a free spot for it
+        (beat.messages || []).forEach(function (m) {
+          var b = document.createElement("div");
+          b.className = "bubble " + (m.from === "me" ? "me" : "them");
+          b.textContent = m.text || "";
+          list.appendChild(b);
+        });
+        s.el.style.visibility = "hidden"; stage.appendChild(s.el);
+        var cw = s.el.offsetWidth, chh = s.el.offsetHeight;
+        s.el.remove(); s.el.style.visibility = ""; list.innerHTML = "";
+        var spot = clearSpot(cw, chh, textRects().concat(mediaRects()), { x: x, y: y }, 1);
+        if (spot) { x = spot.x - cw / 2; y = spot.y - chh / 2; anchorAt = "topleft"; }
+      }
+      var item = addItem(s.el, x, y, diesAt, anchorAt);
 
       var msgs = beat.messages || [];
       var t = reduceMotion ? 0 : 300;

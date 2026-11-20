@@ -415,13 +415,14 @@
         var B = bands(), box = item.el.getBoundingClientRect();
         if (!item.cornerSide) item.cornerSide = (box.left + box.width / 2) < v.w / 2 ? "right" : "left";
         var pw = mediaWidth(next.size || "m", next.ratio || 1.5, next.scale), ph = pw / (next.ratio || 1.5);
-        if (v.h > v.w) { next._fit = 0.8; pw *= 0.8; ph *= 0.8; } else next._fit = 1;   // phones: a bit smaller
+        next._fit = 1;
         // phones: the text is as wide as the screen, so the pile goes to the top or the bottom, away from it
         var topPile = v.h > v.w && (box.top + box.height / 2) > v.h / 2;
-        f = { x: item.cornerSide === "left" ? pw * 0.36 : v.w - pw * 0.36,
-              y: topPile ? B.t + ph * 0.3 : v.h - B.b - ph * 0.28 };
-        f.x += (Math.random() * 2 - 1) * pw * 0.16; f.y += (Math.random() * 2 - 1) * ph * 0.22;
-        next.tilt = Math.round((Math.random() * 2 - 1) * 16);
+        // mostly on screen (the city name must be readable), just a corner sticking out
+        f = { x: item.cornerSide === "left" ? pw * 0.46 : v.w - pw * 0.46,
+              y: topPile ? B.t + ph * 0.52 : v.h - B.b - ph * 0.5 };
+        f.x += (Math.random() * 2 - 1) * pw * 0.08; f.y += (Math.random() * 2 - 1) * ph * 0.14;
+        next.tilt = Math.round((Math.random() * 2 - 1) * 12);
         playBeat(next, f.x, f.y, at);
         if (beat.onTop !== false) { toFront(item); item.el.classList.add("boxed"); }
         return;
@@ -538,6 +539,7 @@
     if (beat.align) s.el.classList.add("align-" + beat.align);
     if (beat.color) s.el.classList.add("color-" + beat.color);
     if (beat.boxed) s.el.classList.add("boxed");
+    if (beat.box === "light") s.el.classList.add("box-light");   // white box, violet text (on coloured pages)
     if (beat.lines) {
       // every line is in place from the start (so the size doesn't jump), just hidden
       (beat.text || "").split("\n").forEach(function (line) {
@@ -1017,6 +1019,49 @@
       later(function () { playThen(beat, item); }, 0);
     },
 
+    // LAPTOP — a big laptop opens and shows a website (live, in an iframe) scrolling slowly by itself.
+    // Optional ribbons (awards) hang from the top of the screen.
+    laptop: function (beat, x, y, diesAt) {
+      var v = viewport(), B = bands();
+      var H = v.h - B.t - B.b;
+      var sw = Math.min(v.w * (v.w > v.h ? (beat.share || 0.5) : 0.92), H * 0.82 * 1.6);   // screen width
+      var sh = sw / 1.6;                                                            // 16:10 screen
+      var bodyH = sh + sw * 0.07;                                                   // + the base
+      var spot = clearSpot(sw * 1.16, bodyH + sw * 0.06, textRects(), { x: x, y: y }, 0.55);
+      var sc = spot ? spot.scale : 1;
+      if (!spot) { var fb = freeSpot(sw * 1.16, bodyH, textRects()); spot = fb; sc = Math.min(1, fb.scale); }
+      sw *= sc; sh *= sc;
+      var s = shell("laptop", 0);
+      s.el.style.width = Math.round(sw * 1.16) + "px"; s.el.style.height = Math.round(sh + sw * 0.07) + "px";
+      s.el.style.setProperty("--sw", sw + "px"); s.el.style.setProperty("--sh", sh + "px");
+      var vw = beat.pageWidth || 1280, k = (sw * 0.94) / vw;          // the site is drawn at desktop width, scaled down
+      var pageH = beat.pageHeight || 1400, viewH = (sh * 0.9) / k;
+      s.inner.innerHTML =
+        '<div class="lt-lid"><div class="lt-screen"><div class="lt-page">' +
+        '<iframe class="lt-frame" loading="eager" tabindex="-1" title="' + (beat.alt || "Website") + '"></iframe>' +
+        '</div></div><div class="lt-ribbons"></div></div><div class="lt-base"><i></i></div>';
+      var frame = s.inner.querySelector(".lt-frame"), page = s.inner.querySelector(".lt-page");
+      frame.style.width = vw + "px"; frame.style.height = pageH + "px";
+      frame.style.transform = "scale(" + k + ")";
+      page.style.setProperty("--travel", -Math.max(0, pageH - viewH) * k + "px");
+      page.style.setProperty("--scroll-s", (beat.scrollTime || 14) + "s");
+      (beat.awards || []).forEach(function (a, i) {
+        var r = document.createElement("span");
+        r.className = "lt-ribbon";
+        r.textContent = a.label;
+        r.style.background = a.bg; r.style.color = a.fg || "#FFFFFF";
+        r.style.animationDelay = (1.6 + i * 0.25) + "s";
+        if (a.title) r.title = a.title;
+        s.inner.querySelector(".lt-ribbons").appendChild(r);
+      });
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", beat.alt || "Laptop showing a website");
+      addItem(s.el, spot.x, spot.y, diesAt);
+      // the lid opens, then the site loads and starts scrolling
+      later(function () { frame.src = beat.url; }, reduceMotion ? 0 : 700);
+      later(function () { page.classList.add("scrolling"); }, reduceMotion ? 0 : (beat.scrollDelay || 3200));
+    },
+
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
     deck: function (beat, x, y, diesAt) {
       var cards = beat.cards || [];
@@ -1054,22 +1099,23 @@
       el.className = "marquee";
       if (beat.color) el.classList.add("color-" + beat.color);
       var span = document.createElement("span");
-      span.textContent = beat.text || "";
       el.appendChild(span);
       stage.appendChild(el);
       var v = viewport();
       var stretch = (beat.stretch || 3.2) * (v.h > v.w ? 1.6 : 1);   // tall phone screens: even taller, narrower letters
       span.style.fontSize = (v.h / (0.72 * stretch)) * 0.96 + "px";   // capitals fill the height
       span.style.setProperty("--sy", stretch);
-      var tw = span.offsetWidth, speed = beat.speed || 650;          // px per second
-      if (beat.direction === "right") {           // comes in from the left, moves right
-        span.style.setProperty("--from", -tw + "px");
-        span.style.setProperty("--to", v.w + "px");
-      } else {
-        span.style.setProperty("--from", v.w + "px");
-        span.style.setProperty("--to", -tw + "px");
-      }
-      span.style.animationDuration = (v.w + tw) / speed + "s";
+      // one endless line: "SPOILER ALERT SPOILER ALERT …" — measure one phrase (+ its space), repeat it
+      var phrase = (beat.text || "") + "\u00a0";
+      span.textContent = phrase;
+      var unit = span.getBoundingClientRect().width, speed = beat.speed || 650;   // px per second
+      var copies = Math.ceil((v.w * 2) / Math.max(1, unit)) + 2;
+      span.textContent = new Array(copies + 1).join(phrase);
+      var dir = beat.direction === "right" ? 1 : -1;
+      span.style.setProperty("--from", (dir < 0 ? 0 : -unit) + "px");
+      span.style.setProperty("--to", (dir < 0 ? -unit : 0) + "px");
+      span.style.animationDuration = unit / speed + "s";   // one phrase per cycle → no seam
+      var tw = unit;
       var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
       el._item = item;
       el.style.zIndex = ++z;
@@ -1414,7 +1460,7 @@
     if (beat.type === "book") {
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7, beat.scale), bh0 = bw0 / (beat.ratio || 0.7);
       var yfs = Math.min(96, Math.max(34, viewport().w * 0.095));       // the large text size
-      yfs *= 0.5;                                                        // the year is half the large size
+      yfs = Math.min(29, Math.max(19, viewport().w * 0.053));            // medium size
       var yearH = beat.year ? yfs * 1.5 : 0, yearW = beat.year ? yfs * (0.75 * String(beat.year).length + 1.1) : 0;
       var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
       var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.4)

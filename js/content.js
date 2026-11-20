@@ -254,7 +254,7 @@ window.STORY = [
 
   // tap: work text (in the free space, near the tap) + the bar photo right away;
   //      then the cities are typed and each one drops its postcard
-  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 200, speed: 22, tilt: 0,
+  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 400, speed: 110, tilt: 0, box: "light",
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
     // the postcards stay until the next tap
 
@@ -263,15 +263,15 @@ window.STORY = [
     cues: {
         // the bar photo pops out of "bartending" as an iMessage photo bubble, right of the text box
         "bartending": { beside: true, bubble: true, type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", tilt: -2 },
-        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
-        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
-        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
-        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
-        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
     }
   },
@@ -302,10 +302,10 @@ window.STORY = [
 
   /* ===== 2016 — BACK TO ITALY ===== */
   // tap: everything goes, the whole page turns violet
-  { clear: true, bg: "var(--primary)",
-    type: "text", text: "2016", style: "big", color: "white", tilt: 0,
+  { clear: true, bg: "default",          // new chapter: back to white
+    type: "text", text: "2016", style: "big", tilt: 0,
     also: [
-      { below: true, type: "text", style: "body", color: "white", typing: true, speed: 50, tilt: 0, gap: 14, delay: 500,
+      { below: true, type: "text", style: "body", typing: true, speed: 50, tilt: 0, gap: 14, delay: 500,
         text: "Ok I'm done, time to go back to Italy, become a graphic and motion designer and maybe an artist (?)",
         then: [ { advance: true, delay: 900 } ] }   // the chat with Leo starts by itself
     ]
@@ -417,41 +417,13 @@ window.STORY = [
     type: "text", style: "body", typing: true, speed: 40, tilt: 0,
     bold: ["Meanwhile,"],
     text: "Meanwhile, I've been freelancing for 10 years now!\nA few projects:",
-    // then the projects fill the screen: panels of covers changing fast + one project card in front.
-    // Covers are loaded from giuliavigna.com / Behance for now (to replace with local copies).
+    // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
-      { type: "collage", interval: 1600, bgInterval: 520, delay: 200, lifespan: 1, cards: [
-      { title: "Motion + Social Media", src: "https://r2.govsble.com/69b9cbe32e35908eabeac46e/photos/01KKYW94KP4RP3WQX6BCT6ZRRV/original.gif",
-        url: "https://giuliavigna.com/homepage/motion/" },
-      { title: "Website Design / Artmultiply", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2QvMy80LzYvZGFiZWY0NjAzM2Y1NWM1ODQwZDFmMTlkNmYzZjY0YjcuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/artmultiply/" },
-      { title: "Burger identity", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvMi85LzUvM2I5NDY3MWMyMjdkNDA2YzlhNjU3MDgxNWQ4Y2ZkYTkuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/burger-identity/" },
-      { title: "Impolite website", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2UvYi83LzIvZTk3NTI1NGViNzQwYjIwYTdlMTcxZDgxMmI5ODA4NmYuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/impolite-wesbite/" },
-      { title: "Ronin", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzUvNC9hLzQvNTBjY2NlODU0NzJhYzQyMmE5Yjk0MDNhNDI5N2IxYWIuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/84430173/" },
-      { title: "Megazinne", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvZS83LzUvM2MwODUzYzdlY2IyNWYyMTdiYWIyZjkxNThjYzVkODIuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/36548381/" },
-      { title: "Tape Saturday", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2EvZi82LzcvYTA1MjVjNTNmZTIyMDZmNzZjMWM3ZDY0NzYxNmVkY2YuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/9878122/" },
-      { title: "Yanez", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvNS8xLzIvMzY3NTIyNzI1NDlmNmYzNjFmZTNiYTE2MjUxOTQ3ZWQuanBnIn0=",
-        url: "https://giuliavigna.com/homepage/9374656/" },
-      { title: "Maos branding and illustration", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/8a4e8d214429615.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Terra Cena movie graphics", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7ade7e204420103.Y3JvcCwxMzgwLDEwODAsMjcwLDA.png",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Poster Design Dameer", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0e3855185106913.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Motion Graphics for Website Awards", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/413af3128639515.Y3JvcCwxODM0LDE0MzQsMCwxOTk.png",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Social media censorship", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/3dea8095366789.Y3JvcCwxNTAwLDExNzMsMCwzMjY.jpg",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Draft for TMI's identity", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/fdbfaf94733593.Y3JvcCwxNDAwLDEwOTUsMCwxMzg.png",
-        url: "https://www.behance.net/Giulia_Vigna" },
-      { title: "Don't let this crisis go to waste", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/8a654894414573.Y3JvcCw0NTAwLDM1MTksMCw0Njc.jpg",
-        url: "https://www.behance.net/Giulia_Vigna" }
-      ]}
+      { type: "laptop", delay: 200, url: "https://giuliavigna.com/", alt: "giuliavigna.com, scrolling",
+        pageWidth: 1280, pageHeight: 1291, scrollTime: 12,
+        // Behance gallery features, as ribbons on the screen
+        awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
+                  { label: "Xd", bg: "#470137", fg: "#FF61F6" } ] }
     ]
   },
 

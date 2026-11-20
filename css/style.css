@@ -601,7 +601,7 @@ body:not(.dark-page) .codecol { color: var(--primary); }
   bottom: 100%;
   margin-bottom: .18em;
   translate: -50% 0;                             /* composes with the pop-in animation */
-  font: 400 calc(var(--fs-l) * .5)/1 "Alfa Slab One", var(--font);   /* half the large size, font 2 */
+  font: 700 var(--fs-m)/1 var(--font);           /* site font, medium size */
   color: var(--primary);
   background: #FFFFFF;                           /* white pill */
   padding: .1em .5em .12em;
@@ -630,6 +630,8 @@ body.dark-page .item.text:not(.color-secondary) .inner { color: #FFFFFF; }
 body.dark-page .inner.caret::after { background: #FFFFFF; }
 body.dark-page .marquee:not(.color-secondary) { color: #FFFFFF; }
 body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow: 0 0 0 2px #FFFFFF; }
+body.dark-page .item.text.box-light.boxed .inner, body.dark-page .item.text.box-light .inner { background: #FFFFFF; color: var(--primary); box-shadow: 0 4px 14px rgba(0,0,0,.18); padding: 6px 9px; }
+body.dark-page .item.text.box-light .inner.caret::after { background: var(--primary); }
 .item.text.color-white .inner.caret::after { background: #FFFFFF; }
 
 /* =========================================================
@@ -873,3 +875,44 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
 }
 .collage-title { font: 700 var(--fs-m)/1 var(--font); text-transform: uppercase; letter-spacing: -.01em; }
 .collage-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; pointer-events: none; }
+
+/* LAPTOP — front view: lid with a black bezel opening up, a silver base below */
+.item.laptop .inner { width: 100%; height: 100%; overflow: visible; background: none; perspective: 1600px; }
+.lt-lid {
+  position: absolute; left: calc((100% - var(--sw)) / 2); top: 0;
+  width: var(--sw); height: var(--sh);
+  background: #111111; border-radius: calc(var(--sw) * .025) calc(var(--sw) * .025) 4px 4px;
+  padding: calc(var(--sw) * .03);
+  transform-origin: 50% 100%;
+  animation: lt-open 1.3s cubic-bezier(.2,.8,.2,1) .15s both;
+  box-shadow: inset 0 0 0 2px #2a2a2a;
+}
+.lt-screen { position: relative; width: 100%; height: 100%; overflow: hidden; background: #FFFFFF; border-radius: 2px; }
+.lt-page { position: absolute; left: 0; top: 0; width: 100%; }
+.lt-page.scrolling { animation: lt-scroll var(--scroll-s) ease-in-out infinite alternate; }
+.lt-frame { border: 0; display: block; transform-origin: 0 0; pointer-events: none; background: #FFFFFF; }
+.lt-base {
+  position: absolute; left: 0; right: 0; top: var(--sh);
+  height: calc(var(--sw) * .045);
+  background: linear-gradient(#e9eaec, #b9bbbf);
+  border-radius: 0 0 calc(var(--sw) * .06) calc(var(--sw) * .06) / 0 0 calc(var(--sw) * .03) calc(var(--sw) * .03);
+  box-shadow: 0 14px 24px rgba(0,0,0,.22);
+}
+.lt-base i { position: absolute; left: 42%; right: 42%; top: 0; height: 32%; background: #a7a9ad; border-radius: 0 0 8px 8px; }
+@keyframes lt-open {
+  0%   { transform: rotateX(-88deg); filter: brightness(.6); }
+  100% { transform: rotateX(0); filter: none; }
+}
+@keyframes lt-scroll { 0%, 8% { transform: translateY(0); } 92%, 100% { transform: translateY(var(--travel)); } }
+/* award ribbons hanging from the top edge of the screen */
+.lt-ribbons { position: absolute; right: 8%; top: 0; display: flex; gap: calc(var(--sw) * .02); transform: translateY(-2px); }
+.lt-ribbon {
+  display: grid; place-items: center;
+  width: calc(var(--sw) * .07); height: calc(var(--sw) * .1); padding-bottom: calc(var(--sw) * .02);
+  font: 700 calc(var(--sw) * .028)/1 var(--font);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+  transform-origin: 50% 0;
+  animation: lt-ribbon .5s cubic-bezier(.2,1.5,.4,1) both;
+}
+@keyframes lt-ribbon { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .lt-page.scrolling { animation: none; } }

@@ -459,20 +459,16 @@ body {
   box-shadow: 0 2px 4px rgba(0,0,0,.16), 0 10px 26px rgba(0,0,0,.20);
 }
 .item.pc-rect .pc-pic { border-radius: 6% / 9%; }
-/* stamp-like scalloped edge: bites along the border */
+/* wavy-edged cream card: the outline is an SVG mask set in JS; shadow on the outer item */
 .item.pc-wavy .inner {
-  --bite: 7px;
   background: #F6EEE3;
-  padding: calc(var(--bite) * 2.2);
+  padding: 7%;
   box-shadow: none;
-  filter: drop-shadow(0 6px 14px rgba(0,0,0,.20));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    radial-gradient(circle var(--bite), #0000 98%, #000) calc(var(--bite) * -1) calc(var(--bite) * -1) / calc(var(--bite) * 2.6) calc(var(--bite) * 2.6) padding-box;
-          mask:
-    linear-gradient(#000 0 0) content-box,
-    radial-gradient(circle var(--bite), #0000 98%, #000) calc(var(--bite) * -1) calc(var(--bite) * -1) / calc(var(--bite) * 2.6) calc(var(--bite) * 2.6) padding-box;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
 }
+.item.pc-wavy { filter: drop-shadow(0 6px 14px rgba(0,0,0,.22)); }
+.item.pc-wavy .pc-pic { border-radius: 2px; }
 .pc-pic {
   position: relative;
   width: 100%;
@@ -538,6 +534,8 @@ body {
 }
 .marquee.leaving { animation: none; }
 .marquee.leaving span { opacity: 0; transition: opacity .3s; }
+
+strong { font-weight: 800; }
 
 /* text colour override */
 .item.text.color-secondary .inner { color: var(--secondary); }

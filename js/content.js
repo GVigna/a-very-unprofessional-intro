@@ -31,6 +31,7 @@
              align    "center" → centred lines
              color    "secondary" (orange) | "primary" (violet)
              boxed    true → white label behind (readable on top of images)
+             bold     ["phrase", …] → those phrases in bold
              typing   true → typed out letter by letter (speed: ms per letter)
              typeFrom "a phrase" → the text before it appears at once,
                       only that phrase and what follows is typed
@@ -58,6 +59,7 @@
                       → a retro postcard: src = its photo, the city name on top
                         in its own font (fill colour + solid shadow)
              fill     0,1,2… (on cue beats) → spots that together cover the screen
+             bleed    true → may stick out of the screen (big postcards)
    "video"            (no src → a coloured placeholder box with a label)
              label    placeholder caption
              ratio    width / height of the photo, e.g. 4/5, 16/9
@@ -106,7 +108,8 @@
    "marquee" text     one phrase, stretched to the full screen height, scrolling
                       sideways forever (stretch: vertical stretch, speed: px/s);
                       its "then" starts when the whole phrase has come in;
-                      taps pass through it
+                      taps pass through it; direction: "right" → enters from
+                      the left (default: from the right)
 
    "chat"    title    optional name at the top of the chat
              messages list of { from: "me" | "them", text: "…" }
@@ -115,8 +118,8 @@
 
 /* ---------- always-visible contact links (empty = hidden) */
 window.CONTACT = {
-  portfolio: "",   // e.g. "https://…"  → ACTUAL PORTFOLIO
-  email: ""        // e.g. "name@domain.com" → EMAIL ME
+  portfolio: "https://giuliavigna.com/",     // → ACTUAL PORTFOLIO
+  email: "info.gommastudio@gmail.com"        // → EMAIL ME
 };
 
 /* ---------- already on screen when the site opens (draggable, always stay) */
@@ -193,10 +196,10 @@ window.STORY = [
         links: { "Suzanne Rae": "https://suzannerae.com/" },
         // when the little cursor clicks the name: 3 Google-image cards (Vogue) are dealt like a deck
         hintThen: [
-          { type: "deck", size: "s", interval: 130, cards: [
-              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.987 },
-              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.796 },
-              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.988 }
+          { type: "deck", size: "m", fan: 0.36, interval: 130, cards: [
+              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.79 },
+              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.661 },
+              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.79 }
           ]}
         ],
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
@@ -244,28 +247,29 @@ window.STORY = [
 
   // tap: in the free space (never over the title or the meme)
   { free: true, type: "text", style: "body", typing: true, typeFrom: "London it is.", speed: 55, tilt: 0,
-    text: "Visa expires. I only speak English. Where do I go?\nLondon it is. Vámonos. 💃" },
+    lifespan: 1,   // goes away when "Fashion jobs…" appears
+    text: "Visa expires. I only speak English.\n\nWhere do I go? London it is.\n\nVámonos. 💃" },
 
   // tap: work text (in the free space, near the tap) + the bar photo right away;
   //      then the cities are typed and each one drops its postcard
   { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 700, speed: 70, tilt: 0,
-    text: "Fashion jobs by day, bartending by night.\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\nIstanbul, Milan, Copenhagen, Paris, Florence.",
+    text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
     also: [
       { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
     ],
     // postcards fill the whole page, one per city as it's typed; the text stays on top.
     // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
-        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", fill: 0, jitter: 0.03, tilt: -7,
-          postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#F7D046", shade: "#E5432A" } },
-        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", fill: 1, jitter: 0.03, tilt: 6,
-          postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#F7D046", shade: "#1B1B1B", upper: true } },
-        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", fill: 2, jitter: 0.03, tilt: -4,
-          postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#F7D046", shade: "#E5432A", upper: true, scale: 1.25 } },
-        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", fill: 3, jitter: 0.03, tilt: 8,
-          postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#F7D046", shade: "#1B1B1B", scale: 2.1 } },
-        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", fill: 4, jitter: 0.03, tilt: -5,
-          postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F7D046", shade: "#E5432A" } }
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
+          postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
+          postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
+          postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
+          postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.4, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
+          postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
     }
   },
 
@@ -275,7 +279,8 @@ window.STORY = [
     type: "text", text: "ALSO, I GOT REALLY INTO CYCLING.", style: "big", typing: true, speed: 45, tilt: 0,
     also: [
       { below: true, type: "text", style: "body", typing: true, typeDelay: 1700, speed: 45, tilt: 0, gap: 14,
-        text: "Still obsessed.\nCycling in London? Easy.\nTRY ROME." },
+        bold: ["TRY ROME."],
+        text: "Still obsessed.\n\nCycling in London? Easy.\n\nTRY ROME." },
       { free: "all", type: "video", src: "media/03_CAPITOLO_3/bici.mp4", poster: "media/03_CAPITOLO_3/bici_poster.jpg",
         ratio: 0.4624, size: "m", frame: "phone", tilt: 3, delay: 800 }
     ]
@@ -283,11 +288,11 @@ window.STORY = [
 
   /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways;
      as soon as the whole phrase has come in, the rest of the text appears */
-  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650,
+  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 650, direction: "right",
     then: [
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
-        text: "Turns out, fashion isn't exactly sustainable.\nAnd sustainability has always mattered to me.\n15 years vegetarian. (Yes, I know I should probably go vegan.)\nDoing my best." }
+        text: "Turns out, fashion isn't exactly sustainable.\nAnd that has always mattered to me.\n\n15 years vegetarian. (Yes, I know I should probably go vegan.)\n\nDoing my best. 😮‍💨" }
     ]
   },
 

@@ -60,12 +60,24 @@
     timers.push(id);
   }
 
+  var segmenter = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
+  function graphemes(str) {
+    return segmenter ? Array.from(segmenter.segment(str), function (g) { return g.segment; }) : Array.from(str);
+  }
+
   function randomTilt() { return (Math.random() * 2 - 1) * MAX_TILT; }
 
   // Keep an item fully on screen.
   function clamp(item, x, y) {
     var v = viewport();
     var w = item.el.offsetWidth, h = item.el.offsetHeight;
+    if (item.bleed) {
+      // may stick out of the screen, but at least ~45% of it stays visible
+      return {
+        x: Math.min(Math.max(x, -w * 0.55), v.w - w * 0.45),
+        y: Math.min(Math.max(y, -h * 0.55), v.h - h * 0.45)
+      };
+    }
     var maxX = Math.max(EDGE, v.w - w - EDGE);
     var maxY = Math.max(EDGE, v.h - h - EDGE);
     return {
@@ -122,6 +134,18 @@
     return Math.round(w);
   }
 
+  // a rectangle whose edges are gentle waves (amp = wave height, wl = wavelength), as SVG
+  function wavySVG(w, h) {
+    var amp = Math.max(2.5, Math.min(w, h) * 0.012), wl = Math.max(10, Math.min(w, h) * 0.055), m = amp * 1.2;
+    var pts = [], x, y;
+    for (x = 0; x <= w; x += 2) pts.push([x, m + amp * Math.sin(2 * Math.PI * x / wl)]);
+    for (y = 0; y <= h; y += 2) pts.push([w - m + amp * Math.sin(2 * Math.PI * y / wl), y]);
+    for (x = w; x >= 0; x -= 2) pts.push([x, h - m + amp * Math.sin(2 * Math.PI * x / wl)]);
+    for (y = h; y >= 0; y -= 2) pts.push([m + amp * Math.sin(2 * Math.PI * y / wl), y]);
+    var d = "M" + pts.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join("L") + "Z";
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><path d="' + d + '" fill="#000"/></svg>';
+  }
+
   function makeImg(src, cls) {
     var img = document.createElement("img");
     img.src = src;
@@ -174,6 +198,12 @@
       name.dataset.base = base;
       pic.appendChild(name);
       s.inner.appendChild(pic);
+      if ((pc.shape || "rect") === "wavy") {
+        var full = s.el.style.width ? parseFloat(s.el.style.width) : w;
+        var fullH = s.el.style.height ? parseFloat(s.el.style.height) : h;
+        var url = 'url("data:image/svg+xml;utf8,' + encodeURIComponent(wavySVG(full, fullH)) + '")';
+        s.inner.style.webkitMaskImage = url; s.inner.style.maskImage = url;
+      }
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", "Postcard from " + (pc.city || ""));
       return s.el;
@@ -301,6 +331,10 @@
       var at = shown.indexOf(phrase);
       if (at >= 0) marks.push({ at: at, len: phrase.length, href: beat.links[phrase] });
     });
+    (beat.bold || []).forEach(function (phrase) {
+      var at = shown.indexOf(phrase);
+      if (at >= 0) marks.push({ at: at, len: phrase.length, bold: true });
+    });
     if (withStrike && beat.strike) {
       var sAt = shown.lastIndexOf(beat.strike);
       if (sAt >= 0) marks.push({ at: sAt, len: beat.strike.length, strike: true });
@@ -315,6 +349,8 @@
       if (m.href) {
         el = document.createElement("a");
         el.href = m.href; el.target = "_blank"; el.rel = "noopener";
+      } else if (m.bold) {
+        el = document.createElement("strong");
       } else {
         el = document.createElement("span");
         el.className = "strike";
@@ -513,13 +549,13 @@
       } else if (beat.typing) {
         // keep the tap point as the centre while the text grows
         var cx = x, cy = y, full = beat.text || "", i = 0;
-        var chars = Array.from(full);        // whole characters, so emoji are never split
+        var chars = graphemes(full);          // whole characters, so emoji are never split
         // typeFrom: everything before that phrase is there at once, only the rest is typed
         var pause = 0;
         if (beat.typeFrom) {
           var from = full.indexOf(beat.typeFrom);
           if (from > 0) {
-            i = Array.from(full.slice(0, from)).length;
+            i = graphemes(full.slice(0, from)).length;
             renderInto(s.inner, full.slice(0, from), beat, false);
             later(function () { maybeHint(item, s.inner, beat, 250); fireCues(beat, item, full.slice(0, from)); }, 0);
             pause = beat.typePause != null ? beat.typePause : TYPE_PAUSE; // breath before the typing
@@ -552,7 +588,11 @@
     },
 
     image: function (beat, x, y, diesAt, anchor) {
-      addItem(buildMedia(beat, "image", "m", beat.tilt), x, y, diesAt, anchor);
+      var it = addItem(buildMedia(beat, "image", "m", beat.tilt), x, y, diesAt, anchor);
+      if (beat.bleed) {
+        it.bleed = true;
+        if (!anchor) place(it, x - it.el.offsetWidth / 2, y - it.el.offsetHeight / 2);
+      }
     },
 
     video: function (beat, x, y, diesAt, anchor) {
@@ -631,9 +671,9 @@
       var r0 = cards[0].ratio || 1;
       var cw = mediaWidth(size, r0), ch = cw / r0;
       var offs = cw * (beat.fan != null ? beat.fan : 0.42);        // horizontal offset per card
-      var bw = cw + offs * (n - 1), bh = ch * 1.12;
-      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, 0.5)
-              || { x: viewport().w / 2, y: viewport().h / 2, scale: 0.7 };
+      var bw = (cw + offs * (n - 1)) * 1.08, bh = ch * 1.22;     // room for the tilted cards
+      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, 0.3);
+      if (!spot) { var fb = freeSpot(bw, bh, textRects()); spot = { x: fb.x, y: fb.y, scale: Math.min(fb.scale, 0.6) }; }
       var sc = spot.scale, origin = { x: x, y: y };
       var gap = reduceMotion ? 0 : (beat.interval || 130);
       cards.forEach(function (spec, k) {
@@ -668,8 +708,13 @@
       span.style.fontSize = (v.h / (0.72 * stretch)) * 0.96 + "px";   // capitals fill the height
       span.style.setProperty("--sy", stretch);
       var tw = span.offsetWidth, speed = beat.speed || 650;          // px per second
-      span.style.setProperty("--from", v.w + "px");
-      span.style.setProperty("--to", -tw + "px");
+      if (beat.direction === "right") {           // comes in from the left, moves right
+        span.style.setProperty("--from", -tw + "px");
+        span.style.setProperty("--to", v.w + "px");
+      } else {
+        span.style.setProperty("--from", v.w + "px");
+        span.style.setProperty("--to", -tw + "px");
+      }
       span.style.animationDuration = (v.w + tw) / speed + "s";
       var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
       el._item = item;
@@ -879,7 +924,7 @@
     var ratio = spec.ratio || 1;
     var w = mediaWidth(beat.size || spec.size || "m", ratio, spec.scale);
     var h = w / ratio;
-    var f = (beat.free === "all" && clearSpot(w, h, textRects().concat(mediaRects())))
+    var f = (beat.free === "all" && clearSpot(w, h, textRects().concat(mediaRects()), null, 0.3))
             || freeSpot(w, h, textRects());
     beat._fit = f.scale;
     beat._side = f.side;

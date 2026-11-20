@@ -52,7 +52,10 @@
     };
   }
 
+  var FAST = false;          // true while replaying steps to go back (no waiting)
+  var taps = [];             // where each step was tapped, to replay it
   function later(fn, ms) {
+    if (FAST) ms = 0;
     var id = setTimeout(function () {
       timers.splice(timers.indexOf(id), 1);
       fn();
@@ -108,8 +111,10 @@
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
 
+  var backBtn = document.getElementById("back");
   function updateProgress() {
     progress.textContent = pad(step) + "/" + pad(STORY.length);
+    if (backBtn) backBtn.hidden = step <= 0;
   }
 
   function nudgeProgress() {
@@ -1088,6 +1093,15 @@
         };
         pile.push(it);
       });
+      // it also goes by itself: one photo flies away every so often (the last one stays)
+      (function auto() {
+        later(function () {
+          if (pile.length <= 1) return;
+          var top = pile[pile.length - 1];
+          if (!drag || drag.item !== top) fling(top, (Math.random() < 0.5 ? -1 : 1) * (700 + Math.random() * 400), (Math.random() * 2 - 1) * 400);
+          auto();
+        }, reduceMotion ? 2500 : (beat.interval || 1100));
+      })();
     },
 
     // RECEIPT — a thermal-paper receipt that prints out; tap it and it crumples into a paper ball
@@ -1122,12 +1136,18 @@
       if (!spreads.length) return;
       var v = viewport(), B = bands(), ratio = beat.ratio || 1.415;
       var H = v.h - B.t - B.b;
-      var w = Math.min(v.w * (v.w > v.h ? 0.62 : 0.94), H * 0.8 * ratio), h = w / ratio;
-      var spot = clearSpot(w * 1.04, h * 1.06, textRects(), { x: x, y: y }, 0.5)
-              || clearSpot(w * 1.04, h * 1.06, textRects(), { x: x, y: y }, 0.35)
-              || { x: v.w / 2, y: B.t + H / 2, scale: 0.75 };          // no room: on top, in the middle
+      var share = beat.share || 1;
+      var w = Math.min(v.w * (v.w > v.h ? 0.62 : 0.94), H * 0.8 * ratio) * share, h = w / ratio;
+      // a preferred side of the screen, so several magazines spread out
+      var SIDES = { left: [0.22, 0.6], right: [0.78, 0.55], top: [0.6, 0.25], bottom: [0.45, 0.82], topleft: [0.25, 0.3], bottomright: [0.75, 0.8] };
+      var pref = beat.side && SIDES[beat.side] ? { x: SIDES[beat.side][0] * v.w, y: B.t + SIDES[beat.side][1] * H } : { x: x, y: y };
+      var avoid = textRects().concat(mediaRects());
+      var spot = clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.5)
+              || clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.3)
+              || clearSpot(w * 1.06, h * 1.1, mediaRects(), pref, 0.3)      // at worst over a text, never over another magazine
+              || { x: pref.x, y: pref.y, scale: 0.5 };
       if (spot.scale && spot.scale < 1) { w *= spot.scale; h = w / ratio; }
-      var s = shell("flipbook", beat.tilt != null ? beat.tilt : -2);
+      var s = shell("flipbook media", beat.tilt != null ? beat.tilt : -2);
       s.el.style.width = Math.round(w) + "px"; s.el.style.height = Math.round(h) + "px";
       var L = document.createElement("div"), R = document.createElement("div");
       L.className = "fb-half fb-l"; R.className = "fb-half fb-r";
@@ -1254,7 +1274,9 @@
       col._item = item;
       // texts that would sit on top of the code (unreadable) bow out; the chat stays
       var cr = col.getBoundingClientRect();
+      if (beat.faint) col.classList.add("faint");
       live.slice().forEach(function (it) {
+        if (beat.keepTexts) return;                        // keepTexts: the list runs behind the texts
         if (!it.el.classList.contains("text")) return;
         var r = it.el.getBoundingClientRect();
         if (r.left < cr.right && r.right > cr.left && r.top < cr.bottom && r.bottom > cr.top) removeItem(it);
@@ -1262,6 +1284,18 @@
       live.push(item);
 
       var lines = beat.lines || [], speed = reduceMotion ? 0 : (beat.speed || 120), at = step;
+      // "accel": the first lines at reading pace, then faster and faster, all done in about total ms
+      var times = lines.map(function (_, n) { return n * speed; });
+      if (beat.accel && !reduceMotion) {
+        var A = beat.accel, after = A.after || 9, slow = A.slow || 420, total = A.total || 8000;
+        var rest = Math.max(0, total - after * slow), k = lines.length - after, t = 0, acc = [];
+        for (var q = 0; q < k; q++) acc.push(1 - q / Math.max(1, k));      // shrinking gaps
+        var sum = acc.reduce(function (p, n) { return p + n; }, 0) || 1;
+        times = lines.map(function (_, n) {
+          if (n <= after) { t = n * slow; return t; }
+          t += rest * acc[n - after - 1] / sum; return t;
+        });
+      }
       lines.forEach(function (line, n) {
         later(function () {
           if (item.dead) return;
@@ -1280,7 +1314,7 @@
             var f = cue.free ? freeSpotFor(cue) : { x: x, y: y };
             playBeat(cue, f.x, f.y, at);
           }
-        }, n * speed);
+        }, times[n]);
       });
     },
 
@@ -1378,6 +1412,13 @@
     if (step >= STORY.length) { nudgeProgress(); return; }
 
     var beat = STORY[step];
+
+    // a receipt on screen crumples into a ball first, then the page moves on
+    if (beat.clear && !FAST) {
+      var rc = live.filter(function (it) { return !it.dead && it.el.classList.contains("receipt") && !it.el.classList.contains("crumpled"); })[0];
+      if (rc) { rc.el.classList.add("crumpled"); setTimeout(function () { reveal(x, y); }, reduceMotion ? 0 : 750); return; }
+    }
+    taps[step] = { x: x, y: y };
 
     // "bg": change the whole background colour (stays until another bg or restart)
     if (beat.bg) setBg(beat.bg);
@@ -1649,6 +1690,33 @@
     document.body.classList.toggle("dark-page", color !== "default");
   }
 
+  // BACK: rebuild the screen as it was one step ago — replay the chapter quickly, from its last "clear"
+  function goBack() {
+    if (FAST || step <= 0) return;
+    var target = step - 1;
+    // a step that moved on by itself (then: advance) can't be stopped at: go one further back
+    while (target > 0 && (STORY[target - 1].then || []).some(function (t) { return t.advance; })) target--;
+    var start = 0, bgNow = "default";
+    for (var i = 0; i < target; i++) { if (STORY[i].clear) start = i; if (STORY[i].bg) bgNow = STORY[i].bg; }
+    restart();
+    if (target === 0) return;
+    setBg(bgNow);
+    step = start;
+    FAST = true;
+    document.body.classList.add("fast");
+    var v = viewport();
+    (function ff() {
+      if (step >= target) {
+        setTimeout(function () { FAST = false; document.body.classList.remove("fast"); }, 400);
+        updateProgress();
+        return;
+      }
+      var p = taps[step] || { x: v.w / 2, y: v.h / 2 };
+      reveal(p.x, p.y);
+      setTimeout(ff, 120);
+    })();
+  }
+
   function restart() {
     setBg("default");
     timers.forEach(clearTimeout);
@@ -1746,6 +1814,10 @@
   // ---- controls ----
   restartBtn.addEventListener("click", function () {
     restart();
+    stage.focus({ preventScroll: true });
+  });
+  if (backBtn) backBtn.addEventListener("click", function () {
+    goBack();
     stage.focus({ preventScroll: true });
   });
 

@@ -422,7 +422,7 @@ window.STORY = [
     // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
       { type: "laptop", delay: 200, image: "media/00_OPENING/giuliavigna_site.webp", alt: "giuliavigna.com scrolling on a laptop",
-        scroll: false, holdEnd: 3500,   // the site stays still, then the lid closes
+        scroll: false, holdEnd: 2000,   // the site stays still, then the lid closes
         // Behance gallery features, as ribbons on the screen
         awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
                   { label: "Xd", bg: "#470137", fg: "#FF61F6" } ] }
@@ -464,6 +464,7 @@ window.STORY = [
     type: "text", text: "2020 — LET'S TALK ABOUT BOOBS.", style: "big", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        bold: ["How could I say no?"],
         text: "My childhood BFF Ilena (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
     ]
   },
@@ -472,7 +473,9 @@ window.STORY = [
   { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
     text: "Three issues, over €20K raised for charity.\n\nRolling Stone, ELLE, Il Messaggero.",
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
-    also: [ { type: "flipbook", delay: 300, flip: 230, interval: 260, loop: true, alt: "Megazinne, issues 2 and 3", spreads: [
+    // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
+    also: [
+      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -485,7 +488,9 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_09.webp",
         "media/06_CAPITOLO_6/mz2_10.webp",
         "media/06_CAPITOLO_6/mz2_11.webp",
-        "media/06_CAPITOLO_6/mz2_12.webp",
+        "media/06_CAPITOLO_6/mz2_12.webp"
+      ] },
+      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -500,7 +505,23 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_11.webp",
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
-    ] } ] },
+      ] },
+      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 1", spreads: [
+        "media/06_CAPITOLO_6/mz1_00.webp",
+        "media/06_CAPITOLO_6/mz1_01.webp",
+        "media/06_CAPITOLO_6/mz1_02.webp",
+        "media/06_CAPITOLO_6/mz1_03.webp",
+        "media/06_CAPITOLO_6/mz1_04.webp",
+        "media/06_CAPITOLO_6/mz1_05.webp",
+        "media/06_CAPITOLO_6/mz1_06.webp",
+        "media/06_CAPITOLO_6/mz1_07.webp",
+        "media/06_CAPITOLO_6/mz1_08.webp",
+        "media/06_CAPITOLO_6/mz1_09.webp",
+        "media/06_CAPITOLO_6/mz1_10.webp",
+        "media/06_CAPITOLO_6/mz1_11.webp",
+        "media/06_CAPITOLO_6/mz1_12.webp"
+      ] }
+    ] },
 
   // tap: everything goes; while this is typed, a receipt prints out (tap it: it crumples into a ball)
   { clear: true, free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
@@ -522,6 +543,58 @@ window.STORY = [
       { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: -3, delay: 900, label: "REEL 1 — video coming" },
       { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: 4, delay: 1200, label: "REEL 2 — video coming" },
       { free: "all", type: "image", ratio: 1, size: "s", tilt: -2, delay: 1500, label: "AUDIO — coming" }
+    ]
+  },
+
+  /* ===== CHAPTER 7 — MOTION ===== */
+  // tap: everything goes; the text sits in front, a very long list of skills streams behind it.
+  // The first ~9 lines at reading pace, then it speeds up (about 8 s in all) — no need to read it all.
+  { clear: true, bg: "default",
+    type: "text", text: "OH, I ALSO MAKE THINGS MOVE.", style: "big", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        text: "At some point, static images weren't enough anymore.\n\nSo I taught myself After Effects." },
+      { type: "code", delay: 1200, keepTexts: true, faint: true, accel: { after: 9, slow: 420, total: 8000 },
+        lines: [
+        "Art Direction",
+        "Graphic Design",
+        "Visual Identities",
+        "Branding",
+        "Editorial Design",
+        "Social Media Assets",
+        "Motion Graphics",
+        "Video Editing",
+        "Packaging Design",
+        "Print Production",
+        "Layout Design",
+        "Digital Design",
+        "UI/UX Design",
+        "Creative Direction",
+        "Presentations",
+        "Making Things Look Nice",
+        "Making Things Move",
+        "Making Things Move Nicely",
+        "Organising Chaos",
+        "Making Lists",
+        "Making Lists About Lists",
+        "Overthinking Typography",
+        "Finding the Right Shade of Blue",
+        "Opening 47 Tabs for Research",
+        "Naming Files FINAL_FINAL_v3",
+        "Working Across Time Zones",
+        "Explaining Why This Font Is Better",
+        "Getting Everyone on the Same Page",
+        "Actually Meeting Deadlines",
+        "Dancing on Tables",
+        "Making Magazines About Boobs",
+        "Cycling in Rome",
+        "Keeping Plants Alive (Sometimes)",
+        "Having Too Many Side Projects",
+        "Starting Another Side Project",
+        "Learning Something New Instead of Resting",
+        "Apparently, Going Back to University",
+        "## AND THE LIST GOES ON..."
+        ] }
     ]
   },
 

@@ -570,7 +570,7 @@ body:not(.dark-page) .codecol { color: var(--primary); }
   width: var(--w);
   height: var(--h);
   transform-style: preserve-3d;
-  animation: book-in 1.2s cubic-bezier(.2,.8,.2,1) both;
+  animation: book-in 1.2s cubic-bezier(.2,.8,.2,1) both, book-turn 9s ease-in-out 1.2s infinite;
 }
 .bf { position: absolute; backface-visibility: hidden; }
 .bf.front, .bf.back { width: var(--w); height: var(--h); }
@@ -920,7 +920,7 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
   transition: transform 1.3s cubic-bezier(.3,.1,.2,1);
 }
 .item.laptop.open .lt-lid { transform: translateZ(2px) rotateX(108deg); }
-.item.laptop.closing .lt-lid { transition-duration: 1s; }
+.item.laptop.closing .lt-lid { transition-duration: .55s; transition-timing-function: cubic-bezier(.6,0,.9,.6); }
 .lt-shell, .lt-display { position: absolute; inset: 0; border-radius: calc(var(--W) * .03); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .lt-shell { background: linear-gradient(160deg, #e9eaed, #c9ccd1); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
 .lt-display { transform: rotateX(180deg); background: #0d0d0e; padding: calc(var(--W) * .022) calc(var(--W) * .022) calc(var(--W) * .04); }
@@ -992,4 +992,25 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
     conic-gradient(from 20deg at 40% 55%, rgba(0,0,0,.12), transparent 9%, rgba(0,0,0,.08) 17%, transparent 26%, rgba(0,0,0,.14) 38%, transparent 47%, rgba(0,0,0,.06) 60%, transparent 71%, rgba(0,0,0,.12) 83%, transparent 92%),
     conic-gradient(from 75deg at 66% 38%, transparent, rgba(0,0,0,.1) 14%, transparent 24%, rgba(0,0,0,.07) 52%, transparent 63%, rgba(0,0,0,.1) 81%, transparent),
     radial-gradient(circle at 72% 78%, rgba(0,0,0,.22), transparent 58%);
+}
+
+/* BACK arrow — left edge, middle */
+.ui-back {
+  left: calc(var(--safe-l) + 6px); top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; padding: 10px 6px;
+  background: none; border: 0; cursor: pointer; touch-action: manipulation;
+}
+.ui-back svg { width: 100%; height: 100%; display: block; }
+.ui-back[hidden] { display: none; }
+.ui-back:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* while replaying (going back), skip the entrance animations */
+body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+
+/* a list running behind texts: lighter, so the texts stay readable */
+.codecol.faint { opacity: .4; }
+
+/* after landing, the books turn slowly back and forth (no opacity: it would flatten the 3D) */
+@keyframes book-turn {
+  0%, 100% { transform: rotateX(0deg) rotateY(var(--rest)); }
+  50%      { transform: rotateX(0deg) rotateY(calc(var(--rest) + 28deg)); }
 }

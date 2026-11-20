@@ -495,9 +495,11 @@
       y: v.h - cy + (Math.random() * 2 - 1) * v.h * 0.18
     };
     // reserve room for the tossed tilts, and never land on texts or other media (the deck, the video)
-    var spot = clearSpot(w * 1.3, h * 1.2, textRects().concat(mediaRects(), [D]), pref, 0.3);
+    var spot = clearSpot(w * 1.3, h * 1.2, textRects().concat(mediaRects(), [D]), pref, isPhone() ? 0.9 : 0.3);
+    if (isPhone()) spot = spot || sideSpot(w, h);
     if (!spot) return null;
     next._fit = spot.scale;
+    next._bleed = !!spot.bleed;
     return spot;
   }
 
@@ -703,6 +705,7 @@
       var mel = buildMedia(beat, "image", "m", beat.tilt);
       if (beat.bubble) mel.classList.add("imsg");          // photo sent as an iMessage bubble
       var it = addItem(mel, x, y, diesAt, anchor);
+      if (beat._bleed && !anchor) { it.bleed = true; place(it, x - mel.offsetWidth / 2, y - mel.offsetHeight / 2); }
       if (beat.bleed) {
         it.bleed = true;
         if (!anchor) place(it, x - it.el.offsetWidth / 2, y - it.el.offsetHeight / 2);
@@ -710,7 +713,8 @@
     },
 
     video: function (beat, x, y, diesAt, anchor) {
-      addItem(buildMedia(beat, "video", "m", beat.tilt), x, y, diesAt, anchor);
+      var vit = addItem(buildMedia(beat, "video", "m", beat.tilt), x, y, diesAt, anchor);
+      if (beat._bleed && !anchor) { vit.bleed = true; place(vit, x - vit.el.offsetWidth / 2, y - vit.el.offsetHeight / 2); }
     },
 
     // one tap → several photos land in quick succession around the tap
@@ -765,6 +769,7 @@
           if (beat._side === "above") el.classList.add("from-top");
           var u = (parseFloat(el.style.width) || 200) * 0.06 * mess;   // scattered, but inside its reserved spot
           var it = addItem(el, x + (Math.random() * 2 - 1) * u, y + (Math.random() * 2 - 1) * u, diesAt);
+          if (beat._bleed) { it.bleed = true; place(it, x - el.offsetWidth / 2, y - el.offsetHeight / 2); }
           it.leaveHow = how;                    // when its lifespan ends, it slides away
           it.group = made; it.idx = made.length;
           made.push(it);
@@ -1158,6 +1163,10 @@
               || clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.3)
               || clearSpot(w * 1.06, h * 1.1, mediaRects(), pref, 0.3)      // at worst over a text, never over another magazine
               || { x: pref.x, y: pref.y, scale: 0.5 };
+      if (isPhone() && (spot.scale || 1) < 0.8) {          // phones: big enough to see, at a side, over old texts if needed
+        var ss = sideSpot(w, h, 0.04, beat.share && beat.share < 0.5 ? 0.55 : 0.8);
+        if (ss) spot = ss;
+      }
       if (spot.scale && spot.scale < 1) { w *= spot.scale; h = w / ratio; }
       var s = shell("flipbook media", beat.tilt != null ? beat.tilt : -2);
       s.el.style.width = Math.round(w) + "px"; s.el.style.height = Math.round(h) + "px";
@@ -1255,9 +1264,12 @@
       var n = cards.length, size = beat.size || "s";
       var r0 = cards[0].ratio || 1;
       var cw = mediaWidth(size, r0), ch = cw / r0;
+      var phoneK = isPhone() ? 0.5 : 1;                         // phones: a smaller fan, room for the rest
+      cw *= phoneK; ch = cw / r0;
       var offs = cw * (beat.fan != null ? beat.fan : 0.42);        // horizontal offset per card
       var bw = (cw + offs * (n - 1)) * 1.08, bh = ch * 1.22;     // room for the tilted cards
-      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, 0.3);
+      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, isPhone() ? 0.7 : 0.3);
+      if (!spot && isPhone()) spot = sideSpot(bw, bh, 0.05, 0.72);
       if (!spot) { var fb = freeSpot(bw, bh, textRects()); spot = { x: fb.x, y: fb.y, scale: Math.min(fb.scale, 0.6) }; }
       var sc = spot.scale, origin = { x: x, y: y };
       var gap = reduceMotion ? 0 : (beat.interval || 130);
@@ -1266,7 +1278,7 @@
           if (step >= diesAt) return;
           var mid = (n - 1) / 2, rel = k - mid;
           var tilt = spec.tilt != null ? spec.tilt : rel * (beat.spread || 7);
-          var el = buildMedia(Object.assign({ _fit: sc }, spec), "image", size, tilt);
+          var el = buildMedia(Object.assign({ _fit: sc * phoneK }, spec), "image", size, tilt);
           el.classList.add("card", "dealt");
           // centre of this card in the fan
           var cx = spot.x + rel * offs * sc, cy = spot.y + Math.abs(rel) * ch * 0.05 * sc;
@@ -1685,6 +1697,43 @@
     if (dx) yr.style.marginLeft = Math.round(dx) + "px";
   }
 
+  function isPhone() { var v = viewport(); return v.h > v.w && v.w < 700; }
+  var PHONE_MIN = 0.55;                      // phones: media never narrower than this share of the screen
+  function sideSpot(w, h, off, maxShare) {
+    off = off != null ? off : 0.15;
+    var v = viewport(), B = bands();
+    var texts = textRects(), media = mediaRects(), best = null;
+    // the newest texts must stay readable; other media must not be covered
+    var hot = texts.slice(-2), cold = texts.slice(0, -2);
+    function ov(l, t, tw, th, r) { var ow = Math.min(l + tw, r.r) - Math.max(l, r.l), oh = Math.min(t + th, r.b) - Math.max(t, r.t); return ow > 0 && oh > 0 ? ow * oh : 0; }
+    [maxShare || 0.55, 0.47, 0.4].forEach(function (share) {
+      var tw = Math.min(w, v.w * share), k = tw / w, th = h * k;
+      ["left", "right"].forEach(function (side) {
+        var cx = side === "left" ? tw * 0.5 - tw * off : v.w - tw * 0.5 + tw * off;   // a bit off the edge
+        for (var cy = B.t + th / 2 + 4; cy <= v.h - B.b - th / 2 - 4; cy += 12) {
+          var l = cx - tw / 2, t = cy - th / 2, cost = 0;
+          hot.forEach(function (r) { cost += ov(l, t, tw, th, r) * 30; });
+          cold.forEach(function (r) { cost += ov(l, t, tw, th, r) * 3; });
+          media.forEach(function (r) { cost += ov(l, t, tw, th, r) * 12; });
+          cost += (1 - share) * 4000;                         // prefer bigger
+          if (!best || cost < best.cost) best = { x: cx, y: cy, scale: k, cost: cost, bleed: off > 0.1, side: side };
+        }
+      });
+    });
+    return best;
+  }
+  function phoneFix(f, w, h) {               // too small, or on top of other media, on a phone? → a side spot
+    if (!isPhone() || !f) return f;
+    var v = viewport(), s = f.scale || 1, sw = w * s, sh = h * s;
+    var l = f.x - sw / 2, t = f.y - sh / 2;
+    var hits = mediaRects().some(function (r) {
+      var ow = Math.min(l + sw, r.r) - Math.max(l, r.l), oh = Math.min(t + sh, r.b) - Math.max(t, r.t);
+      return ow > 0 && oh > 0 && ow * oh > sw * sh * 0.08;
+    });
+    if (sw >= v.w * PHONE_MIN && !hits) return f;
+    return sideSpot(w, h) || f;
+  }
+
   function freeSpotFor(beat) {
     if (beat.type === "book") {
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7, beat.scale), bh0 = bw0 / (beat.ratio || 0.7);
@@ -1708,8 +1757,10 @@
     var f = (beat.free === "all" && clearSpot(w * (beat.type === "stack" ? 1.3 : 1.08), h * (beat.type === "stack" ? 1.2 : 1.08),
                                               textRects().concat(mediaRects()), null, 0.2))
             || freeSpot(w, h, textRects());
+    if (beat.free === "all") f = phoneFix(f, w, h);
     beat._fit = f.scale;
-    beat._side = f.side;
+    beat._side = f.side === "left" || f.side === "right" ? "below" : f.side;
+    beat._bleed = !!f.bleed;
     return f;
   }
 

@@ -156,7 +156,7 @@ window.STORY = [
     ratio: 0.3944, size: "m", tilt: 0,
     reveal: { mask: "media/00_OPENING/test1_mask_orange.png" },
     also: [
-      { type: "text", text: "Hi, I’m Giulia", style: "big", words: true, tilt: 0,
+      { type: "text", text: "Hi, I’m Giulia", style: "big", words: true, tilt: 0, color: "secondary",
         offset: [-0.45, 0.08], delay: 700 }
     ]
   },
@@ -208,7 +208,7 @@ window.STORY = [
         // (in the free space) and stay
         then: [
           // diagonal to the Vogue cards, a bit on top of them, tossed rather than neatly piled
-          { near: "deck", free: "all", type: "stack", size: "m", mess: 1, interval: 900, delay: 1200,
+          { near: "deck", free: "all", type: "stack", size: "m", mess: 1, interval: 810, delay: 1080,
             photos: [
               { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
               { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06
@@ -292,7 +292,7 @@ window.STORY = [
 
   /* tap: everything goes; SPOILER ALERT fills the screen and scrolls sideways,
      the text sits on top of it from the start */
-  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 1050,
+  { clear: true, type: "marquee", text: "SPOILER ALERT", stretch: 3.2, speed: 945,
     also: [   // the text is there straight away; the giant words scroll underneath
       { at: [0.5, 0.55], type: "text", style: "body", boxed: true, tilt: -2,
         typing: true, typeFrom: "Doing my best.", speed: 60,
@@ -315,13 +315,15 @@ window.STORY = [
   { type: "chat", title: "Leonardo Magrelli", tilt: -2, free: true, messages: [
       { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?", typing: 300, pause: 400 },
       { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
-      { from: "me",   text: "Yes! Amazing!" }
+      { from: "me",   text: "Yes! Amazing!" },
+      { from: "note", text: "And Vaste Programme was born." }
   ]},
 
   // tap: the Vaste Programme CV streams like code (behind everything; half screen on
   //      wide screens, full screen on phones); meanwhile the two books spin in, in 3D
   { type: "code", speed: 110,
     lines: [
+      "## VASTE PROGRAMME CV",
       "## EXHIBITIONS & FESTIVALS",
       "2026  Ghostland - Fotografia Europea • curated by Arianna Catania • Palazzo da Mosto, Reggio Emilia, IT",
       "2026  MMMMMMM KM • Permanent Installation • Museo Tam • Matera, Italy",
@@ -389,10 +391,10 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.065, spine: "#7c5634", rest: -52, tilt: -3, lifespan: 1, year: "2021" },
+            ratio: 0.6667, depth: 0.08, spine: "#7c5634", rest: -40, tilt: -3, lifespan: 1, year: "2021" },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.1, spine: "#4a1519", rest: 50, scale: 1.13, tilt: 4, lifespan: 1, year: "2023" }
+            ratio: 0.7533, depth: 0.12, spine: "#4a1519", rest: -40, scale: 1.13, tilt: 4, lifespan: 1, year: "2023" }
     }
   },
 
@@ -419,8 +421,8 @@ window.STORY = [
     text: "Meanwhile, I've been freelancing for 10 years now!\nA few projects:",
     // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
-      { type: "laptop", delay: 200, url: "https://giuliavigna.com/", alt: "giuliavigna.com, scrolling",
-        pageWidth: 1280, pageHeight: 1291, scrollTime: 12,
+      { type: "laptop", delay: 200, image: "media/00_OPENING/giuliavigna_site.webp", alt: "giuliavigna.com scrolling on a laptop",
+        scrollTime: 6,
         // Behance gallery features, as ribbons on the screen
         awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
                   { label: "Xd", bg: "#470137", fg: "#FF61F6" } ] }
@@ -429,6 +431,12 @@ window.STORY = [
 
   /* tap: the projects go; the clients stream in like the Vaste Programme CV (typewriter font) */
   { clear: true, type: "code", speed: 140,
+    // a pile of 12 photos (placeholders for now): flick the top one away, or tap the pile
+    also: [ { type: "flick", delay: 700, size: "m", photos: [
+      { color: "#7D00FF" }, { color: "#FF5500" }, { color: "#FFC93C" }, { color: "#1FA36B" },
+      { color: "#2F6FB0" }, { color: "#F7C6D3" }, { color: "#111111" }, { color: "#B5532F" },
+      { color: "#9FD3F2" }, { color: "#E5432A" }, { color: "#6B4E9B" }, { color: "#D9D3C7" }
+    ] } ],
     lines: [
       "## I WORKED WITH AGENCIES, ARTISTS, BRANDS, FESTIVALS, TV.",
       "Salva Tu Alma • Milan",
@@ -456,13 +464,66 @@ window.STORY = [
     type: "text", text: "2020 — LET'S TALK ABOUT BOOBS.", style: "big", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
-        text: "My childhood BFF Ilena (we met at a school run by nuns, btw) has an idea: a magazine about boobs. Called MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no?" }
+        text: "My childhood BFF Ilena (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
     ]
   },
 
   // tap: in the free space
   { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
-    text: "Three issues, over €20K raised for charity. Rolling Stone, ELLE, Il Messaggero. Thanks, bye! Social media feminism wasn't really our thing anymore, so we called it quits." },
+    text: "Three issues, over €20K raised for charity.\n\nRolling Stone, ELLE, Il Messaggero.",
+    // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
+    also: [ { type: "flipbook", delay: 300, flip: 230, interval: 260, loop: true, alt: "Megazinne, issues 2 and 3", spreads: [
+        "media/06_CAPITOLO_6/mz2_00.webp",
+        "media/06_CAPITOLO_6/mz2_01.webp",
+        "media/06_CAPITOLO_6/mz2_02.webp",
+        "media/06_CAPITOLO_6/mz2_03.webp",
+        "media/06_CAPITOLO_6/mz2_04.webp",
+        "media/06_CAPITOLO_6/mz2_05.webp",
+        "media/06_CAPITOLO_6/mz2_06.webp",
+        "media/06_CAPITOLO_6/mz2_07.webp",
+        "media/06_CAPITOLO_6/mz2_08.webp",
+        "media/06_CAPITOLO_6/mz2_09.webp",
+        "media/06_CAPITOLO_6/mz2_10.webp",
+        "media/06_CAPITOLO_6/mz2_11.webp",
+        "media/06_CAPITOLO_6/mz2_12.webp",
+        "media/06_CAPITOLO_6/mz3_00.webp",
+        "media/06_CAPITOLO_6/mz3_01.webp",
+        "media/06_CAPITOLO_6/mz3_02.webp",
+        "media/06_CAPITOLO_6/mz3_03.webp",
+        "media/06_CAPITOLO_6/mz3_04.webp",
+        "media/06_CAPITOLO_6/mz3_05.webp",
+        "media/06_CAPITOLO_6/mz3_06.webp",
+        "media/06_CAPITOLO_6/mz3_07.webp",
+        "media/06_CAPITOLO_6/mz3_08.webp",
+        "media/06_CAPITOLO_6/mz3_09.webp",
+        "media/06_CAPITOLO_6/mz3_10.webp",
+        "media/06_CAPITOLO_6/mz3_11.webp",
+        "media/06_CAPITOLO_6/mz3_12.webp",
+        "media/06_CAPITOLO_6/mz3_13.webp"
+    ] } ] },
+
+  // tap: everything goes; while this is typed, a receipt prints out (tap it: it crumples into a ball)
+  { clear: true, free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    bold: ["Thanks, bye!"],
+    text: "Thanks, bye! Social media feminism wasn't really our thing anymore, so we called it quits.",
+    also: [
+      { type: "receipt", delay: 500, tilt: -3,
+        text: "********************************\n          MEGAZINNE\n********************************\n\nCHARITY RECEIPT\n2020 — 2021\n\n--------------------------------\nITEM 01\nMEGAZINNE — ISSUE #01\nOCTOBER 2020\n\nLILT FIRENZE\nCancer prevention, patient\nsupport & rehabilitation.\n\n--------------------------------\nITEM 02\nMEGAZINNE — ISSUE #02\nMARCH 2021\n\nD.i.Re\nWomen Against Violence Network\n\n--------------------------------\nITEM 03\nMEGAZINNE — ISSUE #03\n\nAIDOS\nItalian Association for\nWomen in Development\n\n\n--------------------------------\n\nISSUES PUBLISHED             03\n\n********************************\n\nTOTAL RAISED\n\n       €20,000+\n\n********************************\n\n100% OF PROCEEDS DONATED\n\nTHANK YOU FOR SUPPORTING\nWOMEN'S HEALTH & RIGHTS.\n\n--------------------------------\n\n\n        ♥ MEGAZINNE ♥\n\n********************************" }
+    ] },
+
+  /* ===== DOCCIA FREDDA ===== */
+  // tap: everything goes. Videos and audio will come from Giulia — for now, placeholders in Reel format (9:16)
+  { clear: true, bg: "default",          // new chapter: back to white
+    type: "text", text: "2026 — WE'RE BACK.", style: "big", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        bold: ["DOCCIA FREDDA"],
+        text: "Meet DOCCIA FREDDA, our new podcast about love, heartbreak and questionable romantic decisions.\n\nBecause apparently, we still have a lot to talk about." },
+      { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: -3, delay: 900, label: "REEL 1 — video coming" },
+      { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: 4, delay: 1200, label: "REEL 2 — video coming" },
+      { free: "all", type: "image", ratio: 1, size: "s", tilt: -2, delay: 1500, label: "AUDIO — coming" }
+    ]
+  },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

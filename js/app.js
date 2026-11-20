@@ -1019,47 +1019,149 @@
       later(function () { playThen(beat, item); }, 0);
     },
 
-    // LAPTOP — a big laptop opens and shows a website (live, in an iframe) scrolling slowly by itself.
-    // Optional ribbons (awards) hang from the top of the screen.
+    // LAPTOP — a realistic 3D laptop seen from above: the lid opens, the site scrolls down on the
+    // screen (a long screenshot), then the lid closes again. Optional award ribbons on the screen.
     laptop: function (beat, x, y, diesAt) {
       var v = viewport(), B = bands();
       var H = v.h - B.t - B.b;
-      var sw = Math.min(v.w * (v.w > v.h ? (beat.share || 0.5) : 0.92), H * 0.82 * 1.6);   // screen width
-      var sh = sw / 1.6;                                                            // 16:10 screen
-      var bodyH = sh + sw * 0.07;                                                   // + the base
-      var spot = clearSpot(sw * 1.16, bodyH + sw * 0.06, textRects(), { x: x, y: y }, 0.55);
-      var sc = spot ? spot.scale : 1;
-      if (!spot) { var fb = freeSpot(sw * 1.16, bodyH, textRects()); spot = fb; sc = Math.min(1, fb.scale); }
-      sw *= sc; sh *= sc;
+      var W = Math.min(v.w * (v.w > v.h ? (beat.share || 0.42) : 0.7), H * 0.75);   // laptop width
+      var boxW = W * 1.45, boxH = W * 1.05;
+      var spot = clearSpot(boxW, boxH, textRects(), { x: x, y: y }, 0.55);
+      if (!spot) { var fb = freeSpot(boxW, boxH, textRects()); spot = fb; }
+      var sc = Math.min(1, spot.scale || 1); W *= sc; boxW *= sc; boxH *= sc;
+      var D = W * 0.68;                                        // depth of the base = height of the lid
       var s = shell("laptop", 0);
-      s.el.style.width = Math.round(sw * 1.16) + "px"; s.el.style.height = Math.round(sh + sw * 0.07) + "px";
-      s.el.style.setProperty("--sw", sw + "px"); s.el.style.setProperty("--sh", sh + "px");
-      var vw = beat.pageWidth || 1280, k = (sw * 0.94) / vw;          // the site is drawn at desktop width, scaled down
-      var pageH = beat.pageHeight || 1400, viewH = (sh * 0.9) / k;
+      s.el.style.width = Math.round(boxW) + "px"; s.el.style.height = Math.round(boxH) + "px";
+      s.el.style.setProperty("--W", W + "px"); s.el.style.setProperty("--D", D + "px");
       s.inner.innerHTML =
-        '<div class="lt-lid"><div class="lt-screen"><div class="lt-page">' +
-        '<iframe class="lt-frame" loading="eager" tabindex="-1" title="' + (beat.alt || "Website") + '"></iframe>' +
-        '</div></div><div class="lt-ribbons"></div></div><div class="lt-base"><i></i></div>';
-      var frame = s.inner.querySelector(".lt-frame"), page = s.inner.querySelector(".lt-page");
-      frame.style.width = vw + "px"; frame.style.height = pageH + "px";
-      frame.style.transform = "scale(" + k + ")";
-      page.style.setProperty("--travel", -Math.max(0, pageH - viewH) * k + "px");
-      page.style.setProperty("--scroll-s", (beat.scrollTime || 14) + "s");
+        '<div class="lt-rig">' +
+          '<div class="lt-base"><div class="lt-keys"></div><div class="lt-pad"></div><div class="lt-front"></div></div>' +
+          '<div class="lt-lid">' +
+            '<div class="lt-shell"></div>' +
+            '<div class="lt-display"><div class="lt-screen"><img class="lt-site" alt="" draggable="false"></div><div class="lt-ribbons"></div></div>' +
+          '</div>' +
+        '</div>';
+      var img = s.inner.querySelector(".lt-site"), screen = s.inner.querySelector(".lt-screen");
+      img.src = beat.image;
       (beat.awards || []).forEach(function (a, i) {
         var r = document.createElement("span");
-        r.className = "lt-ribbon";
-        r.textContent = a.label;
+        r.className = "lt-ribbon"; r.textContent = a.label;
         r.style.background = a.bg; r.style.color = a.fg || "#FFFFFF";
-        r.style.animationDelay = (1.6 + i * 0.25) + "s";
-        if (a.title) r.title = a.title;
         s.inner.querySelector(".lt-ribbons").appendChild(r);
       });
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Laptop showing a website");
-      addItem(s.el, spot.x, spot.y, diesAt);
-      // the lid opens, then the site loads and starts scrolling
-      later(function () { frame.src = beat.url; }, reduceMotion ? 0 : 700);
-      later(function () { page.classList.add("scrolling"); }, reduceMotion ? 0 : (beat.scrollDelay || 3200));
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+      var openAt = reduceMotion ? 0 : 400, openMs = reduceMotion ? 0 : 1300;
+      var scrollMs = reduceMotion ? 0 : (beat.scrollTime || 6) * 1000;
+      later(function () { s.el.classList.add("open"); }, openAt);
+      later(function () {                                    // scroll the site to the bottom
+        var travel = Math.max(0, img.offsetHeight - screen.clientHeight);
+        img.style.transition = "transform " + scrollMs + "ms cubic-bezier(.45,0,.55,1)";
+        img.style.transform = "translateY(" + (-travel) + "px)";
+      }, openAt + openMs + 500);
+      later(function () { s.el.classList.remove("open"); s.el.classList.add("closing"); },   // …and close it
+            openAt + openMs + 500 + scrollMs + (beat.holdEnd || 900));
+    },
+
+    // FLICK — a neat pile of square photos; drag the top one away (or tap the pile) and it flies off
+    flick: function (beat, x, y, diesAt) {
+      var photos = beat.photos || [];
+      var v = viewport(), B = bands();
+      var w = mediaWidth(beat.size || "m", 1);
+      var spot = clearSpot(w * 1.25, w * 1.25, textRects(), { x: v.w / 2, y: v.h / 2 }, 0.6) || { x: v.w / 2, y: (B.t + v.h - B.b) / 2, scale: 1 };
+      w *= spot.scale || 1;
+      var pile = [];
+      photos.slice().reverse().forEach(function (spec, n) {      // the first photo ends up on top
+        var s = shell("flick media", (Math.random() * 2 - 1) * 3);
+        s.el.style.width = Math.round(w) + "px"; s.el.style.height = Math.round(w) + "px";
+        if (spec.src) s.inner.appendChild(makeImg(spec.src, "pic")); else s.inner.style.background = spec.color || "#ddd";
+        s.el.style.animationDelay = (n * 40) + "ms";
+        var off = (photos.length - 1 - n) * 1.5;                   // a slightly offset pile
+        var it = addItem(s.el, spot.x + off, spot.y + off, diesAt);
+        it.flick = pile;
+        it.onTap = function () {                                   // tap → the top photo flies away
+          var top = pile[pile.length - 1];
+          if (top) fling(top, (Math.random() < 0.5 ? -1 : 1) * 900, -200 - Math.random() * 300);
+        };
+        pile.push(it);
+      });
+    },
+
+    // RECEIPT — a thermal-paper receipt that prints out; tap it and it crumples into a paper ball
+    receipt: function (beat, x, y, diesAt) {
+      var v = viewport(), B = bands();
+      var text = beat.text || "", rows = text.split("\n");
+      var cols = rows.reduce(function (m, r) { return Math.max(m, Array.from(r).length); }, 0);
+      // font size so the whole receipt fits the screen height (and width)
+      var H = (v.h - B.t - B.b) * 0.92, W = v.w - EDGE * 2;
+      var fs = Math.min(14, (H - 40) / (rows.length * 1.25), (W * (v.w > v.h ? 0.42 : 0.9) - 28) / (cols * 0.6));
+      fs = Math.max(6, fs);
+      var s = shell("receipt", beat.tilt != null ? beat.tilt : -3);
+      var paper = document.createElement("pre");
+      paper.className = "rc-paper";
+      paper.style.fontSize = fs.toFixed(2) + "px";
+      paper.textContent = text;
+      s.inner.appendChild(paper);
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", "Charity receipt: " + text.replace(/[*\-]{4,}/g, " ").replace(/\s+/g, " ").trim());
+      s.el.style.visibility = "hidden"; stage.appendChild(s.el);
+      var w = s.el.offsetWidth, h = s.el.offsetHeight; s.el.remove(); s.el.style.visibility = "";
+      var spot = clearSpot(w * 1.08, h * 1.02, textRects().concat(mediaRects()), { x: x, y: y }, 0.6) || freeSpot(w, h, textRects());
+      if (spot.scale && spot.scale < 1) paper.style.fontSize = (fs * spot.scale).toFixed(2) + "px";
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+      it.onTap = function () { s.el.classList.toggle("crumpled"); };   // tap: paper ball (tap again: flat)
+    },
+
+    // FLIPBOOK — an open magazine seen from above: it opens in a flash (no cover), then the
+    // spreads flip by quickly, right page over to the left.
+    flipbook: function (beat, x, y, diesAt) {
+      var spreads = beat.spreads || [];
+      if (!spreads.length) return;
+      var v = viewport(), B = bands(), ratio = beat.ratio || 1.415;
+      var H = v.h - B.t - B.b;
+      var w = Math.min(v.w * (v.w > v.h ? 0.62 : 0.94), H * 0.8 * ratio), h = w / ratio;
+      var spot = clearSpot(w * 1.04, h * 1.06, textRects(), { x: x, y: y }, 0.5)
+              || clearSpot(w * 1.04, h * 1.06, textRects(), { x: x, y: y }, 0.35)
+              || { x: v.w / 2, y: B.t + H / 2, scale: 0.75 };          // no room: on top, in the middle
+      if (spot.scale && spot.scale < 1) { w *= spot.scale; h = w / ratio; }
+      var s = shell("flipbook", beat.tilt != null ? beat.tilt : -2);
+      s.el.style.width = Math.round(w) + "px"; s.el.style.height = Math.round(h) + "px";
+      var L = document.createElement("div"), R = document.createElement("div");
+      L.className = "fb-half fb-l"; R.className = "fb-half fb-r";
+      s.inner.appendChild(L); s.inner.appendChild(R);
+      var gutter = document.createElement("div"); gutter.className = "fb-gutter"; s.inner.appendChild(gutter);
+      function bg(el, src, side) { el.style.backgroundImage = src ? 'url("' + src + '")' : "none"; el.style.backgroundPosition = side; }
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", beat.alt || "Magazine pages flipping");
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+      var speed = reduceMotion ? 900 : (beat.flip || 230), pause = reduceMotion ? 900 : (beat.interval || 300);
+      // a leaf turning: front = the old right page, back = the new left page
+      function turn(fromSrc, toSrc, plainFront, done) {
+        var leaf = document.createElement("div"); leaf.className = "fb-leaf";
+        leaf.style.animationDuration = speed + "ms";
+        var f = document.createElement("div"), k = document.createElement("div");
+        f.className = "fb-face fb-front" + (plainFront ? " plain" : ""); k.className = "fb-face fb-back";
+        if (!plainFront) bg(f, fromSrc, "right center");
+        bg(k, toSrc, "left center");
+        leaf.appendChild(f); leaf.appendChild(k); s.inner.appendChild(leaf);
+        bg(R, toSrc, "right center");                      // the new right page is underneath
+        later(function () { bg(L, toSrc, "left center"); leaf.remove(); done && done(); }, speed);
+      }
+      // opens: a plain cover flips open onto the first spread
+      L.classList.add("blank"); bg(L, null);
+      var i = 0;
+      later(function () {
+        L.classList.remove("blank");
+        turn(null, spreads[0], true, function () {
+          (function next() {
+            if (it.dead) return;
+            i++;
+            if (i >= spreads.length) { if (beat.loop) i = 0; else return; }
+            later(function () { if (!it.dead) turn(spreads[i - 1 < 0 ? spreads.length - 1 : i - 1], spreads[i], false, next); }, pause);
+          })();
+        });
+      }, 450);
     },
 
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
@@ -1227,7 +1329,7 @@
         // measure the finished conversation, then reserve a free spot for it
         (beat.messages || []).forEach(function (m) {
           var b = document.createElement("div");
-          b.className = "bubble " + (m.from === "me" ? "me" : "them");
+          b.className = "bubble " + (m.from === "me" ? "me" : m.from === "note" ? "note" : "them");
           b.textContent = m.text || "";
           list.appendChild(b);
         });
@@ -1242,8 +1344,8 @@
       var msgs = beat.messages || [];
       var t = reduceMotion ? 0 : 300;
       msgs.forEach(function (m) {
-        var side = m.from === "me" ? "me" : "them";
-        var typing = reduceMotion ? 0 : (m.typing != null ? m.typing : CHAT_TYPING);
+        var side = m.from === "me" ? "me" : m.from === "note" ? "note" : "them";
+        var typing = reduceMotion || side === "note" ? 0 : (m.typing != null ? m.typing : CHAT_TYPING);
 
         // 1. typing dots
         later(function () {
@@ -1463,9 +1565,10 @@
       yfs = Math.min(29, Math.max(19, viewport().w * 0.053));            // medium size
       var yearH = beat.year ? yfs * 1.5 : 0, yearW = beat.year ? yfs * (0.75 * String(beat.year).length + 1.1) : 0;
       var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
-      var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.4)
+      var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.9)
             // no room? the book may overlap the chat, but never texts, the CV or other books
-            || clearSpot(needW, needH, textRects(true).concat(mediaRects()), null, 0.35)
+            || clearSpot(needW, needH, textRects(true).concat(mediaRects()), null, 0.9)
+            || clearSpot(needW, needH, textRects(true), null, 0.9)          // may sit over the other book
             || freeSpot(bw0, bh0, textRects());
       if (yearH) fb.y += yearH / 2;            // the book sits below its year
       beat._fit = fb.scale;
@@ -1592,11 +1695,27 @@
     }
   });
 
+  // throw an item off the screen (with a spin), then forget it
+  function fling(item, vx, vy) {
+    if (item.dead) return;
+    if (item.flick) { var i = item.flick.indexOf(item); if (i >= 0) item.flick.splice(i, 1); }
+    item.dead = true;
+    var el = item.el;
+    el.style.pointerEvents = "none";
+    el.style.transition = reduceMotion ? "none" : "transform .6s cubic-bezier(.2,.6,.3,1), opacity .6s";
+    el.style.transform = "translate3d(" + (item.x + vx) + "px," + (item.y + vy) + "px,0) rotate(" + (vx > 0 ? 35 : -35) + "deg)";
+    el.style.opacity = "0";
+    setTimeout(function () { el.remove(); var k = live.indexOf(item); if (k >= 0) live.splice(k, 1); }, 650);
+  }
+
   function endPointer(e, cancelled) {
     if (drag && drag.id === e.pointerId) {
       drag.item.el.classList.remove("dragging");
       // a tap (no real movement) on an item that reacts to taps, e.g. the zine turns a page
-      if (!cancelled && drag.item.onTap && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) <= TAP_SLOP) drag.item.onTap();
+      var moved = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy);
+      if (!cancelled && drag.item.onTap && moved <= TAP_SLOP) drag.item.onTap();
+      else if (!cancelled && drag.item.flick && moved > 60)        // a flick: keep going the same way, off screen
+        fling(drag.item, (e.clientX - drag.sx) * 4, (e.clientY - drag.sy) * 4);
       drag = null;
       return; // ending a drag NEVER reveals anything
     }
@@ -1645,6 +1764,7 @@
       if (b.reveal && b.reveal.mask) new Image().src = b.reveal.mask;
       preload(b.photos); preload(b.also); preload(b.then); preload(b.cards); preload(b.hintThen);
       if (b.front) { new Image().src = b.front; if (b.back) new Image().src = b.back; }
+      if (b.spreads) b.spreads.forEach(function (src) { new Image().src = src; });
       if (b.cues && b.type === "code") preload(Object.keys(b.cues).map(function (k) { return b.cues[k]; }));
     });
   }

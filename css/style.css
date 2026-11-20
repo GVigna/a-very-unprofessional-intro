@@ -533,12 +533,17 @@ body {
   text-transform: uppercase;
   transform-origin: left center;
   will-change: transform;
-  animation: marquee linear infinite;
+  transform: translateX(var(--from, 100vw)) scaleY(var(--sy));
 }
-@keyframes marquee {
+@keyframes mq-in {
   from { transform: translateX(var(--from)) scaleY(var(--sy)); }
-  to   { transform: translateX(var(--to))   scaleY(var(--sy)); }
+  to   { transform: translateX(0)           scaleY(var(--sy)); }
 }
+@keyframes mq-loop {        /* one phrase-width per cycle, so it wraps around seamlessly */
+  from { transform: translateX(0) scaleY(var(--sy)); }
+  to   { transform: translateX(calc(var(--unit) * var(--dir))) scaleY(var(--sy)); }
+}
+.mq-unit { padding-right: .35em; }   /* the space after ALERT before it starts again */
 .marquee.leaving { animation: none; }
 .marquee.leaving span { opacity: 0; transition: opacity .3s; }
 
@@ -552,8 +557,8 @@ strong { font-weight: 800; }
   color: #FFFFFF;
   font: 400 clamp(11px, 2.9vw, 13px)/1.45 ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
-.codecol.full { inset: calc(var(--safe-t) + 52px) 14px calc(var(--safe-b) + 52px) 14px; opacity: .9; }
-.codecol.half { top: 64px; bottom: 24px; width: 46vw; }
+.codecol.full { inset: calc(var(--band-t) + 8px) 14px calc(var(--band-b) + 8px) 14px; opacity: .9; }
+.codecol.half { top: calc(var(--band-t) + 8px); bottom: calc(var(--band-b) + 8px); width: 46vw; }
 .codecol.half.left { left: 2vw; }
 .codecol.half.right { right: 2vw; }
 .codefeed { transition: transform .25s ease-out; padding-bottom: 18px; }
@@ -599,11 +604,13 @@ body:not(.dark-page) .codecol { color: var(--primary); }
   position: absolute;
   left: 50%;
   bottom: 100%;
-  margin-bottom: .12em;
-  transform: translateX(-50%) rotate(-3deg);
-  font: 400 var(--fs-l)/1 "Alfa Slab One", Georgia, serif;
-  color: #FFFFFF;
-  text-shadow: 1px 1px 0 #1B1B1B, 2px 2px 0 #1B1B1B, 3px 3px 0 #1B1B1B, 4px 4px 0 #1B1B1B;
+  margin-bottom: .18em;
+  translate: -50% 0;                             /* composes with the pop-in animation */
+  font: 700 var(--fs-l)/1 var(--font);          /* large size, site font */
+  color: var(--primary);
+  background: #FFFFFF;                           /* white pill */
+  padding: .1em .5em .12em;
+  border-radius: 999px;
   white-space: nowrap;
   pointer-events: none;
   animation: pop-in 420ms cubic-bezier(.2, 1.6, .4, 1) .9s both;
@@ -652,14 +659,34 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
   :root { --fs-s: clamp(16px, 4.3vw, 22.5px); }   /* small info a bit smaller on desktop */
 }
 
-/* contact links: next to the counter on wide screens, at the bottom on phones */
-.ui-contact {
-  top: calc(var(--safe-t) + 4px);
-  left: calc(var(--safe-l) + 5.6em);
-  display: flex;
-  gap: 1.4em;
+/* the two UI bands: counter + RESTART on top, contact links at the bottom.
+   They are painted in the page colour above every item, so nothing ever covers the UI;
+   placement and dragging keep things between them. */
+:root {
+  --band-t: calc(var(--safe-t) + var(--fs-s) + 24px);
+  --band-b: calc(var(--safe-b) + var(--fs-s) + 24px);
 }
-.ui-contact .ui-email { order: -1; }     /* EMAIL ME first, then ACTUAL PORTFOLIO */
+.ui-band {
+  position: fixed;
+  left: 0; right: 0;
+  z-index: 99999;                       /* above all items, below the UI texts */
+  background: var(--page, var(--bg));
+  pointer-events: none;
+  transition: background .3s;
+}
+.ui-band-top { top: 0; height: var(--band-t); }
+.ui-band-bottom { bottom: 0; height: var(--band-b); }
+
+/* contact links: always at the bottom, EMAIL ME left, ACTUAL PORTFOLIO right */
+.ui-contact {
+  left: calc(var(--safe-l) + 4px);
+  right: calc(var(--safe-r) + 4px);
+  bottom: calc(var(--safe-b) + 4px);
+  display: flex;
+  justify-content: space-between;
+}
+.ui-contact .ui-email { order: -1; }
+.ui-portfolio { margin-left: auto; }
 .ui-link {
   color: inherit;
   text-decoration: none;
@@ -668,17 +695,6 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
 }
 .ui-link:hover, .ui-link:focus-visible { text-decoration: underline; outline: none; }
 .ui-link[hidden] { display: none; }
-@media (orientation: portrait), (max-width: 600px) {
-  .ui-contact {
-    top: auto;
-    left: calc(var(--safe-l) + 4px);
-    right: calc(var(--safe-r) + 4px);
-    bottom: calc(var(--safe-b) + 4px);
-    justify-content: space-between;
-  }
-  .ui-email { order: -1; }        /* EMAIL ME left, ACTUAL PORTFOLIO right */
-  .ui-portfolio { margin-left: auto; }
-}
 .ui-restart {
   top: calc(var(--safe-t) + 4px);
   right: calc(var(--safe-r) + 4px);
@@ -720,7 +736,7 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
 
 @media (prefers-reduced-motion: reduce) {
   .book3d { animation: none; transform: rotateX(8deg) rotateY(var(--rest)); }
-  .marquee span { animation: none; transform: translateX(4vw) scaleY(var(--sy)); }
+  .marquee span { animation: none !important; transform: translateX(4vw) scaleY(var(--sy)); }
   .wash { display: none; }
   .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .item.dealt .inner, .bubble,
   .bubble.dots i, .inner.caret::after, .video .bar, .ui-progress.bump {
@@ -729,3 +745,81 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
   }
   .inner { transition: none; }
 }
+
+/* iMessage photo bubble: grey bubble with a tail at the bottom-left */
+.item.imsg .inner {
+  overflow: visible;
+  background: #E9E9EB;
+  padding: 5px;
+  border-radius: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+.item.imsg .inner img { border-radius: 17px; display: block; width: 100%; height: 100%; object-fit: cover; }
+.item.imsg .inner::before,
+.item.imsg .inner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  height: 22px;
+}
+.item.imsg .inner::before { left: -7px; width: 22px; background: #E9E9EB; border-bottom-right-radius: 16px 14px; }
+.item.imsg .inner::after  { left: -10px; width: 10px; background: var(--page, var(--bg)); border-bottom-right-radius: 10px; }
+
+/* ZINE — stapled paper zine whose pages turn in 3D */
+.item.zine .inner { width: 100%; height: 100%; overflow: visible; background: none; perspective: 2400px; }
+.zine-book {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .8s cubic-bezier(.45,.05,.3,1);
+}
+.zine-book.closed { transform: translateX(calc(var(--pw) * -0.5)); }   /* closed: only the cover, centred */
+.zbase, .zleaf { position: absolute; left: 50%; top: 0; width: 50%; height: 100%; }
+.zleaf {
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform .95s cubic-bezier(.45,.05,.3,1);
+}
+.zleaf.turned { transform: rotateY(-179.5deg); }
+.zface, .zbase {
+  background-color: #F4F1E9;
+  box-shadow: 0 10px 22px rgba(0,0,0,.22), 0 1px 2px rgba(0,0,0,.18);
+}
+.zface {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.zface.back { transform: rotateY(180deg); }
+/* the photo, printed on the paper (multiply = ink on paper), a bit crooked */
+.zimg {
+  position: absolute; left: 10%; top: 10%; width: 80%; height: 80%;
+  object-fit: contain;
+  transform: translate(var(--zx, 0), var(--zy, 0)) rotate(var(--zt, 0deg));
+  mix-blend-mode: multiply;
+  filter: saturate(.92) contrast(1.03);
+  pointer-events: none;
+}
+.zimg.bleed { left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; transform: none; }
+/* paper grain + the fold shading near the spine, over the print */
+.zface::after, .zbase::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .42  0 0 0 0 .38  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+  opacity: .5;
+}
+.zface.front::before, .zbase::before, .zface.back::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+}
+.zface.front::before, .zbase::before { background: linear-gradient(to right, rgba(0,0,0,.22), rgba(0,0,0,.05) 7%, transparent 16%); }
+.zface.back::before  { background: linear-gradient(to left,  rgba(0,0,0,.22), rgba(0,0,0,.05) 7%, transparent 16%); }
+/* while a leaf turns, its paper darkens and lightens like it's catching the light */
+.zleaf.turning .zface::before { animation: z-light .95s ease-in-out; }
+@keyframes z-light { 0%, 100% { opacity: 1; } 50% { opacity: 1; box-shadow: inset 0 0 0 999px rgba(0,0,0,.12); } }
+.zstaples { position: absolute; left: calc(50% - 1.5px); top: 0; width: 3px; height: 100%; transform: translateZ(2px); pointer-events: none; transition: opacity .3s; }
+.zstaples::before, .zstaples::after {
+  content: ""; position: absolute; left: 0; width: 3px; height: 11%;
+  background: linear-gradient(to right, #8d8d8d, #e2e2e2, #8d8d8d); border-radius: 2px;
+}
+.zstaples::before { top: 22%; }
+.zstaples::after { bottom: 22%; }
+.zine-book.closed .zstaples { opacity: 0; }

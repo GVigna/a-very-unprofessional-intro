@@ -197,16 +197,17 @@ window.STORY = [
         // when the little cursor clicks the name: 3 Google-image cards (Vogue) are dealt like a deck
         hintThen: [
           { type: "deck", size: "m", fan: 0.36, interval: 130, cards: [
-              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.7453 },
-              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.6236 },
-              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.7453 }
+              { src: "media/02_CAPITOLO_2/suzanne_1.webp", ratio: 0.7662 },
+              { src: "media/02_CAPITOLO_2/suzanne_2.webp", ratio: 0.6411 },
+              { src: "media/02_CAPITOLO_2/suzanne_3.webp", ratio: 0.7662 }
           ]}
         ],
         text: "Working for Suzanne Rae.\nFeminist, sustainable fashion.\nI thought all fashion jobs were like this.\nI was wrong.",
         // right after the crossing-out line: the three screenshots slide up by themselves
         // (in the free space) and stay
         then: [
-          { free: "all", type: "stack", size: "m", interval: 900, delay: 1200,
+          // diagonal to the Vogue cards, a bit on top of them, tossed rather than neatly piled
+          { near: "deck", free: "all", type: "stack", size: "m", mess: 1, interval: 900, delay: 1200,
             photos: [
               { src: "media/02_CAPITOLO_2/ny_03.webp", ratio: 0.6667 },   // 2013-09-30 23.55.43
               { src: "media/02_CAPITOLO_2/ny_01.webp", ratio: 0.6667 },   // 2013-09-16 20.25.06
@@ -255,12 +256,12 @@ window.STORY = [
   { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 300, speed: 35, tilt: 0,
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
     // the postcards stay until the next tap
-    also: [
-      { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
-    ],
+
     // postcards fill the whole page, one per city as it's typed; the text stays on top.
     // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
+        // the bar photo pops up as an iMessage photo bubble right next to "bartending by night."
+        "night.": { beside: true, bubble: true, type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", tilt: -2 },
         "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
           postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
         "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
@@ -281,7 +282,7 @@ window.STORY = [
     also: [
       { below: true, type: "text", style: "body", typing: true, typeDelay: 1700, speed: 45, tilt: 0, gap: 14,
         bold: ["TRY ROME."],
-        text: "Still obsessed.\n\nCycling in London? Easy.\n\nTRY ROME." },
+        text: "Still obsessed.\n\nCycling in London? Easy.\nTRY ROME." },
       { free: "all", type: "video", src: "media/03_CAPITOLO_3/bici.mp4", poster: "media/03_CAPITOLO_3/bici_poster.jpg",
         ratio: 0.4624, size: "m", frame: "phone", tilt: 3, delay: 800,
         rate: 1.2, loop: false }   // 20% faster, plays once, freezes on the last frame
@@ -304,7 +305,7 @@ window.STORY = [
     type: "text", text: "2016", style: "big", color: "white", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", color: "white", typing: true, speed: 50, tilt: 0, gap: 14, delay: 500,
-        text: "Ok I'm done, time to go back to Italy" }
+        text: "Ok I'm done, time to go back to Italy, become a graphic and motion designer and maybe an artist (?)" }
     ]
   },
 
@@ -386,16 +387,16 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1, year: "2021" },
+            ratio: 0.6667, depth: 0.065, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1, year: "2021" },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1, year: "2023" }
+            ratio: 0.7533, depth: 0.1, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1, year: "2023" }
     }
   },
 
-  // tap: the books go; a burst of work photos 0–9 (like IED, a bit bigger) — they stay.
-  //      Presentation may change once Giulia sends a reference.
-  { type: "burst", size: "m", speed: 110, spread: 0.5, photos: [
+  // tap: the books go; the work photos are printed in a stapled paper zine that opens and
+  //      turns its pages by itself (tap the zine to keep flipping; drag it around). It stays.
+  { type: "zine", interval: 1300, alt: "Zine with Vaste Programme works", photos: [
       { src: "media/04_CAPITOLO_4/work_0.webp", ratio: 0.7503 },
       { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 0.75 },
       { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 0.75 },

@@ -68,6 +68,12 @@
   function randomTilt() { return (Math.random() * 2 - 1) * MAX_TILT; }
 
   // Keep an item fully on screen.
+  // heights of the top / bottom UI bands (nothing may sit under them)
+  function bands() {
+    var t = document.getElementById("band-top"), b = document.getElementById("band-bottom");
+    return { t: t ? t.offsetHeight : EDGE, b: b ? b.offsetHeight : EDGE };
+  }
+
   function clamp(item, x, y) {
     var v = viewport();
     var w = item.el.offsetWidth, h = item.el.offsetHeight;
@@ -78,11 +84,12 @@
         y: Math.min(Math.max(y, -h * 0.55), v.h - h * 0.45)
       };
     }
+    var B = bands(), top = B.t + 4;
     var maxX = Math.max(EDGE, v.w - w - EDGE);
-    var maxY = Math.max(EDGE, v.h - h - EDGE);
+    var maxY = Math.max(top, v.h - h - B.b - 4);
     return {
       x: Math.min(Math.max(x, EDGE), maxX),
-      y: Math.min(Math.max(y, EDGE), maxY)
+      y: Math.min(Math.max(y, top), maxY)
     };
   }
 
@@ -129,7 +136,7 @@
     var share = SIZE[size] || SIZE.m;
     var cap = SIZE_CAP[size] || SIZE_CAP.m;
     var w = Math.min(Math.min(v.w, v.h) * share * 1.25, cap, v.w - EDGE * 2) * (scale || 1);
-    var maxH = v.h * 0.7; // tall items must also fit the height (landscape phones!)
+    var B = bands(), maxH = (v.h - B.t - B.b) * 0.8; // tall items must also fit between the UI bands
     if (w / ratio > maxH) w = maxH * ratio;
     return Math.round(w);
   }
@@ -388,17 +395,76 @@
       if (item.fired[word] || shown.indexOf(word) < 0) return;
       item.fired[word] = true;
       var next = beat.cues[word], v = viewport(), unit = Math.min(v.w, v.h);
+      if (next.beside) {                                         // wait for the text to lay out, then sit next to the word
+        later(function () {
+          if (item.dead) return;
+          var fb = besideSpot(item, next, word);
+          playBeat(next, fb.x, fb.y, at);
+        }, 60);
+        return;
+      }
       var f;
-      if (next.fill != null) f = fillSpot(next.fill);           // cover the whole screen
+      if (next.fill != null) f = fillSpot(next.fill);      // cover the whole screen
       else if (next.free) f = freeSpotFor(next);
       else f = { x: item.x + item.el.offsetWidth / 2, y: item.y - unit * 0.2 };
       var j = next.jitter != null ? next.jitter : 0;      // scatter, so a pile looks tossed
       playBeat(next, f.x + (Math.random() * 2 - 1) * j * unit, f.y + (Math.random() * 2 - 1) * j * unit, at);
-      if (beat.onTop !== false) {                          // the text stays readable above
+      if (beat.onTop !== false) {          // the text stays readable above
+        live.forEach(function (it) { if (!it.dead && it.el.classList.contains("imsg")) toFront(it); });  // chat-bubble photos too
         toFront(item);
         item.el.classList.add("boxed");
       }
     });
+  }
+
+  // centre for a photo sitting right next to the last typed character (else above / below that line)
+  function besideSpot(item, next, word) {
+    next._fit = 1;
+    var inner = item.el.querySelector(".inner"), v = viewport(), B = bands();
+    var w = mediaWidth(next.size || "s", next.ratio || 1, next.scale), h = w / (next.ratio || 1);
+    var walker = document.createTreeWalker(inner, NodeFilter.SHOW_TEXT), node;
+    var c = item.el.getBoundingClientRect();
+    var bare = word.replace(/[.,!?;:]+$/, "");             // the final dot may live in another text node
+    while ((node = walker.nextNode())) {
+      var k = node.textContent.indexOf(word);
+      if (k < 0) { k = node.textContent.indexOf(bare); if (k < 0) continue; word = bare; }
+      var rg = document.createRange();
+      rg.setStart(node, k + word.length - 1); rg.setEnd(node, k + word.length);
+      var rs = rg.getClientRects(); if (rs.length) c = rs[rs.length - 1];
+      break;
+    }
+    var g = 14, room = v.w - EDGE - c.right - g;
+    if (room < w && room >= w * 0.55) {              // a little tight: shrink the photo to fit beside the word
+      next._fit = room / w; w = room; h = w / (next.ratio || 1);
+    }
+    if (c.right + g + w <= v.w - EDGE) return { x: c.right + g + w / 2, y: Math.max(B.t + 4 + h / 2, c.top + c.height / 2 - h * 0.62) };
+    if (c.top - g - h >= B.t + 4) return { x: Math.min(v.w - EDGE - w / 2, Math.max(EDGE + w / 2, c.right - w * 0.3)), y: c.top - g - h / 2 };
+    return { x: Math.min(v.w - EDGE - w / 2, Math.max(EDGE + w / 2, c.right - w * 0.3)), y: c.bottom + g + h / 2 };
+  }
+
+  // centre for a group placed far from the deck's cards, somewhere random on the other side of the screen
+  function nearDeckSpot(next) {
+    var cards = live.filter(function (it) { return it.el.classList.contains("card") && !it.dead; });
+    if (!cards.length) return null;
+    var D = cards.reduce(function (a, it) {
+      var r = it.el.getBoundingClientRect();
+      return { l: Math.min(a.l, r.left), t: Math.min(a.t, r.top), r: Math.max(a.r, r.right), b: Math.max(a.b, r.bottom) };
+    }, { l: 1e9, t: 1e9, r: -1e9, b: -1e9 });
+    D = { l: D.l, t: D.t, r: D.r, b: D.b };
+    var v = viewport();
+    var spec = next.photos ? next.photos[0] : next;
+    var w = mediaWidth(next.size || "m", spec.ratio || 1), h = w / (spec.ratio || 1);
+    var cx = (D.l + D.r) / 2, cy = (D.t + D.b) / 2;
+    // aim at the mirror of the deck across the screen centre, pushed around at random
+    var pref = {
+      x: v.w - cx + (Math.random() * 2 - 1) * v.w * 0.18,
+      y: v.h - cy + (Math.random() * 2 - 1) * v.h * 0.18
+    };
+    var spot = clearSpot(w, h, textRects().concat([D]), pref, 0.55)
+            || clearSpot(w, h, textRects(), pref, 0.5);
+    if (!spot) return null;
+    next._fit = spot.scale;
+    return spot;
   }
 
   function maybeHint(item, inner, beat, delay) {
@@ -500,6 +566,11 @@
       var ay = anchor.mode === "above" ? ref.y - el.offsetHeight - g
                                        : ref.y + refH + g;
       place(item, ref.x + (anchor.dx || 0), ay);
+      if (anchor.mode !== "above" && item.y < ay - 1 && !ref.fixed) {
+        // no room below: lift the item it hangs from, so they never overlap
+        place(ref, ref.x, ref.y - (ay - item.y));
+        place(item, ref.x + (anchor.dx || 0), ref.y + refH + g);
+      }
     } else if (anchor === "topleft") place(item, x, y);
     else place(item, x - el.offsetWidth / 2, y - el.offsetHeight / 2); // centred on the tap
     toFront(item);
@@ -534,6 +605,8 @@
         var keep = { x: item.x, y: item.y };
         s.el.style.minWidth = fs.w + "px"; s.el.style.minHeight = fs.h + "px";
         place(item, keep.x, keep.y);           // keep it on screen at its final size
+        if (anchor && anchor.ref && anchor.mode !== "above" && item.y < keep.y - 1 && !anchor.ref.fixed)
+          place(anchor.ref, anchor.ref.x, anchor.ref.y - (keep.y - item.y));   // lift what it hangs from
         s.el.style.minWidth = ""; s.el.style.minHeight = "";
       }
       if (!beat.typing && beat.strike) strikeOut(s.inner, beat.text || "", beat);
@@ -592,7 +665,9 @@
     },
 
     image: function (beat, x, y, diesAt, anchor) {
-      var it = addItem(buildMedia(beat, "image", "m", beat.tilt), x, y, diesAt, anchor);
+      var mel = buildMedia(beat, "image", "m", beat.tilt);
+      if (beat.bubble) mel.classList.add("imsg");          // photo sent as an iMessage bubble
+      var it = addItem(mel, x, y, diesAt, anchor);
       if (beat.bleed) {
         it.bleed = true;
         if (!anchor) place(it, x - it.el.offsetWidth / 2, y - it.el.offsetHeight / 2);
@@ -646,11 +721,15 @@
       photos.forEach(function (spec, n) {
         later(function () {
           if (step >= diesAt) return; // the story already moved on
-          var tilt = spec.tilt != null ? spec.tilt : (n === 0 ? 0 : (n % 2 ? 1 : -1) * (2 + Math.random() * 3));
+          var mess = beat.mess || 0;              // 0 = neat pile; 1 = tossed (bigger tilts, scattered)
+          var tilt = spec.tilt != null ? spec.tilt
+                   : mess ? (Math.random() * 2 - 1) * (6 + 10 * mess)
+                   : (n === 0 ? 0 : (n % 2 ? 1 : -1) * (2 + Math.random() * 3));
           var el = buildMedia(Object.assign({ _fit: beat._fit }, spec), "image", beat.size || "m", tilt);
           el.classList.add("stacked");
           if (beat._side === "above") el.classList.add("from-top");
-          var it = addItem(el, x, y, diesAt);
+          var u = Math.min(viewport().w, viewport().h) * 0.09 * mess;
+          var it = addItem(el, x + (Math.random() * 2 - 1) * u, y + (Math.random() * 2 - 1) * u, diesAt);
           it.leaveHow = how;                    // when its lifespan ends, it slides away
           it.group = made; it.idx = made.length;
           made.push(it);
@@ -665,6 +744,85 @@
           }, start + n * (reduceMotion ? 0 : (beat.leaveInterval || 220)));
         });
       }
+    },
+
+    // ZINE — a stapled paper zine that opens and turns its pages by itself (tap it to keep flipping).
+    // Leaf k: front = photo 2k (right page), back = photo 2k+1 (left page). Photo 0 is the cover.
+    zine: function (beat, x, y, diesAt) {
+      var photos = beat.photos || [];
+      var nLeaves = Math.ceil(photos.length / 2);
+      var v = viewport(), B = bands(), ratio = beat.pageRatio || 0.72;   // page width / height
+      var availW = v.w - EDGE * 2, availH = (v.h - B.t - B.b) * (beat.height || 0.78);
+      var pw = Math.min(availW / 2, availH * ratio, beat.maxPage || 360), ph = pw / ratio;
+      var spot = clearSpot(pw * 2 + 24, ph + 24, textRects(), { x: x, y: y }, 0.55)
+              || clearSpot(pw * 2 + 24, ph + 24, textRects(true), { x: x, y: y }, 0.55);   // may cover the chat
+      var sc = spot ? spot.scale : 0.8;
+      if (!spot) { var fb = freeSpot(pw * 2, ph, textRects(true)); spot = { x: fb.x, y: fb.y }; sc = Math.min(0.9, fb.scale); }
+      pw = Math.round(pw * sc); ph = Math.round(ph * sc);
+
+      var s = shell("zine", beat.tilt != null ? beat.tilt : -2);
+      s.el.style.width = pw * 2 + "px"; s.el.style.height = ph + "px";
+      s.el.style.setProperty("--pw", pw + "px");
+      var book = document.createElement("div");
+      book.className = "zine-book closed";
+      s.inner.appendChild(book);
+      var base = document.createElement("div");          // the inside of the back cover (right) under all leaves
+      base.className = "zpage zbase";
+      book.appendChild(base);
+
+      function page(spec, side, k) {
+        var p = document.createElement("div");
+        p.className = "zface " + side;
+        if (spec) {
+          var cover = k === 0 || spec.bleed;                    // the cover and some pages are full-bleed
+          var img = makeImg(spec.src, "zimg" + (cover ? " bleed" : ""));
+          if (!cover) {                                         // printed slightly crooked, like a collage
+            img.style.setProperty("--zt", ((Math.random() * 2 - 1) * 2.5).toFixed(1) + "deg");
+            img.style.setProperty("--zx", ((Math.random() * 2 - 1) * 4).toFixed(1) + "%");
+            img.style.setProperty("--zy", ((Math.random() * 2 - 1) * 4).toFixed(1) + "%");
+          }
+          p.appendChild(img);
+        }
+        return p;
+      }
+      var leaves = [];
+      for (var k = 0; k < nLeaves; k++) {
+        var leaf = document.createElement("div");
+        leaf.className = "zleaf";
+        leaf.style.zIndex = nLeaves - k;
+        leaf.appendChild(page(photos[2 * k], "front", 2 * k));
+        leaf.appendChild(page(photos[2 * k + 1], "back", 2 * k + 1));
+        book.appendChild(leaf);
+        leaves.push(leaf);
+      }
+      var staple = document.createElement("div");
+      staple.className = "zstaples";
+      book.appendChild(staple);
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", beat.alt || "Zine of works");
+
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+      var turned = 0, flipMs = reduceMotion ? 0 : (beat.flip || 950);
+      function flipTo(n) {
+        turned = Math.max(0, Math.min(nLeaves, n));
+        leaves.forEach(function (lf, i) {
+          var done = i < turned, rest = done ? i + 1 : nLeaves - i;
+          var moving = lf.classList.contains("turned") !== done;
+          lf.classList.toggle("turned", done);
+          if (moving) {                       // the turning leaf flies over everything, then settles
+            lf.style.zIndex = nLeaves * 2;
+            lf.classList.remove("turning"); void lf.offsetWidth; lf.classList.add("turning");
+            setTimeout(function () { lf.style.zIndex = rest; lf.classList.remove("turning"); }, flipMs);
+          } else lf.style.zIndex = rest;
+        });
+        book.classList.toggle("closed", turned === 0);
+      }
+      it.onTap = function () { flipTo(turned >= nLeaves ? 0 : turned + 1); };
+      // opens and turns the pages by itself, stopping on the last full spread
+      var auto = Math.max(1, nLeaves - 1), every = beat.interval || 1300;
+      for (var n = 1; n <= auto; n++) (function (n) {
+        later(function () { if (!it.dead && turned === n - 1) flipTo(n); }, (beat.delay0 || 700) + (n - 1) * every);
+      })(n);
     },
 
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
@@ -704,22 +862,23 @@
       el.className = "marquee";
       if (beat.color) el.classList.add("color-" + beat.color);
       var span = document.createElement("span");
-      span.textContent = beat.text || "";
       el.appendChild(span);
       stage.appendChild(el);
       var v = viewport();
       var stretch = (beat.stretch || 3.2) * (v.h > v.w ? 1.6 : 1);   // tall phone screens: even taller, narrower letters
       span.style.fontSize = (v.h / (0.72 * stretch)) * 0.96 + "px";   // capitals fill the height
       span.style.setProperty("--sy", stretch);
-      var tw = span.offsetWidth, speed = beat.speed || 650;          // px per second
-      if (beat.direction === "right") {           // comes in from the left, moves right
-        span.style.setProperty("--from", -tw + "px");
-        span.style.setProperty("--to", v.w + "px");
-      } else {
-        span.style.setProperty("--from", v.w + "px");
-        span.style.setProperty("--to", -tw + "px");
-      }
-      span.style.animationDuration = (v.w + tw) / speed + "s";
+      // endless loop: the phrase + a space, repeated enough to always fill the screen
+      function copy() { var c = document.createElement("span"); c.className = "mq-unit"; c.textContent = beat.text || ""; span.appendChild(c); return c; }
+      var unit = copy().offsetWidth, speed = beat.speed || 650;      // px per second
+      for (var cw = unit; cw < v.w + unit * 2; cw += unit) copy();
+      var dir = beat.direction === "right" ? 1 : -1;
+      span.style.setProperty("--from", (dir < 0 ? v.w : -unit) + "px");   // first pass slides in from the edge
+      span.style.setProperty("--unit", unit + "px");
+      span.style.setProperty("--dir", dir);
+      var tIn = (dir < 0 ? v.w : unit) / speed, tLoop = unit / speed;
+      span.style.animation = "mq-in " + tIn + "s linear, mq-loop " + tLoop + "s linear " + tIn + "s infinite";
+      var tw = unit;
       var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
       el._item = item;
       el.style.zIndex = ++z;
@@ -953,16 +1112,16 @@
 
   // the roomiest area around the texts that fits a w×h box: returns centre, scale, side
   function freeSpot(w, h, rects) {
-    var v = viewport(), g = 16;
+    var v = viewport(), g = 16, BB = bands();
     if (!rects.length) return { x: v.w / 2, y: v.h / 2, scale: 1, side: "below" };
     var U = rects.reduce(function (a, r) {
       return { l: Math.min(a.l, r.l), t: Math.min(a.t, r.t), r: Math.max(a.r, r.r), b: Math.max(a.b, r.b) };
     });
     var areas = [
-      { side: "below", l: EDGE, t: U.b + g, r: v.w - EDGE, b: v.h - EDGE },
-      { side: "above", l: EDGE, t: EDGE + 30, r: v.w - EDGE, b: U.t - g },
-      { side: "right", l: U.r + g, t: EDGE + 30, r: v.w - EDGE, b: v.h - EDGE },
-      { side: "left",  l: EDGE, t: EDGE + 30, r: U.l - g, b: v.h - EDGE }
+      { side: "below", l: EDGE, t: U.b + g, r: v.w - EDGE, b: v.h - BB.b - 4 },
+      { side: "above", l: EDGE, t: BB.t + 4, r: v.w - EDGE, b: U.t - g },
+      { side: "right", l: U.r + g, t: BB.t + 4, r: v.w - EDGE, b: v.h - BB.b - 4 },
+      { side: "left",  l: EDGE, t: BB.t + 4, r: U.l - g, b: v.h - BB.b - 4 }
     ];
     var best = null;
     areas.forEach(function (a) {
@@ -991,7 +1150,9 @@
         if (item.dead) return;
         var v = viewport(), unit = Math.min(v.w, v.h), x, y;
         if (next.below) { playBeat(next, 0, 0, step - 1, { mode: "below", ref: item, gap: next.gap }); return; }
-        if (next.free) { var f0 = freeSpotFor(next); x = f0.x; y = f0.y; }
+        var nd = next.near === "deck" && nearDeckSpot(next);
+        if (nd) { x = nd.x; y = nd.y; }
+        else if (next.free) { var f0 = freeSpotFor(next); x = f0.x; y = f0.y; }
         else if (next.at) { x = next.at[0] * v.w; y = next.at[1] * v.h; }   // share of the screen
         else {                                                          // just below the text
           x = item.x + item.el.offsetWidth / 2;
@@ -1020,11 +1181,9 @@
   // without touching any text or photo (falls back to the text-only method)
   // pref = the point it would like to be near (the tap, or the screen centre);
   // minScale = 1 for texts (they never shrink)
-  function bottomBar() { var v = viewport(); return v.h > v.w ? 44 : 0; } // phone: contact links at the bottom
-
   function clearSpot(w, h, rects, pref, minScale) {
-    var v = viewport(), m = 12, top = EDGE + 40;
-    v = { w: v.w, h: v.h - bottomBar() };
+    var v = viewport(), m = 12, B = bands(), top = B.t + 4;
+    v = { w: v.w, h: v.h - B.b + EDGE - 4 };      // stay above the bottom band
     pref = pref || { x: v.w / 2, y: v.h / 2 };
     for (var sc = 1; sc >= (minScale || 0.4) - 0.001; sc -= 0.05) {
       var bw = w * sc, bh = h * sc, best = null, bestD = Infinity;
@@ -1064,7 +1223,7 @@
     if (beat.type === "book") {
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7), bh0 = bw0 / (beat.ratio || 0.7);
       var yfs = Math.min(96, Math.max(34, viewport().w * 0.095));       // the large text size
-      var yearH = beat.year ? yfs * 1.15 : 0, yearW = beat.year ? yfs * 0.72 * String(beat.year).length + 10 : 0;
+      var yearH = beat.year ? yfs * 1.45 : 0, yearW = beat.year ? yfs * (0.62 * String(beat.year).length + 1.0) : 0;
       var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
       var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.4)
             // no room? the book may overlap the chat, but never texts, the CV or other books
@@ -1175,7 +1334,7 @@
       if (drag) return; // one drag at a time
       var item = itemEl._item;
       toFront(item);
-      drag = { id: e.pointerId, item: item, dx: e.clientX - item.x, dy: e.clientY - item.y };
+      drag = { id: e.pointerId, item: item, dx: e.clientX - item.x, dy: e.clientY - item.y, sx: e.clientX, sy: e.clientY };
       itemEl.classList.add("dragging");
       itemEl.setPointerCapture(e.pointerId);
       tap = null;
@@ -1197,6 +1356,8 @@
   function endPointer(e, cancelled) {
     if (drag && drag.id === e.pointerId) {
       drag.item.el.classList.remove("dragging");
+      // a tap (no real movement) on an item that reacts to taps, e.g. the zine turns a page
+      if (!cancelled && drag.item.onTap && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) <= TAP_SLOP) drag.item.onTap();
       drag = null;
       return; // ending a drag NEVER reveals anything
     }

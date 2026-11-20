@@ -254,24 +254,24 @@ window.STORY = [
 
   // tap: work text (in the free space, near the tap) + the bar photo right away;
   //      then the cities are typed and each one drops its postcard
-  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 300, speed: 35, tilt: 0,
+  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 200, speed: 22, tilt: 0,
     text: "Fashion jobs by day, bartending by night.\n\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\n\nIstanbul, Milan, Copenhagen, Paris, Florence.",
     // the postcards stay until the next tap
 
     // postcards fill the whole page, one per city as it's typed; the text stays on top.
     // Alternating: coloured-frame cards / cream cards with a stamp-like scalloped edge.
     cues: {
-        // the bar photo pops up as an iMessage photo bubble right next to "bartending by night."
-        "night.": { beside: true, bubble: true, type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", tilt: -2 },
-        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 0, jitter: 0.03, tilt: -7,
+        // the bar photo pops out of "bartending" as an iMessage photo bubble, right of the text box
+        "bartending": { beside: true, bubble: true, type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", tilt: -2 },
+        "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
           postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
-        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 1, jitter: 0.03, tilt: 6,
+        "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
           postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
-        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 2, jitter: 0.03, tilt: -4,
+        "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
           postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
-        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 3, jitter: 0.03, tilt: 8,
+        "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
           postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
-        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.15, bleed: true, fill: 4, jitter: 0.03, tilt: -5,
+        "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 0.85, bleed: true, corner: true,
           postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
     }
   },
@@ -306,7 +306,8 @@ window.STORY = [
     type: "text", text: "2016", style: "big", color: "white", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", color: "white", typing: true, speed: 50, tilt: 0, gap: 14, delay: 500,
-        text: "Ok I'm done, time to go back to Italy, become a graphic and motion designer and maybe an artist (?)" }
+        text: "Ok I'm done, time to go back to Italy, become a graphic and motion designer and maybe an artist (?)",
+        then: [ { advance: true, delay: 900 } ] }   // the chat with Leo starts by itself
     ]
   },
 
@@ -388,16 +389,16 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.065, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1, year: "2021" },
+            ratio: 0.6667, depth: 0.065, spine: "#7c5634", rest: -52, tilt: -3, lifespan: 1, year: "2021" },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.1, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1, year: "2023" }
+            ratio: 0.7533, depth: 0.1, spine: "#4a1519", rest: 50, scale: 1.13, tilt: 4, lifespan: 1, year: "2023" }
     }
   },
 
-  // tap: the books go; the work photos are printed in a stapled paper zine that opens and
-  //      turns its pages by itself (tap the zine to keep flipping; drag it around). It stays.
-  { type: "zine", interval: 1300, alt: "Zine with Vaste Programme works", photos: [
+  // tap: the books go; the work photos slide in one after another, big, on top of everything,
+  //      straight (no tilt, no shadow). They stay.
+  { type: "slides", interval: 650, photos: [
       { src: "media/04_CAPITOLO_4/work_0.webp", ratio: 0.7503 },
       { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 0.75 },
       { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 0.75 },
@@ -414,11 +415,12 @@ window.STORY = [
   // tap: everything goes, the page is white again
   { clear: true, bg: "default",
     type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    bold: ["Meanwhile,"],
     text: "Meanwhile, I've been freelancing for 10 years now!\nA few projects:",
-    // then the wall of projects: the camera glides card to card, zooms out, dives back in.
+    // then the projects fill the screen: panels of covers changing fast + one project card in front.
     // Covers are loaded from giuliavigna.com / Behance for now (to replace with local copies).
     then: [
-      { free: "all", type: "cards", interval: 1100, zoomEvery: 5, delay: 200, cards: [
+      { type: "collage", interval: 1600, bgInterval: 520, delay: 200, lifespan: 1, cards: [
       { title: "Motion + Social Media", src: "https://r2.govsble.com/69b9cbe32e35908eabeac46e/photos/01KKYW94KP4RP3WQX6BCT6ZRRV/original.gif",
         url: "https://giuliavigna.com/homepage/motion/" },
       { title: "Website Design / Artmultiply", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2QvMy80LzYvZGFiZWY0NjAzM2Y1NWM1ODQwZDFmMTlkNmYzZjY0YjcuanBnIn0=",
@@ -452,6 +454,43 @@ window.STORY = [
       ]}
     ]
   },
+
+  /* tap: the projects go; the clients stream in like the Vaste Programme CV (typewriter font) */
+  { clear: true, type: "code", speed: 140,
+    lines: [
+      "## I WORKED WITH AGENCIES, ARTISTS, BRANDS, FESTIVALS, TV.",
+      "Salva Tu Alma • Milan",
+      "Impolite • Berlin",
+      "Made in Evolve • Modena",
+      "Art Multiply • India",
+      "Four in the Morning • Rome",
+      "Kelross • London",
+      "Cultivar • Rome",
+      "Yinka Ilori • London",
+      "MTV • International",
+      "Rai • International",
+      "Cook inc. • Lucca",
+      "Goldenpoint • Milan",
+      "Spring Attitude • Rome",
+      "Roma Lazio Film Commission • Rome",
+      "House of Ronin • Milan",
+      "Pacifico"
+    ]
+  },
+
+  /* ===== CHAPTER 6 — MEGAZINNE ===== */
+  // tap: everything goes, the page turns orange (white texts)
+  { clear: true, bg: "var(--secondary)",
+    type: "text", text: "2020 — LET'S TALK ABOUT BOOBS.", style: "big", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        text: "My childhood BFF Ilena (we met at a school run by nuns, btw) has an idea: a magazine about boobs. Called MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no?" }
+    ]
+  },
+
+  // tap: in the free space
+  { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    text: "Three issues, over €20K raised for charity. Rolling Stone, ELLE, Il Messaggero. Thanks, bye! Social media feminism wasn't really our thing anymore, so we called it quits." },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

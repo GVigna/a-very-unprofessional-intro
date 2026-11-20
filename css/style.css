@@ -533,17 +533,12 @@ body {
   text-transform: uppercase;
   transform-origin: left center;
   will-change: transform;
-  transform: translateX(var(--from, 100vw)) scaleY(var(--sy));
+  animation: marquee linear infinite;
 }
-@keyframes mq-in {
+@keyframes marquee {
   from { transform: translateX(var(--from)) scaleY(var(--sy)); }
-  to   { transform: translateX(0)           scaleY(var(--sy)); }
+  to   { transform: translateX(var(--to))   scaleY(var(--sy)); }
 }
-@keyframes mq-loop {        /* one phrase-width per cycle, so it wraps around seamlessly */
-  from { transform: translateX(0) scaleY(var(--sy)); }
-  to   { transform: translateX(calc(var(--unit) * var(--dir))) scaleY(var(--sy)); }
-}
-.mq-unit { padding-right: .35em; }   /* the space after ALERT before it starts again */
 .marquee.leaving { animation: none; }
 .marquee.leaving span { opacity: 0; transition: opacity .3s; }
 
@@ -606,7 +601,7 @@ body:not(.dark-page) .codecol { color: var(--primary); }
   bottom: 100%;
   margin-bottom: .18em;
   translate: -50% 0;                             /* composes with the pop-in animation */
-  font: 700 var(--fs-l)/1 var(--font);          /* large size, site font */
+  font: 400 calc(var(--fs-l) * .5)/1 "Alfa Slab One", var(--font);   /* half the large size, font 2 */
   color: var(--primary);
   background: #FFFFFF;                           /* white pill */
   padding: .1em .5em .12em;
@@ -737,7 +732,7 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
 
 @media (prefers-reduced-motion: reduce) {
   .book3d { animation: none; transform: rotateX(8deg) rotateY(var(--rest)); }
-  .marquee span { animation: none !important; transform: translateX(4vw) scaleY(var(--sy)); }
+  .marquee span { animation: none; transform: translateX(4vw) scaleY(var(--sy)); }
   .wash { display: none; }
   .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .item.dealt .inner, .bubble,
   .bubble.dots i, .inner.caret::after, .video .bar, .ui-progress.bump {
@@ -858,3 +853,23 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
   background: var(--primary); color: #FFFFFF; font-weight: 700;
 }
 @media (prefers-reduced-motion: reduce) { .cards-wall { transition-duration: .01s; } }
+
+/* SLIDES — big straight photos sliding in from the right, nothing else */
+.item.slide .inner { width: 100%; height: 100%; animation: slide-in .55s cubic-bezier(.2,.8,.2,1) both; }
+.item.slide .pic { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+@keyframes slide-in { from { transform: translateX(110vw); } to { transform: none; } }
+
+/* COLLAGE — full-screen changing panels + one white project card in front */
+.collage { position: absolute; left: 0; right: 0; overflow: hidden; }
+.collage-bg { position: absolute; inset: 0; }
+.collage-tile { position: absolute; object-fit: cover; display: block; pointer-events: none; }
+.collage-card {
+  position: absolute; top: var(--cy); transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: .5em;
+  background: #FFFFFF; color: var(--primary); text-decoration: none;
+  padding: 14px 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  touch-action: manipulation;
+}
+.collage-title { font: 700 var(--fs-m)/1 var(--font); text-transform: uppercase; letter-spacing: -.01em; }
+.collage-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; pointer-events: none; }

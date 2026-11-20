@@ -222,7 +222,7 @@ window.STORY = [
   // tap: the small text becomes something else, then the video appears by itself
   { type: "text", into: "ny-text", style: "body", typing: true, typeFrom: "Main character syndrome", speed: 45, tilt: 0,
     text: "Stumbled upon the set of Girls on my way to work.\nMain character syndrome, basically.",
-    then: [
+    also: [   // the video starts together with the typing
       { free: "all", type: "video", src: "media/02_CAPITOLO_2/girls.mp4", poster: "media/02_CAPITOLO_2/girls_poster.jpg",
         ratio: 16 / 9, size: "l", tilt: -3, delay: 300,
         loop: false,          // plays once (with its sound), then stops on the last frame
@@ -316,7 +316,7 @@ window.STORY = [
       { from: "me",   text: "Hey Leo! I came across your work online. Would you be up for collaborating on a new project?", typing: 300, pause: 400 },
       { from: "them", text: "Hey! Why not? Fancy a beer?", typing: 1400 },
       { from: "me",   text: "Yes! Amazing!" },
-      { from: "note", text: "And Vaste Programme was born." }
+      { from: "note", text: "Vaste Programme was born." }
   ]},
 
   // tap: the Vaste Programme CV streams like code (behind everything; half screen on

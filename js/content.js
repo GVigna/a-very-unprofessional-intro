@@ -42,6 +42,8 @@
              hintThen beats that pop out of the link when that cursor clicks
              id       a name for this text, so a later beat can replace it
              into     "id" → this text takes the place of that earlier text
+             cues     { "word": beat } → that beat plays the moment "word" is typed
+                      (free: true + jitter: 0.12 → tossed in a loose pile)
              then     beats that start BY THEMSELVES when the typing ends
                       (delay: ms; at: [x, y] share of the screen, default
                       = just below the text)
@@ -49,6 +51,8 @@
              lines    true → appears one line at a time (speed: ms per line)
 
    "image"   src      the photo, e.g. "media/00_OPENING/test1.webp"
+             postcard { city, frame: "#hex", ink: "#hex", field: "css colour" }
+                      → a vintage "Greetings from CITY" postcard; src = its photo
    "video"            (no src → a coloured placeholder box with a label)
              label    placeholder caption
              ratio    width / height of the photo, e.g. 4/5, 16/9
@@ -224,6 +228,33 @@ window.STORY = [
   // tap: in the free space (never over the title or the meme)
   { free: true, type: "text", style: "body", typing: true, typeFrom: "London it is.", speed: 55, tilt: 0,
     text: "Visa expires. I only speak English. Where do I go?\nLondon it is. Vámonos. 💃" },
+
+  // tap: work text (in the free space, near the tap) + the bar photo right away;
+  //      then the cities are typed and each one drops its postcard
+  { free: true, type: "text", style: "body", typing: true, typeFrom: "Istanbul", typePause: 700, speed: 70, tilt: 0,
+    text: "Fashion jobs by day, bartending by night.\nMy last fashion job wasn't the coolest, but it took me to a lot of places!\nIstanbul, Milan, Copenhagen, Paris, Florence.",
+    also: [
+      { free: "all", type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", delay: 250 }
+    ],
+    // postcards: photos still to come from Giulia — a colour field stands in for now
+    cues: {
+          "Istanbul": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
+            postcard: { city: "Istanbul", frame: "#F7C6D3", ink: "var(--secondary)",
+                        field: "linear-gradient(#f6c48a 0 50%, #2f6f8f 50% 100%)" } },
+          "Milan": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
+            postcard: { city: "Milan", frame: "#D8642C", ink: "#FFFFFF",
+                        field: "linear-gradient(#cfd8de 0 58%, #9a8f86 58% 100%)" } },
+          "Copenhagen": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
+            postcard: { city: "Copenhagen", frame: "#F2EBDD", ink: "var(--secondary)",
+                        field: "linear-gradient(#a9d3f0 0 45%, #e9b44c 45% 70%, #2d5d7b 70% 100%)" } },
+          "Paris": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
+            postcard: { city: "Paris", frame: "#F5B323", ink: "#FFFFFF",
+                        field: "linear-gradient(#bcd6ea 0 60%, #7f9a6a 60% 100%)" } },
+          "Florence": { type: "image", size: "m", ratio: 1.5, free: true, jitter: 0.12,
+            postcard: { city: "Florence", frame: "#CFE5D3", ink: "var(--secondary)",
+                        field: "linear-gradient(#f3d9a8 0 50%, #c56a3c 50% 100%)" } }
+    }
+  },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

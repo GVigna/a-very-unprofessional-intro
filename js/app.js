@@ -149,6 +149,29 @@
       s.el.style.height = h + "px";
     }
 
+    if (spec.postcard) {
+      // POSTCARD: coloured frame, photo (or a colour field until there is one), "Greetings from CITY"
+      var pc = spec.postcard;
+      s.el.classList.add("postcard");
+      s.inner.style.setProperty("--frame", pc.frame || "#F7C6D3");
+      s.inner.style.setProperty("--ink", pc.ink || "var(--secondary)");
+      var pic = document.createElement("div");
+      pic.className = "pc-pic";
+      if (spec.src) pic.appendChild(makeImg(spec.src, "pic"));
+      else pic.style.background = pc.field || "linear-gradient(#9fd0f5 0 55%, #7fb069 55% 100%)";
+      var cap = document.createElement("div");
+      cap.className = "pc-cap";
+      cap.innerHTML = "<i>Greetings from</i> <b></b>";
+      cap.querySelector("b").textContent = (pc.city || "").toUpperCase();
+      var stamp = document.createElement("span");
+      stamp.className = "pc-stamp";
+      stamp.textContent = pc.stamp || "GV";
+      s.inner.appendChild(pic); s.inner.appendChild(cap); s.inner.appendChild(stamp);
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", "Postcard: greetings from " + (pc.city || ""));
+      return s.el;
+    }
+
     if (spec.src && kind === "video") {
       s.el.classList.add("photo", "clip");
       var vid = document.createElement("video");
@@ -300,6 +323,21 @@
   // a little mouse cursor that glides onto the first link of a text, clicks twice, fades away
   // pixel-art arrow (black outline, white fill), drawn square by square
   var CURSOR_SVG = '<svg viewBox="0 0 11 17" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="1" height="1" fill="#000"/><rect x="0" y="1" width="1" height="1" fill="#000"/><rect x="1" y="1" width="1" height="1" fill="#000"/><rect x="0" y="2" width="1" height="1" fill="#000"/><rect x="1" y="2" width="1" height="1" fill="#FFF"/><rect x="2" y="2" width="1" height="1" fill="#000"/><rect x="0" y="3" width="1" height="1" fill="#000"/><rect x="1" y="3" width="1" height="1" fill="#FFF"/><rect x="2" y="3" width="1" height="1" fill="#FFF"/><rect x="3" y="3" width="1" height="1" fill="#000"/><rect x="0" y="4" width="1" height="1" fill="#000"/><rect x="1" y="4" width="1" height="1" fill="#FFF"/><rect x="2" y="4" width="1" height="1" fill="#FFF"/><rect x="3" y="4" width="1" height="1" fill="#FFF"/><rect x="4" y="4" width="1" height="1" fill="#000"/><rect x="0" y="5" width="1" height="1" fill="#000"/><rect x="1" y="5" width="1" height="1" fill="#FFF"/><rect x="2" y="5" width="1" height="1" fill="#FFF"/><rect x="3" y="5" width="1" height="1" fill="#FFF"/><rect x="4" y="5" width="1" height="1" fill="#FFF"/><rect x="5" y="5" width="1" height="1" fill="#000"/><rect x="0" y="6" width="1" height="1" fill="#000"/><rect x="1" y="6" width="1" height="1" fill="#FFF"/><rect x="2" y="6" width="1" height="1" fill="#FFF"/><rect x="3" y="6" width="1" height="1" fill="#FFF"/><rect x="4" y="6" width="1" height="1" fill="#FFF"/><rect x="5" y="6" width="1" height="1" fill="#FFF"/><rect x="6" y="6" width="1" height="1" fill="#000"/><rect x="0" y="7" width="1" height="1" fill="#000"/><rect x="1" y="7" width="1" height="1" fill="#FFF"/><rect x="2" y="7" width="1" height="1" fill="#FFF"/><rect x="3" y="7" width="1" height="1" fill="#FFF"/><rect x="4" y="7" width="1" height="1" fill="#FFF"/><rect x="5" y="7" width="1" height="1" fill="#FFF"/><rect x="6" y="7" width="1" height="1" fill="#FFF"/><rect x="7" y="7" width="1" height="1" fill="#000"/><rect x="0" y="8" width="1" height="1" fill="#000"/><rect x="1" y="8" width="1" height="1" fill="#FFF"/><rect x="2" y="8" width="1" height="1" fill="#FFF"/><rect x="3" y="8" width="1" height="1" fill="#FFF"/><rect x="4" y="8" width="1" height="1" fill="#FFF"/><rect x="5" y="8" width="1" height="1" fill="#FFF"/><rect x="6" y="8" width="1" height="1" fill="#FFF"/><rect x="7" y="8" width="1" height="1" fill="#FFF"/><rect x="8" y="8" width="1" height="1" fill="#000"/><rect x="0" y="9" width="1" height="1" fill="#000"/><rect x="1" y="9" width="1" height="1" fill="#FFF"/><rect x="2" y="9" width="1" height="1" fill="#FFF"/><rect x="3" y="9" width="1" height="1" fill="#FFF"/><rect x="4" y="9" width="1" height="1" fill="#FFF"/><rect x="5" y="9" width="1" height="1" fill="#FFF"/><rect x="6" y="9" width="1" height="1" fill="#FFF"/><rect x="7" y="9" width="1" height="1" fill="#FFF"/><rect x="8" y="9" width="1" height="1" fill="#FFF"/><rect x="9" y="9" width="1" height="1" fill="#000"/><rect x="0" y="10" width="1" height="1" fill="#000"/><rect x="1" y="10" width="1" height="1" fill="#FFF"/><rect x="2" y="10" width="1" height="1" fill="#FFF"/><rect x="3" y="10" width="1" height="1" fill="#FFF"/><rect x="4" y="10" width="1" height="1" fill="#FFF"/><rect x="5" y="10" width="1" height="1" fill="#FFF"/><rect x="6" y="10" width="1" height="1" fill="#000"/><rect x="7" y="10" width="1" height="1" fill="#000"/><rect x="8" y="10" width="1" height="1" fill="#000"/><rect x="9" y="10" width="1" height="1" fill="#000"/><rect x="10" y="10" width="1" height="1" fill="#000"/><rect x="0" y="11" width="1" height="1" fill="#000"/><rect x="1" y="11" width="1" height="1" fill="#FFF"/><rect x="2" y="11" width="1" height="1" fill="#FFF"/><rect x="3" y="11" width="1" height="1" fill="#000"/><rect x="4" y="11" width="1" height="1" fill="#FFF"/><rect x="5" y="11" width="1" height="1" fill="#FFF"/><rect x="6" y="11" width="1" height="1" fill="#000"/><rect x="0" y="12" width="1" height="1" fill="#000"/><rect x="1" y="12" width="1" height="1" fill="#FFF"/><rect x="2" y="12" width="1" height="1" fill="#000"/><rect x="4" y="12" width="1" height="1" fill="#000"/><rect x="5" y="12" width="1" height="1" fill="#FFF"/><rect x="6" y="12" width="1" height="1" fill="#FFF"/><rect x="7" y="12" width="1" height="1" fill="#000"/><rect x="0" y="13" width="1" height="1" fill="#000"/><rect x="1" y="13" width="1" height="1" fill="#000"/><rect x="4" y="13" width="1" height="1" fill="#000"/><rect x="5" y="13" width="1" height="1" fill="#FFF"/><rect x="6" y="13" width="1" height="1" fill="#FFF"/><rect x="7" y="13" width="1" height="1" fill="#000"/><rect x="0" y="14" width="1" height="1" fill="#000"/><rect x="5" y="14" width="1" height="1" fill="#000"/><rect x="6" y="14" width="1" height="1" fill="#FFF"/><rect x="7" y="14" width="1" height="1" fill="#FFF"/><rect x="8" y="14" width="1" height="1" fill="#000"/><rect x="5" y="15" width="1" height="1" fill="#000"/><rect x="6" y="15" width="1" height="1" fill="#FFF"/><rect x="7" y="15" width="1" height="1" fill="#FFF"/><rect x="8" y="15" width="1" height="1" fill="#000"/><rect x="6" y="16" width="1" height="1" fill="#000"/><rect x="7" y="16" width="1" height="1" fill="#000"/></svg>';
+  // "cues": { "word": beat } → that beat plays the moment "word" has been typed
+  function fireCues(beat, item, shown) {
+    if (!beat.cues) return;
+    item.fired = item.fired || {};
+    var at = step - 1;
+    Object.keys(beat.cues).forEach(function (word) {
+      if (item.fired[word] || shown.indexOf(word) < 0) return;
+      item.fired[word] = true;
+      var next = beat.cues[word], v = viewport(), unit = Math.min(v.w, v.h);
+      var f = next.free ? freeSpotFor(next) : { x: item.x + item.el.offsetWidth / 2, y: item.y - unit * 0.2 };
+      var j = next.jitter != null ? next.jitter : 0;      // scatter, so a pile looks tossed
+      playBeat(next, f.x + (Math.random() * 2 - 1) * j * unit, f.y + (Math.random() * 2 - 1) * j * unit, at);
+    });
+  }
+
   function maybeHint(item, inner, beat, delay) {
     if (item.hinted || !beat.links || beat.linkHint === false) return;
     if (!inner.querySelector("a")) return;          // the link isn't complete yet
@@ -435,7 +473,7 @@
           if (from > 0) {
             i = Array.from(full.slice(0, from)).length;
             renderInto(s.inner, full.slice(0, from), beat, false);
-            later(function () { maybeHint(item, s.inner, beat, 250); }, 0);
+            later(function () { maybeHint(item, s.inner, beat, 250); fireCues(beat, item, full.slice(0, from)); }, 0);
             pause = beat.typePause != null ? beat.typePause : TYPE_PAUSE; // breath before the typing
           }
         }
@@ -445,8 +483,10 @@
         var typeNext = function () {
           if (item.dead) return;
           i++;
-          renderInto(s.inner, chars.slice(0, i).join(""), beat, false);
+          var shownNow = chars.slice(0, i).join("");
+          renderInto(s.inner, shownNow, beat, false);
           maybeHint(item, s.inner, beat, 150);
+          fireCues(beat, item, shownNow);
           if (anchored) refit(item);
           else place(item, cx - s.el.offsetWidth / 2, cy - s.el.offsetHeight / 2);
           if (i < chars.length) later(typeNext, reduceMotion ? 0 : speed);

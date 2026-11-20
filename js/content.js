@@ -131,7 +131,8 @@
 /* ---------- always-visible contact links (empty = hidden) */
 window.CONTACT = {
   portfolio: "https://giuliavigna.com/",     // → ACTUAL PORTFOLIO
-  email: "info.gommastudio@gmail.com"        // → EMAIL ME
+  email: "info.gommastudio@gmail.com",       // → EMAIL ME
+  cv: "media/00_OPENING/Cv_GiuliaVigna_2026.pdf"   // → CV (next to ACTUAL PORTFOLIO)
 };
 
 /* ---------- already on screen when the site opens (draggable, always stay) */
@@ -408,6 +409,49 @@ window.STORY = [
       { src: "media/04_CAPITOLO_4/work_8.webp", ratio: 0.812 },
       { src: "media/04_CAPITOLO_4/work_9.webp", ratio: 1.0 }
   ]},
+
+  /* ===== FREELANCE ===== */
+  // tap: everything goes, the page is white again
+  { clear: true, bg: "default",
+    type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    text: "Meanwhile, I've been freelancing for 10 years now!\nA few projects:",
+    // then the wall of projects: the camera glides card to card, zooms out, dives back in.
+    // Covers are loaded from giuliavigna.com / Behance for now (to replace with local copies).
+    then: [
+      { free: "all", type: "cards", interval: 1100, zoomEvery: 5, delay: 200, cards: [
+      { title: "Motion + Social Media", src: "https://r2.govsble.com/69b9cbe32e35908eabeac46e/photos/01KKYW94KP4RP3WQX6BCT6ZRRV/original.gif",
+        url: "https://giuliavigna.com/homepage/motion/" },
+      { title: "Website Design / Artmultiply", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2QvMy80LzYvZGFiZWY0NjAzM2Y1NWM1ODQwZDFmMTlkNmYzZjY0YjcuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/artmultiply/" },
+      { title: "Burger identity", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvMi85LzUvM2I5NDY3MWMyMjdkNDA2YzlhNjU3MDgxNWQ4Y2ZkYTkuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/burger-identity/" },
+      { title: "Impolite website", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2UvYi83LzIvZTk3NTI1NGViNzQwYjIwYTdlMTcxZDgxMmI5ODA4NmYuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/impolite-wesbite/" },
+      { title: "Ronin", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzUvNC9hLzQvNTBjY2NlODU0NzJhYzQyMmE5Yjk0MDNhNDI5N2IxYWIuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/84430173/" },
+      { title: "Megazinne", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvZS83LzUvM2MwODUzYzdlY2IyNWYyMTdiYWIyZjkxNThjYzVkODIuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/36548381/" },
+      { title: "Tape Saturday", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlL2EvZi82LzcvYTA1MjVjNTNmZTIyMDZmNzZjMWM3ZDY0NzYxNmVkY2YuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/9878122/" },
+      { title: "Yanez", src: "https://d10wkeykn55puz.cloudfront.net/eyJidWNrZXQiOiJ2c2JsZSIsImVkaXRzIjp7InJvdGF0ZSI6bnVsbCwicmVzaXplIjp7ImZpdCI6Imluc2lkZSIsIndpZHRoIjoxMDAwLCJoZWlnaHQiOjEwMDB9fSwia2V5IjoiZmlsZS1zdG9yYWdlLzMvNS8xLzIvMzY3NTIyNzI1NDlmNmYzNjFmZTNiYTE2MjUxOTQ3ZWQuanBnIn0=",
+        url: "https://giuliavigna.com/homepage/9374656/" },
+      { title: "Maos branding and illustration", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/8a4e8d214429615.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Terra Cena movie graphics", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7ade7e204420103.Y3JvcCwxMzgwLDEwODAsMjcwLDA.png",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Poster Design Dameer", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0e3855185106913.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Motion Graphics for Website Awards", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/413af3128639515.Y3JvcCwxODM0LDE0MzQsMCwxOTk.png",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Social media censorship", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/3dea8095366789.Y3JvcCwxNTAwLDExNzMsMCwzMjY.jpg",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Draft for TMI's identity", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/fdbfaf94733593.Y3JvcCwxNDAwLDEwOTUsMCwxMzg.png",
+        url: "https://www.behance.net/Giulia_Vigna" },
+      { title: "Don't let this crisis go to waste", src: "https://mir-s3-cdn-cf.behance.net/projects/max_808/8a654894414573.Y3JvcCw0NTAwLDM1MTksMCw0Njc.jpg",
+        url: "https://www.behance.net/Giulia_Vigna" }
+      ]}
+    ]
+  },
 
   { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
 ];

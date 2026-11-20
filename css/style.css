@@ -686,7 +686,8 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
   justify-content: space-between;
 }
 .ui-contact .ui-email { order: -1; }
-.ui-portfolio { margin-left: auto; }
+.ui-cv { margin-left: auto; margin-right: .6em; }   /* CV sits right before ACTUAL PORTFOLIO */
+.ui-portfolio { order: 1; }
 .ui-link {
   color: inherit;
   text-decoration: none;
@@ -823,3 +824,37 @@ body.dark-page .item.text.boxed .inner { background: var(--primary); box-shadow:
 .zstaples::before { top: 22%; }
 .zstaples::after { bottom: 22%; }
 .zine-book.closed .zstaples { opacity: 0; }
+
+/* CARDS — wall of project covers seen through a window; the camera moves, the window stays */
+.item.cards .inner { width: 100%; height: 100%; overflow: hidden; background: none; border-radius: 4px; }
+.cards-wall {
+  position: absolute; left: 0; top: 0;
+  transform-origin: 0 0;
+  transition: transform .75s cubic-bezier(.65,0,.25,1);
+  will-change: transform;
+}
+.pcard {
+  position: absolute;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #E9E9EB;
+  box-shadow: 0 6px 16px rgba(0,0,0,.14);
+}
+.pcard-img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.pcard-pill {
+  position: absolute; left: 8%; right: 8%; top: 44%;
+  display: flex; align-items: center; justify-content: space-between; gap: .5em;
+  background: #FFFFFF; color: #111111; text-decoration: none;
+  border-radius: 999px;
+  padding: .45em .45em .45em .9em;
+  font: 500 clamp(11px, 1.1vw, 14px)/1.1 var(--font);
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  touch-action: manipulation;
+}
+.pcard-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-go {
+  flex: none; width: 1.7em; height: 1.7em; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--primary); color: #FFFFFF; font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) { .cards-wall { transition-duration: .01s; } }

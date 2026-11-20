@@ -825,6 +825,87 @@
       })(n);
     },
 
+    // CARDS — project covers on a wall; the "camera" glides from card to card, now and then
+    // zooms out to show the whole wall and dives back in somewhere else. Each card has a pill caption.
+    cards: function (beat, x, y, diesAt) {
+      var list = beat.cards || [];
+      if (!list.length) return;
+      var v = viewport(), B = bands();
+      var ratio = beat.ratio || 0.8;                         // card width / height
+      var availH = v.h - B.t - B.b - 16;
+      var winW = Math.min(v.w - EDGE * 2, beat.maxWidth || 1000);
+      var cw = winW * (v.w > v.h ? 0.34 : 0.62), ch = cw / ratio, gap = Math.round(cw * 0.09);
+      var winH = ch + gap * 2;
+      var spot = clearSpot(winW, winH, textRects(), { x: x, y: y }, 0.5);
+      if (!spot) { var fb = freeSpot(winW, winH, textRects()); spot = { x: fb.x, y: fb.y, scale: Math.min(fb.scale, 0.8) }; }
+      var sc = Math.min(1, spot.scale || 1);
+      winW *= sc; cw *= sc; ch = cw / ratio; gap = Math.round(gap * sc); winH = ch + gap * 2;
+
+      var s = shell("cards", 0);
+      s.el.style.width = winW + "px"; s.el.style.height = winH + "px";
+      var wall = document.createElement("div");
+      wall.className = "cards-wall";
+      s.inner.appendChild(wall);
+      var cols = beat.cols || Math.ceil(Math.sqrt(list.length * 1.6)), rows = Math.ceil(list.length / cols);
+      var pos = [];
+      list.forEach(function (c, i) {
+        var col = i % cols, row = Math.floor(i / cols);
+        var px = col * (cw + gap) + (row % 2 ? (cw + gap) / 2 : 0), py = row * (ch + gap);   // rows offset, like bricks
+        pos.push({ x: px + cw / 2, y: py + ch / 2 });
+        var card = document.createElement("div");
+        card.className = "pcard";
+        card.style.cssText = "left:" + px + "px;top:" + py + "px;width:" + cw + "px;height:" + ch + "px";
+        card.appendChild(makeImg(c.src, "pcard-img"));
+        var pill = document.createElement(c.url ? "a" : "div");
+        pill.className = "pcard-pill";
+        if (c.url) { pill.href = c.url; pill.target = "_blank"; pill.rel = "noopener"; }
+        pill.innerHTML = '<span class="pcard-name"></span><span class="pcard-go" aria-hidden="true">→</span>';
+        pill.querySelector(".pcard-name").textContent = c.title || "";
+        card.appendChild(pill);
+        wall.appendChild(card);
+      });
+      var wallW = cols * (cw + gap) + (cw + gap) / 2, wallH = rows * (ch + gap);
+      s.el.setAttribute("role", "region");
+      s.el.setAttribute("aria-label", beat.alt || "A few projects");
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+
+      var cur = 0, hops = 0;
+      function look(i, zoom) {                     // put card i in the middle of the window
+        var p = pos[i];
+        var k = zoom || 1;
+        // keep the wall covering the window: no empty space beside the first / last cards
+        var tx = Math.min(gap / 2, Math.max(winW - wallW * k + gap / 2, winW / 2 - p.x * k));
+        var ty = Math.min(gap, Math.max(winH - wallH * k, winH / 2 - p.y * k));
+        wall.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + k + ")";
+      }
+      function overview() {                        // the whole wall, small
+        var k = Math.min(winW / wallW, winH / wallH) * 0.95;
+        wall.style.transform = "translate(" + (winW - wallW * k) / 2 + "px," + (winH - wallH * k) / 2 + "px) scale(" + k + ")";
+      }
+      wall.style.transition = "none"; look(0);
+      void wall.offsetWidth; wall.style.transition = "";
+      var every = reduceMotion ? 2600 : (beat.interval || 1100);
+      function tick() {
+        if (it.dead) return;
+        hops++;
+        if (hops % (beat.zoomEvery || 5) === 0) {
+          overview();
+          later(function () {
+            if (it.dead) return;
+            var next; do { next = Math.floor(Math.random() * list.length); } while (next === cur && list.length > 1);
+            cur = next; look(cur); later(tick, every);
+          }, every * 1.1);
+          return;
+        }
+        var row = Math.floor(cur / cols), nxt = cur + 1;
+        if (nxt >= list.length || Math.floor(nxt / cols) !== row) nxt = row * cols;   // wrap within the row
+        cur = nxt; look(cur);
+        later(tick, every);
+      }
+      later(tick, (beat.delay0 || 900));
+      it.onTap = function () { cur = (cur + 1) % list.length; look(cur); };
+    },
+
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
     deck: function (beat, x, y, diesAt) {
       var cards = beat.cards || [];
@@ -1417,6 +1498,8 @@
     var p = document.getElementById("link-portfolio"), m = document.getElementById("link-email");
     if (p && cfg.portfolio) { p.href = cfg.portfolio; p.hidden = false; }
     if (m && cfg.email) { m.href = "mailto:" + cfg.email; m.hidden = false; }
+    var cv = document.getElementById("link-cv");
+    if (cv && cfg.cv) { cv.href = cfg.cv; cv.hidden = false; }
   })();
 
   updateProgress();

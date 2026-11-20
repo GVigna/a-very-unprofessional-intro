@@ -432,7 +432,7 @@ window.STORY = [
   /* tap: the projects go; the clients stream in like the Vaste Programme CV (typewriter font) */
   { clear: true, type: "code", speed: 140,
     // a pile of 12 photos (placeholders for now): flick the top one away, or tap the pile
-    also: [ { type: "flick", delay: 700, size: "m", photos: [
+    also: [ { type: "flick", delay: 700, size: "m", interval: 850, photos: [
       { color: "#7D00FF" }, { color: "#FF5500" }, { color: "#FFC93C" }, { color: "#1FA36B" },
       { color: "#2F6FB0" }, { color: "#F7C6D3" }, { color: "#111111" }, { color: "#B5532F" },
       { color: "#9FD3F2" }, { color: "#E5432A" }, { color: "#6B4E9B" }, { color: "#D9D3C7" }
@@ -475,7 +475,7 @@ window.STORY = [
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
     // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
     also: [
-      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 2", spreads: [
+      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -490,7 +490,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -506,7 +506,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 230, interval: 260, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",
@@ -529,7 +529,7 @@ window.STORY = [
     text: "Thanks, bye! Social media feminism wasn't really our thing anymore, so we called it quits.",
     also: [
       { type: "receipt", delay: 500, tilt: -3,
-        text: "********************************\n          MEGAZINNE\n********************************\n\nCHARITY RECEIPT\n2020 — 2021\n\n--------------------------------\nITEM 01\nMEGAZINNE — ISSUE #01\nOCTOBER 2020\n\nLILT FIRENZE\nCancer prevention, patient\nsupport & rehabilitation.\n\n--------------------------------\nITEM 02\nMEGAZINNE — ISSUE #02\nMARCH 2021\n\nD.i.Re\nWomen Against Violence Network\n\n--------------------------------\nITEM 03\nMEGAZINNE — ISSUE #03\n\nAIDOS\nItalian Association for\nWomen in Development\n\n\n--------------------------------\n\nISSUES PUBLISHED             03\n\n********************************\n\nTOTAL RAISED\n\n       €20,000+\n\n********************************\n\n100% OF PROCEEDS DONATED\n\nTHANK YOU FOR SUPPORTING\nWOMEN'S HEALTH & RIGHTS.\n\n--------------------------------\n\n\n        ♥ MEGAZINNE ♥\n\n********************************" }
+        text: "********************************\n          MEGAZINNE\n********************************\n\nCHARITY RECEIPT\n2020 — 2021\n\n--------------------------------\nITEM 01\nMEGAZINNE — ISSUE #01\nOCTOBER 2020\n\nLILT FIRENZE\nCancer prevention, patient\nsupport & rehabilitation.\n\n--------------------------------\nITEM 02\nMEGAZINNE — ISSUE #02\nMARCH 2021\n\nD.i.Re\nWomen Against Violence Network\n\n--------------------------------\nITEM 03\nMEGAZINNE — ISSUE #03\n\nAIDOS\nItalian Association for\nWomen in Development\n\n\n--------------------------------\n\nISSUES PUBLISHED             03\n\n********************************\n\n**TOTAL RAISED            €20,000+**\n\n********************************\n\n100% OF PROCEEDS DONATED\n\nTHANK YOU FOR SUPPORTING\nWOMEN'S HEALTH & RIGHTS.\n\n--------------------------------\n\n\n        ♥ MEGAZINNE ♥\n\n********************************" }
     ] },
 
   /* ===== DOCCIA FREDDA ===== */
@@ -546,7 +546,7 @@ window.STORY = [
     ]
   },
 
-  /* ===== CHAPTER 7 — MOTION ===== */
+  /* ===== MOTION ===== */
   // tap: everything goes; the text sits in front, a very long list of skills streams behind it.
   // The first ~9 lines at reading pace, then it speeds up (about 8 s in all) — no need to read it all.
   { clear: true, bg: "default",
@@ -598,5 +598,45 @@ window.STORY = [
     ]
   },
 
-  { type: "text", text: "(to be continued)", style: "note", tilt: 0 }
+  /* ===== CHAPTER 7 — BACK TO SCHOOL ===== */
+  // tap: the university card on its lanyard swings in from the left and wipes everything away; white page
+  { wipe: true, wipeMs: 700, bg: "default",
+    type: "lanyard", src: "media/07_CAPITOLO_7/sapienza_card.webp", ratio: 1.66, x: 0.78, alt: "Sapienza University of Rome student card on a lanyard",
+    also: [
+      { free: true, type: "text", text: "2026 — Back to school.\nAgain.", style: "big", typing: true, speed: 30, tilt: 0, delay: 1300,
+        then: [
+          { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 400,
+            bold: ["PRESENT DAY"],
+            text: "PRESENT DAY\nWent back to university.\nCurrently in my second year of a BA in Art History at Sapienza University of Rome.\nBecause having several jobs and projects clearly wasn't enough." }
+        ] }
+    ]
+  },
+
+  // tap: the card swings back out; same layout as Megazinne (big title + text below)
+  { clear: true, bg: "default",
+    type: "text", text: "OK, BUT WHAT DO I ACTUALLY CARE ABOUT?", style: "big", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        text: "People, mostly. Doing things together. Sharing what I know, learning what I don't.\n\nI care about community, collaboration, and finding ways to make creative work a little more sustainable." }
+    ]
+  },
+
+  // tap: in the free space
+  { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    text: "I'd also love to work more with younger generations, share what I've learned, and hopefully learn twice as much in return.\n\nI'd rather be in a room where everyone has something to share than be the smartest person in it." },
+
+  /* ===== CLOSING ===== */
+  // tap: everything goes
+  { clear: true, bg: "default",
+    type: "text", text: "WHAT'S NEXT?", style: "big", tilt: 0,
+    also: [
+      { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
+        bold: ["YES, PLEASE.", "GOT SOMETHING IN MIND?", "HMU ↗"],
+        links: { "HMU ↗": "mailto:giu.vigna@gmail.com" }, linkHint: false,
+        text: "More art?\nMore design?\nMore people doing weird things together?\nYES, PLEASE.\n\nFreelance projects, collaborations, teaching, workshops, collective experiments, unexpected ideas.\nGOT SOMETHING IN MIND?\nHMU ↗",
+        // when it's all typed, a little mail icon pops up: tap it to write to Giulia
+        then: [ { type: "mailicon", email: "giu.vigna@gmail.com", delay: 300 } ] }
+    ]
+  },
+
 ];

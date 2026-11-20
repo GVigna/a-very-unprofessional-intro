@@ -1014,3 +1014,58 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
   0%, 100% { transform: rotateX(0deg) rotateY(var(--rest)); }
   50%      { transform: rotateX(0deg) rotateY(calc(var(--rest) + 28deg)); }
 }
+
+/* WIPE — white panel sweeping left → right */
+.wipe-panel { position: absolute; left: 0; right: 0; background: #FFFFFF; animation: wipe-lr ease-in-out both; pointer-events: none; }
+@keyframes wipe-lr { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* LANYARD — strap from the top, metal clip, card; swings like a pendulum */
+.lanyard { position: absolute; width: 0; height: 0; pointer-events: none; }
+.ly-swing { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: auto; cursor: grab; touch-action: none; }
+.ly-strap {
+  position: absolute; left: calc(var(--cw) * -.06); top: -40px;
+  width: calc(var(--cw) * .12); height: calc(var(--strap) + 40px);
+  background: linear-gradient(90deg, #5e0f12, #7c1a1d 30%, #8e2326 50%, #7c1a1d 70%, #5e0f12);
+  box-shadow: 2px 0 6px rgba(0,0,0,.18);
+}
+.ly-clip {
+  position: absolute; left: calc(var(--cw) * -.05); top: calc(var(--strap) - 6px);
+  width: calc(var(--cw) * .1); height: calc(var(--cw) * .16);
+  border-radius: 40% 40% 30% 30%;
+  background: linear-gradient(90deg, #8d9096, #f2f3f5 45%, #a6a9ae 60%, #6f7277);
+  box-shadow: 0 2px 4px rgba(0,0,0,.3);
+}
+.ly-clip i { position: absolute; left: 30%; right: 30%; top: 18%; height: 40%; border-radius: 40%; background: rgba(0,0,0,.25); }
+.ly-card {
+  position: absolute; left: calc(var(--cw) * -.5); top: calc(var(--strap) + var(--cw) * .13);
+  width: var(--cw);
+  border-radius: calc(var(--cw) * .04);
+  overflow: hidden; background: #FFFFFF;
+  box-shadow: 0 14px 28px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.06);
+}
+.ly-card img { display: block; width: 100%; height: auto; pointer-events: none; }
+.ly-swing.swing { animation: ly-swing 2.2s cubic-bezier(.3,.05,.3,1) both; }
+.ly-swing.nudge { animation: ly-nudge 1.8s ease-out both; }
+@keyframes ly-swing {
+  0%   { transform: rotate(88deg); }
+  38%  { transform: rotate(-22deg); }
+  58%  { transform: rotate(10deg); }
+  75%  { transform: rotate(-4deg); }
+  88%  { transform: rotate(1.5deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes ly-nudge {
+  0% { transform: rotate(0); } 20% { transform: rotate(-12deg); } 45% { transform: rotate(7deg); }
+  65% { transform: rotate(-3deg); } 82% { transform: rotate(1deg); } 100% { transform: rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) { .ly-swing.swing, .ly-swing.nudge { animation: none; } }
+
+.ly-swing.out { animation: ly-out .75s cubic-bezier(.5,0,.8,.4) both; }
+@keyframes ly-out { from { transform: rotate(0deg); } to { transform: rotate(95deg); } }
+
+/* MAILICON — envelope with a notification dot; a real mailto link */
+.item.mailicon .inner { background: none; overflow: visible; animation: pop-in 420ms cubic-bezier(.2,1.6,.4,1) both, mi-wiggle 2.4s ease-in-out 1s infinite; }
+.mi-link { display: block; position: relative; width: 84px; color: var(--primary); touch-action: manipulation; }
+.mi-link svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
+.mi-dot { position: absolute; right: -8px; top: -10px; width: 26px; height: 26px; border-radius: 50%; background: var(--secondary); color: #FFFFFF; font: 700 14px/26px var(--font); text-align: center; }
+@keyframes mi-wiggle { 0%, 80%, 100% { rotate: 0deg; } 85% { rotate: -9deg; } 90% { rotate: 7deg; } 95% { rotate: -4deg; } }

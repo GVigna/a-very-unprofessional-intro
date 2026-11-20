@@ -1107,7 +1107,7 @@
     // RECEIPT — a thermal-paper receipt that prints out; tap it and it crumples into a paper ball
     receipt: function (beat, x, y, diesAt) {
       var v = viewport(), B = bands();
-      var text = beat.text || "", rows = text.split("\n");
+      var text = beat.text || "", rows = text.replace(/\*\*/g, "").split("\n");
       var cols = rows.reduce(function (m, r) { return Math.max(m, Array.from(r).length); }, 0);
       // font size so the whole receipt fits the screen height (and width)
       var H = (v.h - B.t - B.b) * 0.92, W = v.w - EDGE * 2;
@@ -1117,10 +1117,16 @@
       var paper = document.createElement("pre");
       paper.className = "rc-paper";
       paper.style.fontSize = fs.toFixed(2) + "px";
-      paper.textContent = text;
+      // a line wrapped in **…** is printed in bold
+      text.split("\n").forEach(function (ln, i) {
+        if (i) paper.appendChild(document.createTextNode("\n"));
+        var m = ln.match(/^\*\*(.*)\*\*$/);
+        if (m && m[1]) { var b = document.createElement("b"); b.textContent = m[1]; paper.appendChild(b); }
+        else paper.appendChild(document.createTextNode(ln));
+      });
       s.inner.appendChild(paper);
       s.el.setAttribute("role", "img");
-      s.el.setAttribute("aria-label", "Charity receipt: " + text.replace(/[*\-]{4,}/g, " ").replace(/\s+/g, " ").trim());
+      s.el.setAttribute("aria-label", "Charity receipt: " + text.replace(/\*\*/g, "").replace(/[*\-]{4,}/g, " ").replace(/\s+/g, " ").trim());
       s.el.style.visibility = "hidden"; stage.appendChild(s.el);
       var w = s.el.offsetWidth, h = s.el.offsetHeight; s.el.remove(); s.el.style.visibility = "";
       var spot = clearSpot(w * 1.08, h * 1.02, textRects().concat(mediaRects()), { x: x, y: y }, 0.6) || freeSpot(w, h, textRects());
@@ -1184,6 +1190,56 @@
           })();
         });
       }, 450);
+    },
+
+    // LANYARD — an ID card on a lanyard swings in from the left, sweeping across the screen,
+    // and settles hanging from the top. Tap it and it swings again.
+    lanyard: function (beat, x, y, diesAt) {
+      var v = viewport(), B = bands();
+      var H = v.h - B.t - B.b, portrait = v.h > v.w;
+      var cw = Math.min(portrait ? v.w * 0.62 : v.w * 0.24, 340);
+      var ch = cw / (beat.ratio || 1.66);
+      var strap = (portrait ? H * 0.22 : H * 0.34);
+      var px = v.w * (portrait ? 0.5 : (beat.x || 0.7));
+      var el = document.createElement("div");
+      el.className = "lanyard";
+      el.style.left = px + "px"; el.style.top = B.t + "px";
+      el.style.setProperty("--cw", cw + "px"); el.style.setProperty("--strap", strap + "px");
+      el.innerHTML = '<div class="ly-swing"><div class="ly-strap"></div><div class="ly-clip"><i></i></div>' +
+                     '<div class="ly-card"><img alt="" draggable="false"></div></div>';
+      el.querySelector("img").src = beat.src;
+      el.setAttribute("role", "img"); el.setAttribute("aria-label", beat.alt || "ID card on a lanyard");
+      stage.appendChild(el);
+      var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
+      el._item = item; el.style.zIndex = ++z; live.push(item);
+      var sw = el.querySelector(".ly-swing");
+      // where the card ends up at rest (not where it is mid-swing)
+      item.obstacle = function () {
+        return { l: px - cw / 2 - 12, t: B.t, r: px + cw / 2 + 12, b: B.t + strap + cw * 0.13 + ch + 16 };
+      };
+      item.leave = function () {                 // swings back out to the left, then goes
+        sw.classList.remove("swing", "nudge"); sw.classList.add("out");
+      };
+      // tap → swing again
+      el.addEventListener("pointerdown", function (e) {
+        e.stopPropagation();
+        sw.classList.remove("swing", "nudge"); void sw.offsetWidth; sw.classList.add("nudge");
+      });
+      sw.classList.add("swing");
+    },
+
+    // MAILICON — a little envelope pops up; tap it to write an email
+    mailicon: function (beat, x, y, diesAt) {
+      var s = shell("mailicon", beat.tilt != null ? beat.tilt : -6);
+      var a = document.createElement("a");
+      a.className = "mi-link";
+      a.href = "mailto:" + beat.email + (beat.subject ? "?subject=" + encodeURIComponent(beat.subject) : "");
+      a.setAttribute("aria-label", "Email " + beat.email);
+      a.innerHTML = '<svg viewBox="0 0 64 46" aria-hidden="true"><rect x="2" y="2" width="60" height="42" rx="6" fill="#FFFFFF" stroke="currentColor" stroke-width="3.5"/><path d="M5 7l27 21L59 7" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/></svg>' +
+                    '<span class="mi-dot">1</span>';
+      s.inner.appendChild(a);
+      var spot = clearSpot(110, 90, textRects().concat(mediaRects()), { x: x, y: y }, 1) || { x: x, y: y };
+      addItem(s.el, spot.x, spot.y, diesAt);
     },
 
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
@@ -1413,6 +1469,12 @@
 
     var beat = STORY[step];
 
+    // a hanging card swings away first, then the page moves on
+    if (beat.clear && !FAST) {
+      var ly = live.filter(function (it) { return !it.dead && it.leave && !it.left; })[0];
+      if (ly) { ly.left = true; ly.leave(); setTimeout(function () { reveal(x, y); }, reduceMotion ? 0 : 750); return; }
+    }
+
     // a receipt on screen crumples into a ball first, then the page moves on
     if (beat.clear && !FAST) {
       var rc = live.filter(function (it) { return !it.dead && it.el.classList.contains("receipt") && !it.el.classList.contains("crumpled"); })[0];
@@ -1422,6 +1484,22 @@
 
     // "bg": change the whole background colour (stays until another bg or restart)
     if (beat.bg) setBg(beat.bg);
+
+    // "wipe": a white panel sweeps left → right over everything, then the old things go
+    if (beat.wipe && !FAST) {
+      var old = live.slice(), Bw = bands();
+      timers.forEach(clearTimeout); timers = [];
+      var panel = document.createElement("div");
+      panel.className = "wipe-panel";
+      panel.style.top = Bw.t + "px"; panel.style.bottom = Bw.b + "px";
+      panel.style.zIndex = ++z;
+      panel.style.animationDuration = (beat.wipeMs || 650) + "ms";
+      stage.appendChild(panel);
+      setTimeout(function () {
+        old.forEach(function (it) { if (!it.dead) { it.dead = true; it.el.remove(); var k = live.indexOf(it); if (k >= 0) live.splice(k, 1); } });
+        panel.remove();
+      }, (beat.wipeMs || 650) + 40);
+    } else if (beat.wipe) { live.slice().forEach(function (it) { removeItem(it); }); timers.forEach(clearTimeout); timers = []; }
 
     // "clear": wipe the screen (intro included) before this beat
     if (beat.clear) {

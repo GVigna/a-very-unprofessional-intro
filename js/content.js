@@ -120,7 +120,8 @@
                       everything; cues: { lineNumber: beat } → plays at that line
 
    "book"    front, back  cover images; ratio, depth (thickness), spine colour,
-                      rest (resting angle in degrees) → a 3D book that spins in
+                      rest (resting angle in degrees), year (shown above it)
+                      → a 3D book that spins in
 
    "chat"    title    optional name at the top of the chat
              messages list of { from: "me" | "them", text: "…" }
@@ -398,10 +399,10 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1 },
+            ratio: 0.6667, depth: 0.12, spine: "#7c5634", rest: -38, tilt: -3, lifespan: 1, year: "2021" },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1 }
+            ratio: 0.7533, depth: 0.09, spine: "#4a1519", rest: 34, tilt: 4, lifespan: 1, year: "2023" }
     }
   },
 

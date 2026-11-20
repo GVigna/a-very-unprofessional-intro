@@ -10,6 +10,11 @@
   --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --edge: 8px; /* minimum gap between items and the screen edge */
 
+  /* THE THREE TEXT SIZES */
+  --fs-s: clamp(18px, 4.8vw, 25px);   /* small: info at the screen edges, notes */
+  --fs-m: clamp(19px, 5.3vw, 29px);   /* medium: every other text (like "Click and drag…") */
+  --fs-l: clamp(34px, 9.5vw, 96px);   /* large: titles, years */
+
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -87,7 +92,7 @@ body {
 
 /* text beats */
 .item.text .inner {
-  font-size: clamp(18px, 4.6vw, 30px);
+  font-size: var(--fs-m);
   line-height: 1.05;
   font-weight: 700;
   white-space: pre-line;
@@ -95,13 +100,13 @@ body {
   padding: 2px 4px;
 }
 .item.text.big .inner {
-  font-size: clamp(34px, 11vw, 96px);
+  font-size: var(--fs-l);
   line-height: 0.92;
   letter-spacing: -0.02em;
   max-width: 90vw;
 }
 .item.text.small .inner {
-  font-size: clamp(16px, 4.1vw, 19px);
+  font-size: var(--fs-s);
   font-weight: 400;
   color: var(--secondary);
 }
@@ -165,12 +170,12 @@ body {
 
 /* chat */
 .item.chat .inner {
-  width: min(78vw, 320px);
+  width: min(86vw, 460px);
   padding: 10px;
   background: var(--bg);
   border: 1.5px solid var(--primary);
   border-radius: 14px;
-  font-size: clamp(17px, 4.6vw, 19px);
+  font-size: var(--fs-m);
   line-height: 1.25;
 }
 .chat-title {
@@ -221,7 +226,7 @@ body {
 
 /* intro title: big but a bit smaller than "big" so the whole title fits */
 .item.text.title .inner {
-  font-size: clamp(30px, 8.6vw, 76px);
+  font-size: var(--fs-l);
   line-height: 0.95;
   letter-spacing: -0.02em;
   max-width: min(90vw, 1000px);
@@ -229,7 +234,7 @@ body {
 
 /* subtitle under the title: orange, readable */
 .item.text.sub .inner {
-  font-size: clamp(19px, 5.3vw, 29px);
+  font-size: var(--fs-m);
   font-weight: 500;
   color: var(--secondary);
 }
@@ -237,14 +242,14 @@ body {
 
 /* body copy: regular weight, comfortable reading width */
 .item.text.body .inner {
-  font-size: clamp(18px, 4.8vw, 25px);
+  font-size: var(--fs-m);
   font-weight: 400;
   line-height: 1.25;
   max-width: min(82vw, 460px);
 }
 /* small orange note, e.g. a year */
 .item.text.note .inner {
-  font-size: clamp(16px, 4.1vw, 19px);
+  font-size: var(--fs-s);
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--secondary);
@@ -551,7 +556,7 @@ strong { font-weight: 800; }
 .codecol.half { top: 64px; bottom: 24px; width: 46vw; }
 .codecol.half.left { left: 2vw; }
 .codecol.half.right { right: 2vw; }
-.codefeed { transition: transform .25s ease-out; }
+.codefeed { transition: transform .25s ease-out; padding-bottom: 18px; }
 .codefeed > div { animation: code-in .18s ease-out both; }
 .codecol .c-head { margin-top: .9em; font-weight: 700; opacity: .75; }
 .codecol .c-year { opacity: .6; }
@@ -590,6 +595,19 @@ body:not(.dark-page) .codecol { color: var(--primary); }
 .bf.pages-t { transform: rotateX(90deg) translateZ(calc(var(--h) / 2 - 2px)); }
 .bf.pages-b { transform: rotateX(-90deg) translateZ(calc(var(--h) / 2 - 2px)); }
 .item.book { filter: drop-shadow(0 18px 22px rgba(0,0,0,.28)); }
+.book-year {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: .12em;
+  transform: translateX(-50%) rotate(-3deg);
+  font: 400 var(--fs-l)/1 "Alfa Slab One", Georgia, serif;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 0 #1B1B1B, 2px 2px 0 #1B1B1B, 3px 3px 0 #1B1B1B, 4px 4px 0 #1B1B1B;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pop-in 420ms cubic-bezier(.2, 1.6, .4, 1) .9s both;
+}
 @keyframes book-in {
   0%   { opacity: 0; transform: rotateX(10deg) rotateY(calc(var(--rest) - 300deg)) scale(.4); }
   20%  { opacity: 1; }
@@ -613,7 +631,7 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
 .ui {
   position: fixed;
   z-index: 100000;
-  font: 700 clamp(18px, 4.8vw, 25px)/1 var(--font);   /* same size as the body texts */
+  font: 700 var(--fs-s)/1 var(--font);   /* small size */
   letter-spacing: 0.03em;
   color: var(--secondary);
 }
@@ -626,7 +644,7 @@ body.dark-page .ui { color: #FFFFFF; }   /* on a coloured page the UI turns whit
 .ui-progress.bump { animation: bump 300ms ease; }
 /* desktop / tablet landscape: UI 10% smaller than the body texts */
 @media (orientation: landscape) and (min-width: 601px) {
-  .ui { font-size: clamp(16px, 4.3vw, 22.5px); }
+  :root { --fs-s: clamp(16px, 4.3vw, 22.5px); }   /* small info a bit smaller on desktop */
 }
 
 /* contact links: next to the counter on wide screens, at the bottom on phones */

@@ -773,8 +773,8 @@
             else el.textContent = line;
           }
           feed.appendChild(el);
-          var over = feed.scrollHeight - col.clientHeight;     // keep the newest line in view
-          feed.style.transform = "translateY(" + (over > 0 ? -over : 0) + "px)";
+          // new lines come in at the BOTTOM and push the others up (from the very first line)
+          feed.style.transform = "translateY(" + (col.clientHeight - feed.scrollHeight) + "px)";
           var cue = beat.cues && beat.cues[n];
           if (cue) {
             var f = cue.free ? freeSpotFor(cue) : { x: x, y: y };
@@ -801,9 +801,17 @@
       b.querySelector(".front").appendChild(makeImg(beat.front, "cover"));
       b.querySelector(".back").appendChild(makeImg(beat.back || beat.front, "cover"));
       s.inner.appendChild(b);
+      var yr = null;
+      if (beat.year) {                       // publication year above the book
+        yr = document.createElement("span");
+        yr.className = "book-year";
+        yr.textContent = beat.year;
+        s.el.appendChild(yr);
+      }
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Book");
       addItem(s.el, x, y, diesAt);
+      if (yr) requestAnimationFrame(function () { nudgeYear(yr, s.el); });
     },
 
     // message bubbles that appear one by one, with "typing…" dots
@@ -933,10 +941,10 @@
     return size;
   }
 
-  function textRects() {
+  function textRects(skipChat) {
     var extra = live.filter(function (it) { return it.obstacle && !it.dead; }).map(function (it) { return it.obstacle(); });
     return extra.concat(live.filter(function (it) {
-      return (it.el.classList.contains("text") || it.el.classList.contains("chat")) && !it.dead;
+      return (it.el.classList.contains("text") || (!skipChat && it.el.classList.contains("chat"))) && !it.dead;
     }).map(function (it) {
       var w = Math.max(it.el.offsetWidth, it.fw || 0), h = Math.max(it.el.offsetHeight, it.fh || 0);
       return { l: it.x, t: it.y, r: it.x + w, b: it.y + h };
@@ -998,7 +1006,13 @@
     return live.filter(function (it) {
       return it.el.classList.contains("media") && !it.dead;
     }).map(function (it) {
-      return { l: it.x, t: it.y, r: it.x + it.el.offsetWidth, b: it.y + it.el.offsetHeight };
+      var r = { l: it.x, t: it.y, r: it.x + it.el.offsetWidth, b: it.y + it.el.offsetHeight };
+      var y = it.el.querySelector(".book-year");           // a book's year sits above it
+      if (y) {
+        var yr = y.getBoundingClientRect();
+        r = { l: Math.min(r.l, yr.left), t: Math.min(r.t, yr.top), r: Math.max(r.r, yr.right), b: r.b };
+      }
+      return r;
     });
   }
 
@@ -1030,10 +1044,33 @@
     return null;
   }
 
+  // keep a book's year label on screen and off the CV column / texts
+  function nudgeYear(yr, el) {
+    var r = yr.getBoundingClientRect(), vw = viewport().w, dx = 0;
+    var self = el.getBoundingClientRect();
+    textRects(true).forEach(function (o) {
+      if (o.t > r.bottom || o.b < r.top) return;
+      if (o.l < r.right && o.r > r.left) {
+        if (o.l >= self.left) dx = Math.min(dx, o.l - r.right - 8);   // obstacle on the right
+        else dx = Math.max(dx, o.r - r.left + 8);                     // obstacle on the left
+      }
+    });
+    if (r.left + dx < 6) dx = 6 - r.left;
+    if (r.right + dx > vw - 6) dx = vw - 6 - r.right;
+    if (dx) yr.style.marginLeft = Math.round(dx) + "px";
+  }
+
   function freeSpotFor(beat) {
     if (beat.type === "book") {
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7), bh0 = bw0 / (beat.ratio || 0.7);
-      var fb = clearSpot(bw0 * 1.15, bh0 * 1.1, textRects().concat(mediaRects()), null, 0.4) || freeSpot(bw0, bh0, textRects());
+      var yfs = Math.min(96, Math.max(34, viewport().w * 0.095));       // the large text size
+      var yearH = beat.year ? yfs * 1.15 : 0, yearW = beat.year ? yfs * 0.72 * String(beat.year).length + 10 : 0;
+      var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
+      var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.4)
+            // no room? the book may overlap the chat, but never texts, the CV or other books
+            || clearSpot(needW, needH, textRects(true).concat(mediaRects()), null, 0.35)
+            || freeSpot(bw0, bh0, textRects());
+      if (yearH) fb.y += yearH / 2;            // the book sits below its year
       beat._fit = fb.scale;
       return fb;
     }

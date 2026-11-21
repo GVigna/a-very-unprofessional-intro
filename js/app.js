@@ -1615,6 +1615,7 @@
           el = buildMedia(media, spec.video ? "video" : "image", "m", rand(-13, 13));
         }
         el.classList.add("card", "wv");
+        if (spec.cutout) el.classList.add("cutout");              // a mockup with its own shadow: no card box
         el.style.visibility = "hidden"; stage.appendChild(el);
         var w = el.offsetWidth, h = el.offsetHeight; el.remove(); el.style.visibility = "";
         var rx = rand(R.l - w * 0.08, Math.max(R.l, R.r - w * 0.92)), ry = rand(R.t, Math.max(R.t, R.b - h));

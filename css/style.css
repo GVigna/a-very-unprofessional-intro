@@ -1324,3 +1324,5 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 
 /* press cards: they only slide out of the folder (no pop-in, neither inside nor once out); wave cards only fall */
 .item.pf-card .inner, .item.pf-done .inner, .item.wv .inner { animation: none; }
+.item.cutout .inner { background: none; box-shadow: none; overflow: visible; }
+.item.cutout .pic { object-fit: contain; }

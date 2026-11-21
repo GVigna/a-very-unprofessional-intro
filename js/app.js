@@ -715,7 +715,7 @@
       }
       if (beat.fill) {
         // the biggest font size at which the whole text fits the screen (between the UI bands)
-        var vF = viewport(), BF = bands(), aw = Math.round(vF.w - EDGE * 3), ah = vF.h - BF.t - BF.b - 28;
+        var vF = viewport(), BF = bands(), aw = Math.round(vF.w - Math.max(EDGE * 3, 112)), ah = vF.h - BF.t - BF.b - 28;
         var lo = 12, hi = 420;
         for (var it2 = 0; it2 < 16; it2++) {
           var mid = (lo + hi) / 2;
@@ -1552,6 +1552,102 @@
     },
 
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
+    // WAVES — the work, one project at a time: its images/videos fall in from above, tilted and
+    // overlapping (like a pile of cards), rest a few seconds, then fall away as the next project lands.
+    // Wide screens: in the half not taken by the code column; phones: the whole screen. Loops.
+    waves: function (beat, x, y, diesAt) {
+      var groups = beat.groups || [];
+      if (!groups.length) return;
+      var gi = 0, current = [], STAG = reduceMotion ? 0 : (beat.stagger || 150);
+      function region() {
+        var v = viewport(), B = bands(), col = live.filter(function (it) { return !it.dead && it.el.classList.contains("codecol") && it.el.classList.contains("half"); })[0];
+        var r = { l: EDGE, r: v.w - EDGE, t: B.t + 6, b: v.h - B.b - 6 };
+        if (col) { if (col.el.classList.contains("left")) r.l = v.w / 2 + EDGE; else r.r = v.w / 2 - EDGE; }
+        r.w = r.r - r.l; r.h = r.b - r.t; return r;
+      }
+      function rand(a, b) { return a + Math.random() * (b - a); }
+      function preload(g) {
+        (g.items || []).forEach(function (s) {
+          var src = s.src || s.poster || (s.spin && s.spin[0].src) || (s.flipbook && s.flipbook[0]);
+          if (src) { var im = new Image(); im.src = src; }
+        });
+      }
+      function fallIn(it, el, h) {
+        if (reduceMotion) return;
+        el.style.transition = "none";
+        el.style.transform = "translate3d(" + (it.x + rand(-30, 30)) + "px," + (-h - rand(20, 140)) + "px,0)";
+        void el.offsetWidth;
+        el.style.transition = "transform " + Math.round(rand(780, 1050)) + "ms cubic-bezier(.45,0,.4,1.12)";
+        el.style.transform = "translate3d(" + it.x + "px," + it.y + "px,0)";
+        setTimeout(function () { if (!it.dead) el.style.transition = ""; }, 1150);
+      }
+      function card(spec) {
+        var R = region(), phone = isPhone(), el, ratio = spec.ratio || 1, tw;
+        if (spec.flipbook) {
+          var before = live.length;
+          players.flipbook({ spreads: spec.flipbook, ratio: ratio, share: phone ? 0.9 : 0.5, side: "random", tilt: rand(-4, 4),
+                             flip: 150, interval: 70, loop: true, alt: spec.alt || "Comic pages flipping" }, x, y, diesAt);
+          return live.length > before ? live[live.length - 1] : null;
+        }
+        if (spec.spin) {                                          // a little garment turning round (front / back)
+          tw = R.w * (phone ? 0.3 : 0.2);
+          var f = spec.spin[0], b = spec.spin[1] || spec.spin[0], h0 = tw / (f.ratio || 1);
+          var s = shell("wv-spin media", rand(-8, 8));
+          s.el.style.width = Math.round(tw) + "px"; s.el.style.height = Math.round(h0) + "px";
+          var sp = document.createElement("div"); sp.className = "wv-spin3d";
+          sp.style.animationDuration = rand(3.2, 4.6).toFixed(2) + "s";
+          sp.style.animationDelay = (-rand(0, 3)).toFixed(2) + "s";
+          var fa = makeImg(f.src, "wv-face front"), ba = makeImg(b.src, "wv-face back");
+          sp.appendChild(fa); sp.appendChild(ba); s.inner.appendChild(sp);
+          s.el.setAttribute("role", "img"); s.el.setAttribute("aria-label", spec.alt || "Uniform design");
+          el = s.el;
+        } else {
+          tw = R.w * (phone ? rand(0.44, 0.62) : rand(0.34, 0.5));
+          if (spec.frame === "phone") tw *= 0.8;
+          var maxH = R.h * (phone ? 0.5 : 0.58);
+          if (tw / ratio > maxH) tw = maxH * ratio;
+          var media = spec.video ? { src: spec.video, poster: spec.poster, ratio: ratio, frame: spec.frame } : { src: spec.src, ratio: ratio };
+          media._fit = tw / mediaWidth("m", ratio);
+          el = buildMedia(media, spec.video ? "video" : "image", "m", rand(-13, 13));
+        }
+        el.classList.add("card", "wv");
+        el.style.visibility = "hidden"; stage.appendChild(el);
+        var w = el.offsetWidth, h = el.offsetHeight; el.remove(); el.style.visibility = "";
+        var rx = rand(R.l - w * 0.08, Math.max(R.l, R.r - w * 0.92)), ry = rand(R.t, Math.max(R.t, R.b - h));
+        var it = addItem(el, rx, ry, diesAt, "topleft");
+        fallIn(it, el, h);
+        return it;
+      }
+      function leave(list) {
+        var v = viewport();
+        list.forEach(function (it, k) {
+          if (!it || it.dead) return;
+          setTimeout(function () {
+            if (it.dead) return;
+            it.dead = true; var li = live.indexOf(it); if (li >= 0) live.splice(li, 1);
+            if (drag && drag.item === it) drag = null;
+            var el = it.el; el.style.pointerEvents = "none";
+            var vd = el.querySelector("video"); if (vd) try { vd.pause(); } catch (e) {}
+            el.style.transition = reduceMotion ? "none" : "transform 780ms cubic-bezier(.55,0,.9,.55)";
+            el.style.transform = "translate3d(" + (it.x + rand(-60, 60)) + "px," + (v.h + 40) + "px,0)";
+            setTimeout(function () { el.remove(); }, reduceMotion ? 0 : 820);
+          }, k * (reduceMotion ? 0 : 55));
+        });
+      }
+      (function next() {
+        if (step >= diesAt) return;
+        var g = groups[gi], old = current; current = [];
+        leave(old);
+        preload(groups[(gi + 1) % groups.length]);
+        (g.items || []).forEach(function (spec, k) {
+          later(function () { if (step < diesAt) { var it = card(spec); if (it) current.push(it); } }, (old.length ? 260 : 0) + k * STAG);
+        });
+        gi = (gi + 1) % groups.length;
+        if (gi === 0 && beat.loop === false) return;
+        later(next, (beat.period || 3400) + (g.items || []).length * STAG);
+      })();
+    },
+
     // FOLDER — a blue desktop folder pops up where the link was clicked, then the cards
     // (press screenshots) slide up out of it one by one and fan out above it. All draggable.
     folder: function (beat, x, y, diesAt) {
@@ -2569,6 +2665,7 @@
       preload(b.photos); preload(b.also); preload(b.then); preload(b.cards); preload(b.hintThen);
       if (b.front) { img(b.front); if (b.back) img(b.back); }
       if (b.spreads) b.spreads.forEach(img);
+      if (b.groups && b.groups[0]) preload(b.groups[0].items);   // waves: the first project
       if (b.faces) Object.keys(b.faces).forEach(function (k) { img(b.faces[k]); });
       if (b.cues && b.type === "code") preload(Object.keys(b.cues).map(function (k) { return b.cues[k]; }));
     });

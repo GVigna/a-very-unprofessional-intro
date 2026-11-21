@@ -1417,6 +1417,44 @@
       play();
     },
 
+    // BURGERBOX — the real BUN × Ronin box in 3D (faces cut from the dieline): it drops in,
+    // the lid swings open and a burger pops out and bobs. Tap it: the burger jumps again.
+    burgerbox: function (beat, x, y, diesAt) {
+      var v = viewport(), B = bands(), F = beat.faces || {};
+      var L = Math.min(v.w * (v.w > v.h ? 0.28 : 0.58), 340) * (beat.scale || 1);
+      var D = L * (beat.depth || 0.711), H = L * (beat.height || 0.395);
+      var boxW = L * 1.35, boxH = L * 1.45;
+      var spot = beat._spot || clearSpot(boxW, boxH, textRects().concat(mediaRects()), { x: x, y: y }, 0.6) || { x: x, y: y, scale: 1 };
+      var k = Math.min(1, spot.scale || 1); L *= k; D *= k; H *= k; boxW *= k; boxH *= k;
+      var s = shell("burgerbox media", 0);
+      s.el.style.width = Math.round(boxW) + "px"; s.el.style.height = Math.round(boxH) + "px";
+      s.el.style.setProperty("--L", L + "px"); s.el.style.setProperty("--D", D + "px"); s.el.style.setProperty("--H", H + "px");
+      function face(cls, src) { return '<div class="bb-f ' + cls + '"' + (src ? ' style="background-image:url(&quot;' + src + '&quot;)"' : "") + '></div>'; }
+      var burger =
+        '<svg class="bb-burger" viewBox="0 0 200 150" aria-hidden="true">' +
+          '<path d="M18 78c0-40 36-66 82-66s82 26 82 66z" fill="#F2A541" stroke="#1B1B1B" stroke-width="5" stroke-linejoin="round"/>' +
+          '<g fill="#FFF3C4"><ellipse cx="70" cy="40" rx="5" ry="2.6" transform="rotate(-20 70 40)"/><ellipse cx="102" cy="30" rx="5" ry="2.6"/><ellipse cx="132" cy="42" rx="5" ry="2.6" transform="rotate(20 132 42)"/><ellipse cx="88" cy="56" rx="5" ry="2.6" transform="rotate(-10 88 56)"/><ellipse cx="118" cy="58" rx="5" ry="2.6" transform="rotate(12 118 58)"/></g>' +
+          '<path d="M10 84c12-10 22 6 34-4s22 8 34-2 22 8 34-2 22 8 34-2 22 6 34 2v10H10z" fill="#7BC043" stroke="#1B1B1B" stroke-width="5" stroke-linejoin="round"/>' +
+          '<path d="M16 96h168l-8 12H24z" fill="#FFD23F" stroke="#1B1B1B" stroke-width="5" stroke-linejoin="round"/>' +
+          '<rect x="14" y="104" width="172" height="20" rx="10" fill="#8B4A2B" stroke="#1B1B1B" stroke-width="5"/>' +
+          '<path d="M20 124h160c0 14-30 22-80 22s-80-8-80-22z" fill="#F2A541" stroke="#1B1B1B" stroke-width="5" stroke-linejoin="round"/>' +
+        '</svg>';
+      s.inner.innerHTML =
+        '<div class="bb-scene"><div class="bb-box">' +
+          face("bb-bottom", F.bottom) + face("bb-front", F.front) + face("bb-back", F.back) +
+          face("bb-left", F.left) + face("bb-right", F.right) + face("bb-inner") +
+          '<div class="bb-pop">' + burger + '</div>' +
+          '<div class="bb-lid">' + face("bb-top", F.top) + face("bb-lidin") + '</div>' +
+        '</div></div>';
+      s.el.setAttribute("role", "img");
+      s.el.setAttribute("aria-label", beat.alt || "Burger box opening, a burger pops out");
+      var it = addItem(s.el, spot.x, spot.y, diesAt);
+      var pop = s.inner.querySelector(".bb-pop");
+      later(function () { s.el.classList.add("open"); }, reduceMotion ? 0 : 900);
+      it.onTap = function () { pop.classList.remove("jump"); void pop.offsetWidth; pop.classList.add("jump"); };
+      return it;
+    },
+
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
     deck: function (beat, x, y, diesAt) {
       var cards = beat.cards || [];

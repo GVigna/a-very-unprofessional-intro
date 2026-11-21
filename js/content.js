@@ -628,7 +628,7 @@ window.STORY = [
       { free: true, type: "text", text: "2026 — Back to school.\nAgain.", style: "big", typing: true, speed: 30, tilt: 0, delay: 1300,
         then: [
           { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 400,
-            text: "Went back to University.\n\nCurrently in my second year of a BA in Art History at Sapienza University of Rome.\n\nBecause having several jobs and projects clearly wasn't enough." }
+            text: "Went back to University.\n\nCurrently in my second year of a BA in Art History at Sapienza University of Rome." }
         ] }
     ]
   },

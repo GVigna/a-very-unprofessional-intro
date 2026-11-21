@@ -1577,7 +1577,8 @@
           var top = fit.y + fh * 0.32 - ch, mid = fit.x + fw / 2 + rel * offs;
           var minTop = B.t + 4; if (top < minTop) top = minTop;
           var left = Math.min(Math.max(mid - cw / 2, EDGE), v.w - EDGE - cw);
-          el.style.left = (left - fit.x) + "px"; el.style.top = (top - fit.y) + "px";
+          var relL = left - fit.x, relT = top - fit.y;
+          el.style.left = relL + "px"; el.style.top = relT + "px";
           // where it starts: inside the folder, small
           var sx = fit.x + fw / 2 - (left + cw / 2), sy = fit.y + fh * 0.7 - (top + ch / 2);
           el.style.transform = "translate(" + sx + "px," + sy + "px) scale(.35)";
@@ -1586,12 +1587,13 @@
           el.style.transform = "translate(0,0) scale(1)";
           later(function () {
             // out of the folder: becomes a free, draggable card on the page
-            var r = el.getBoundingClientRect(), st = stage.getBoundingClientRect();
+            // (computed, not measured: a transition may not have run in a background tab)
+            var fx = fit.x + relL, fy = fit.y + relT;
             el.classList.remove("pf-card");
             el.style.left = ""; el.style.top = ""; el.style.transform = "";
             out.removeChild(el);
             if (step >= diesAt || fit.dead) return;
-            fit.pfCards.push(addItem(el, r.left - st.left, r.top - st.top, Infinity, "topleft"));
+            fit.pfCards.push(addItem(el, fx, fy, Infinity, "topleft"));
           }, dur + 40);
         }, (reduceMotion ? 0 : 380) + k * gap);
       });

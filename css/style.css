@@ -917,7 +917,7 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
   transform-origin: 50% 0;
   transform: translateZ(2px) rotateX(0deg);
   transform-style: preserve-3d;
-  transition: transform 1.3s cubic-bezier(.3,.1,.2,1);
+  transition: transform .8s cubic-bezier(.3,.1,.2,1);
 }
 .item.laptop.open .lt-lid { transform: translateZ(2px) rotateX(108deg); }
 .item.laptop.closing .lt-lid { transition-duration: .55s; transition-timing-function: cubic-bezier(.6,0,.9,.6); }
@@ -993,7 +993,7 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
           mask: linear-gradient(#000 0 0) top / 100% calc(100% - 10px) no-repeat,
                 conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 14px 10px repeat-x;
   transform-origin: 50% 0;
-  animation: rc-print 2.2s steps(18, end) both;     /* prints out line by line */
+  animation: rc-print 1.1s steps(14, end) both;     /* prints out line by line */
   transition: transform .5s cubic-bezier(.5,0,.3,1.4), border-radius .5s;
 }
 @keyframes rc-print { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
@@ -1107,8 +1107,8 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 @keyframes rc-pop { from { transform: scale(.55) rotate(-25deg); } 70% { transform: scale(1.06) rotate(4deg); } to { transform: none; } }
 
 /* BIN for the paper ball */
-.rc-bin { position: absolute; width: 64px; color: var(--primary); pointer-events: none; animation: pop-in 420ms cubic-bezier(.2,1.6,.4,1) 1.6s both; }
-.rc-bin svg { display: block; width: 100%; height: auto; }
+.rc-bin { position: absolute; width: 78px; pointer-events: none; animation: pop-in 420ms cubic-bezier(.2,1.6,.4,1) .7s both; }
+.rc-bin svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,.2)); }
 .rc-bin.got { animation: bin-shake .45s ease-out .45s; }
 @keyframes bin-shake { 0%,100% { rotate: 0deg; } 25% { rotate: -8deg; } 55% { rotate: 6deg; } 80% { rotate: -2deg; } }
 
@@ -1302,4 +1302,8 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 @media (prefers-reduced-motion: reduce) { .pf-out > .item.pf-card { transition: none; } .item.pfolder.pf-pop .inner { animation: none; } }
 
 .rc-creases { position: absolute; inset: 0; background-size: 100% 100%; pointer-events: none; opacity: 0; mix-blend-mode: normal; }
-.pf-out > .item.pf-card.pf-back-in { transition: transform 520ms cubic-bezier(.5,0,.75,.4); }
+.pf-out > .item.pf-card.pf-back-in { transition: transform 420ms cubic-bezier(.5,0,.75,.4); }
+
+/* the last sentence, as big as the screen */
+.item.text.fill { line-height: 1.04; letter-spacing: -0.01em; }
+.item.text.fill .inner { white-space: pre-wrap; }

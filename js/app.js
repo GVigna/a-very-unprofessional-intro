@@ -626,6 +626,11 @@
     if (beat.color) s.el.classList.add("color-" + beat.color);
     if (beat.boxed) s.el.classList.add("boxed");
     if (beat.box === "light") s.el.classList.add("box-light");   // white box, violet text (on coloured pages)
+    if (beat._fill) {                                             // "fill": as big as the screen allows
+      s.el.classList.add("fill");
+      s.el.style.fontSize = beat._fill.f + "px";
+      s.el.style.width = beat._fill.w + "px"; s.el.style.maxWidth = beat._fill.w + "px";
+    }
     if (beat.lines) {
       // every line is in place from the start (so the size doesn't jump), just hidden
       (beat.text || "").split("\n").forEach(function (line) {
@@ -706,6 +711,21 @@
           x = old.x; y = old.y; anchor = "topleft";
           removeItem(old, "fast");
         }
+      }
+      if (beat.fill) {
+        // the biggest font size at which the whole text fits the screen (between the UI bands)
+        var vF = viewport(), BF = bands(), aw = Math.round(vF.w - EDGE * 3), ah = vF.h - BF.t - BF.b - 28;
+        var lo = 12, hi = 420;
+        for (var it2 = 0; it2 < 16; it2++) {
+          var mid = (lo + hi) / 2;
+          var probe = buildText(Object.assign({}, beat, { typing: false, words: false, lines: false, _fill: { f: mid, w: aw } }));
+          probe.el.style.visibility = "hidden"; stage.appendChild(probe.el);
+          var ok = probe.el.offsetHeight <= ah && probe.inner.scrollWidth <= aw + 1;
+          probe.el.remove();
+          if (ok) lo = mid; else hi = mid;
+        }
+        beat._fill = { f: Math.floor(lo), w: aw };
+        x = vF.w / 2; y = BF.t + (vF.h - BF.t - BF.b) / 2; anchor = undefined;
       }
       var fs = beat.typing ? finalSize(beat) : null;
       if (fs && !anchor) {
@@ -1030,7 +1050,7 @@
       var v = viewport(), B = bands();
       var gap = reduceMotion ? 0 : (beat.interval || 650);
       var areaW = v.w - EDGE * 2, areaH = (v.h - B.t - B.b) * (beat.fill || 0.86);
-      var cx = v.w / 2, cy = B.t + (v.h - B.t - B.b) / 2;
+      var cx = v.w / 2, cy = B.t + (v.h - B.t - B.b) / 2, shown = [];
       photos.forEach(function (spec, n) {
         later(function () {
           if (step >= diesAt) return;
@@ -1042,9 +1062,25 @@
           s.inner.appendChild(makeImg(spec.src, "pic"));
           var full = v.h - B.t - B.b, sx = Math.max(0, (areaW - w) / 2), sy = Math.max(0, (full - h) / 2);
           var px = cx + (Math.random() * 2 - 1) * sx * 0.85, py = cy + (Math.random() * 2 - 1) * sy * 0.85;
-          addItem(s.el, px, py, diesAt);
+          shown.push(addItem(s.el, px, py, diesAt));
         }, n * gap);
       });
+      if (beat.after && beat.after.length) {
+        // when the last photo is in: the photos go, one after the other, then the "after" things appear
+        var tEnd = photos.length * gap + (reduceMotion ? 0 : (beat.hold || 900));
+        later(function () {
+          if (step >= diesAt) return;
+          shown.slice().reverse().forEach(function (it, k) { later(function () { removeItem(it, true); }, k * (reduceMotion ? 0 : 35)); });
+          later(function () {
+            if (step >= diesAt) return;
+            var vv = viewport(), BB = bands(), n2 = beat.after.length;
+            beat.after.forEach(function (spec, k) {
+              var ax = vv.w * (k + 1) / (n2 + 1), ay = BB.t + (vv.h - BB.t - BB.b) * 0.52;
+              later(function () { if (step < diesAt) players[spec.type](Object.assign({}, spec), ax, ay, diesAt); }, k * (reduceMotion ? 0 : 220));
+            });
+          }, shown.length * (reduceMotion ? 0 : 35) + (reduceMotion ? 0 : 250));
+        }, tEnd);
+      }
     },
 
     // COLLAGE — full screen: the background is cut into 1–4 panels of project images that keep
@@ -1158,7 +1194,7 @@
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Laptop showing a website");
       var it = addItem(s.el, spot.x, spot.y, diesAt);
-      var openAt = reduceMotion ? 0 : 400, openMs = reduceMotion ? 0 : 1300;
+      var openAt = reduceMotion ? 0 : 150, openMs = reduceMotion ? 0 : 800;
       var scrollMs = reduceMotion ? 0 : (beat.scrollTime || 6) * 1000;
       later(function () { s.el.classList.add("open"); }, openAt);
       if (beat.scroll === false) scrollMs = 0;
@@ -1246,7 +1282,7 @@
       var bin = document.createElement("div");
       bin.className = "rc-bin";
       bin.style.left = binX + "px"; bin.style.bottom = (Bb.b + 10) + "px";
-      bin.innerHTML = '<svg viewBox="0 0 64 76" aria-hidden="true"><path d="M8 18h48l-5 52a4 4 0 0 1-4 4H17a4 4 0 0 1-4-4z" fill="#FFFFFF" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M4 18h56M24 18v-6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6M24 30l2 34M32 30v34M40 30l-2 34" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
+      bin.innerHTML = meshBin();                                   // a little chrome wire-mesh wastebasket
       bin.setAttribute("aria-hidden", "true");
       stage.appendChild(bin);
       var binItem = { el: bin, x: 0, y: 0, diesAt: diesAt, fixed: true };
@@ -1316,8 +1352,18 @@
         bg(k, toSrc, "left center");
         leaf.appendChild(f); leaf.appendChild(k); s.inner.insertBefore(leaf, paper);
         bg(R, toSrc, "right center");                      // the new right page is underneath
-        later(function () { bg(L, toSrc, "left center"); leaf.remove(); done && done(); }, speed);
+        later(function () {
+          bg(L, toSrc, "left center");
+          requestAnimationFrame(function () { requestAnimationFrame(function () { leaf.remove(); }); });   // no flash between leaf and page
+          done && done();
+        }, speed);
       }
+      // every spread decoded before it is shown (half-loaded pages made the flipping glitchy)
+      var ready = {};
+      spreads.forEach(function (src) {
+        var im = new Image(); im.src = src;
+        (im.decode ? im.decode() : Promise.resolve()).then(function () { ready[src] = true; }, function () { ready[src] = true; });
+      });
       // opens: a plain cover flips open onto the first spread
       L.classList.add("blank"); bg(L, null);
       var i = 0;
@@ -1328,7 +1374,11 @@
             if (it.dead) return;
             i++;
             if (i >= spreads.length) { if (beat.loop) i = 0; else return; }
-            later(function () { if (!it.dead) turn(spreads[i - 1 < 0 ? spreads.length - 1 : i - 1], spreads[i], false, next); }, pause);
+            later(function go() {
+              if (it.dead) return;
+              if (!ready[spreads[i]]) { later(go, 80); return; }        // wait for the page, don't flip onto a blank
+              turn(spreads[i - 1 < 0 ? spreads.length - 1 : i - 1], spreads[i], false, next);
+            }, pause);
           })();
         });
       }, 450);
@@ -1508,7 +1558,7 @@
       if (!cards.length) return;
       var n = cards.length, size = beat.size || "m";
       var phoneK = isPhone() ? 0.62 : 1;
-      var W = mediaWidth(size, 1) * 0.82 * phoneK;                  // every card gets the same width
+      var W = mediaWidth(size, 1) * 0.95 * phoneK;                  // every card gets the same width
       var maxH = 0; cards.forEach(function (c) { maxH = Math.max(maxH, W / (c.ratio || 1)); });
       var B = bands(), v = viewport(), room = (v.h - B.t - B.b) * 0.92;
       var fw0 = W * 0.6, fh0 = fw0 * 0.8;
@@ -1542,7 +1592,7 @@
       fit.pfCards = [];
       // at the next tap the cards slide back into the folder, then the folder goes
       fit.pfClose = function () {
-        var back = fit.pfCards.filter(function (c) { return !c.dead; }), d = reduceMotion ? 0 : 110, mv = reduceMotion ? 0 : 520;
+        var back = fit.pfCards.filter(function (c) { return !c.dead; }), d = reduceMotion ? 0 : 70, mv = reduceMotion ? 0 : 420;
         back.forEach(function (c) { c.diesAt = Infinity; c.leaving = true; });   // their space is free already
         back.forEach(function (c, i) {
           later(function () {
@@ -2340,6 +2390,26 @@
       if (Math.random() < .5) { poly(p00, p10, p11); poly(p00, p11, p01); } else { poly(p00, p10, p01); poly(p10, p11, p01); }
     }
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" preserveAspectRatio="none">' + s + "</svg>";
+  }
+  // chrome wire-mesh wastebasket (drawn here, with a couple of paper balls inside)
+  function meshBin() {
+    var mesh = "";
+    for (var i = -8; i <= 16; i++) {
+      var x = i * 6;
+      mesh += '<path d="M' + x + ' 14L' + (x + 40) + ' 92"/><path d="M' + (x + 40) + ' 14L' + x + ' 92"/>';
+    }
+    return '<svg viewBox="0 0 80 96" aria-hidden="true"><defs>' +
+      '<linearGradient id="mbC" x1="0" x2="1"><stop offset="0" stop-color="#8d9196"/><stop offset=".22" stop-color="#f4f5f6"/><stop offset=".5" stop-color="#b9bdc2"/><stop offset=".78" stop-color="#eef0f1"/><stop offset="1" stop-color="#7d8186"/></linearGradient>' +
+      '<linearGradient id="mbI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3d41"/><stop offset="1" stop-color="#9aa0a6"/></linearGradient>' +
+      '<clipPath id="mbK"><path d="M9 16 L71 16 L64 88 L16 88 Z"/></clipPath></defs>' +
+      '<ellipse cx="40" cy="15" rx="31" ry="7" fill="url(#mbI)"/>' +
+      '<circle cx="31" cy="15" r="9" fill="#f2f2ef"/><circle cx="47" cy="13" r="8" fill="#e6e5e0"/>' +
+      '<path d="M26 11l5 3 4-4M43 9l5 4" stroke="#bdbbb4" stroke-width="1" fill="none"/>' +
+      '<g clip-path="url(#mbK)" stroke="#1d1f22" stroke-width="1.6" fill="none">' + mesh + '</g>' +
+      '<path d="M9 16 L71 16 L64 88 L16 88 Z" fill="none" stroke="#2a2c2f" stroke-width=".6" opacity=".5"/>' +
+      '<rect x="14" y="84" width="52" height="7" rx="3.5" fill="url(#mbC)"/>' +
+      '<ellipse cx="40" cy="15" rx="33" ry="7.5" fill="none" stroke="url(#mbC)" stroke-width="4"/>' +
+      '</svg>';
   }
   function crumple(it) {
     if (it.el.classList.contains("crumpled")) return;

@@ -1,0 +1,396 @@
+{
+ "ronin": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/photo1.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/photo2.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/burger.webp",
+   "ratio": 0.667
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/lunch.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/piccolo.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/roncoroni_post.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/roncoroni_story.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/tees.webp",
+   "ratio": 2.1786
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/menu2.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/menu3.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/beverage_menu_1.webp",
+   "ratio": 0.707
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/beverage_menu_2.webp",
+   "ratio": 0.707
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/flyer_lunch_1.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/flyer_lunch_2.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/roncoroni_menu_1.webp",
+   "ratio": 0.705
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/bun_box_1.webp",
+   "ratio": 1.4306
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/stickers_1.webp",
+   "ratio": 1.4144
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/ronin/poster_1.webp",
+   "ratio": 0.7082
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/ronin/esa.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/ronin/esa_poster.webp",
+   "ratio": 0.5625
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/ronin/storia.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/ronin/storia_poster.webp",
+   "ratio": 0.5625,
+   "frame": "phone"
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/ronin/roncoroni.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/ronin/roncoroni_poster.webp",
+   "ratio": 0.5625,
+   "frame": "phone"
+  }
+ ],
+ "ronin_uniforms": [
+  [
+   {
+    "src": "media/05_CAPITOLO_5/b1/ronin/uniform2_front.webp",
+    "ratio": 1.1581
+   },
+   {
+    "src": "media/05_CAPITOLO_5/b1/ronin/uniform2_back.webp",
+    "ratio": 1.1207
+   }
+  ],
+  [
+   {
+    "src": "media/05_CAPITOLO_5/b1/ronin/uniform4_front.webp",
+    "ratio": 0.8212
+   }
+  ],
+  [
+   {
+    "src": "media/05_CAPITOLO_5/b1/ronin/uniform8_front.webp",
+    "ratio": 1.0256
+   },
+   {
+    "src": "media/05_CAPITOLO_5/b1/ronin/uniform8_back.webp",
+    "ratio": 0.9538
+   }
+  ]
+ ],
+ "cluedo": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/board.webp",
+   "ratio": 1.0
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/cluedo/teaser.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/cluedo/teaser_poster.webp",
+   "ratio": 0.7988
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/cover_1.webp",
+   "ratio": 1.4085
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/rules_1.webp",
+   "ratio": 1.4085
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/rules_2.webp",
+   "ratio": 1.4085
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/rules_3.webp",
+   "ratio": 1.4085
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/rules_4.webp",
+   "ratio": 1.4085
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/mockup_1.webp",
+   "ratio": 1.7762
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/mockup_2.webp",
+   "ratio": 1.7762
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/box_1.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/envelope_1.webp",
+   "ratio": 1.292
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/notepad_1.webp",
+   "ratio": 0.67
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/weapon_1.webp",
+   "ratio": 0.455
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/weapon_2.webp",
+   "ratio": 0.455
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/weapon_3.webp",
+   "ratio": 0.455
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/weapon_4.webp",
+   "ratio": 0.455
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_cover.webp",
+   "ratio": 0.7044
+  }
+ ],
+ "cluedo_comic": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_00.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_01.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_02.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_03.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_04.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_05.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_06.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_07.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_08.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_09.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_10.webp",
+   "ratio": 1.4093
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cluedo/comic_11.webp",
+   "ratio": 1.4093
+  }
+ ],
+ "arcade": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_01.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_02.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_03.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_04.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_05.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_06.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_07.webp",
+   "ratio": 1.0
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_08.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/arcade/arcade_09.webp",
+   "ratio": 0.8
+  }
+ ],
+ "pacifico": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_00.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_01.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_02.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_03.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_04.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_05.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_06.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_07.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_08.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/pacifico/pacifico_09.webp",
+   "ratio": 0.8
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/pacifico/intro.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/pacifico/intro_poster.webp",
+   "ratio": 0.5625,
+   "frame": "phone"
+  }
+ ],
+ "cheng": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/cheng/cheng.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cheng/newyear.webp",
+   "ratio": 0.562
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/cheng/xmas.webp",
+   "ratio": 1.7762
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/cheng/logo3d.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/cheng/logo3d_poster.webp",
+   "ratio": 0.5625,
+   "frame": "phone"
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/cheng/soundsystem.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/cheng/soundsystem_poster.webp",
+   "ratio": 1.0
+  },
+  {
+   "video": "media/05_CAPITOLO_5/b1/cheng/karaoke.mp4",
+   "poster": "media/05_CAPITOLO_5/b1/cheng/karaoke_poster.webp",
+   "ratio": 0.5625
+  }
+ ],
+ "banchi": [
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_01.webp",
+   "ratio": 0.841
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_02.webp",
+   "ratio": 0.506
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_03.webp",
+   "ratio": 0.456
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_04.webp",
+   "ratio": 0.598
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_05.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_06.webp",
+   "ratio": 0.8
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_07.webp",
+   "ratio": 0.694
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_08.webp",
+   "ratio": 1.368
+  },
+  {
+   "src": "media/05_CAPITOLO_5/b1/banchi/banchi_09.webp",
+   "ratio": 1.7762
+  }
+ ]
+}

@@ -405,7 +405,15 @@ window.STORY = [
 
   // tap: the books go; the work photos slide in one after another, big, on top of everything,
   //      straight (no tilt, no shadow). They stay.
-  { type: "slides", interval: 550, photos: [
+  // when the last photo is in, the photos go and the two books come back
+  { type: "slides", interval: 360, hold: 800, after: [
+      { type: "book", size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
+        front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
+        ratio: 0.6667, depth: 0.08, spine: "#7c5634", rest: -40, tilt: -3, year: "2021" },
+      { type: "book", size: "s", alt: "How to make Jam (2023)",
+        front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
+        ratio: 0.7533, depth: 0.12, spine: "#4a1519", rest: -40, scale: 1.13, tilt: 4, year: "2023" }
+    ], photos: [
       { src: "media/04_CAPITOLO_4/work_0.webp", ratio: 0.7503 },
       { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 1.3333 },
       { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 1.3333 },
@@ -508,9 +516,9 @@ window.STORY = [
         links: { "MEGAZINNE": "https://www.instagram.com/megazinne/" },
         // the little cursor clicks MEGAZINNE → a blue folder pops up and the press cards slide out of it
         hintThen: [
-          { type: "folder", size: "m", fan: 0.55, interval: 300, alt: "A folder of press articles about Megazinne", cards: [
-              { src: "media/06_CAPITOLO_6/press/elle.webp", ratio: 1.0587, alt: "ELLE Italia article on Megazinne" },
-              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.4686, alt: "Il Messaggero article on Megazinne" },
+          { type: "folder", size: "l", fan: 0.42, interval: 300, alt: "A folder of press articles about Megazinne", cards: [
+              { src: "media/06_CAPITOLO_6/press/elle.webp", ratio: 1.3115, alt: "ELLE Italia article on Megazinne" },
+              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.9576, alt: "Il Messaggero article on Megazinne" },
               { src: "media/06_CAPITOLO_6/press/rollingstone.webp", ratio: 0.7407, alt: "Rolling Stone Italia article on Megazinne" }
           ]}
         ],
@@ -524,7 +532,7 @@ window.STORY = [
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
     // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
     also: [
-      { type: "flipbook", delay: 200, share: 0.62, side: "random", tilt: 2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 2", spreads: [
+      { type: "flipbook", delay: 900, share: 0.62, side: "random", tilt: 2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -539,7 +547,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 500, share: 0.62, side: "random", tilt: -2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 1150, share: 0.62, side: "random", tilt: -2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -555,7 +563,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 800, share: 0.4, side: "random", tilt: -4, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 1400, share: 0.4, side: "random", tilt: -4, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",
@@ -689,8 +697,9 @@ window.STORY = [
     ]
   },
 
-  // tap: the second block in the free space; when it's typed, a little winged letter flies in
-  { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+  // tap: everything goes; the very last sentence fills the whole screen (whatever the screen),
+  //      and when it's typed the little winged letter flies in and around
+  { clear: true, fill: true, type: "text", style: "body", typing: true, speed: 30, tilt: 0,
     bold: ["GOT SOMETHING IN MIND?", "HMU ↗"],
     links: { "HMU ↗": "mailto:giu.vigna@gmail.com" }, linkHint: false,
     text: "Freelance projects, collaborations, teaching, workshops, collective experiments, unexpected ideas.\n\nGOT SOMETHING IN MIND?\nHMU ↗",

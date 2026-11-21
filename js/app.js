@@ -2154,65 +2154,52 @@
 
   // RECEIPT: fold up, then swap the paper for a faceted paper ball (item shrinks to the ball)
   function paperBall(size) {
-    var n = 16, cx = size / 2, cy = size / 2, outer = [], svg = "";
-    for (var i = 0; i < n; i++) {
-      var a = i / n * Math.PI * 2, r = size * (0.42 + Math.random() * 0.08);
-      outer.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    var cx = size / 2, cy = size / 2, svg = "", P = [];
+    // points on 3 rings + centre, jittered → many small creased facets, a fairly round outline
+    var rings = [[0.47, 22], [0.33, 14], [0.18, 8]];
+    rings.forEach(function (rg, ri) {
+      for (var i = 0; i < rg[1]; i++) {
+        var a = i / rg[1] * Math.PI * 2 + ri * 0.4 + (Math.random() - .5) * 0.25, r = size * rg[0] * (0.9 + Math.random() * 0.14);
+        P.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r, ring: ri, i: i, n: rg[1] });
+      }
+    });
+    P.push({ x: cx + (Math.random() - .5) * 4, y: cy + (Math.random() - .5) * 4, ring: 3, i: 0, n: 1 });
+    function ringPts(r) { return P.filter(function (p) { return p.ring === r; }); }
+    function shade(x, y) {
+      var dx = (x - size * 0.38) / size, dy = (y - size * 0.32) / size, d = Math.sqrt(dx * dx + dy * dy);
+      var g = Math.round(253 - d * 95 - Math.random() * 26);
+      return "rgb(" + g + "," + g + "," + (g - 4) + ")";
     }
-    var inner = [];
-    for (var k = 0; k < 7; k++) {
-      var a2 = k / 7 * Math.PI * 2 + Math.random(), r2 = size * (0.14 + Math.random() * 0.14);
-      inner.push([cx + Math.cos(a2) * r2, cy + Math.sin(a2) * r2]);
+    function tri(a, b, c) {
+      var mx = (a.x + b.x + c.x) / 3, my = (a.y + b.y + c.y) / 3;
+      svg += '<polygon points="' + [a, b, c].map(function (v) { return v.x.toFixed(1) + "," + v.y.toFixed(1); }).join(" ") +
+             '" fill="' + shade(mx, my) + '" stroke="rgba(0,0,0,.07)" stroke-width=".5" stroke-linejoin="round"/>';
     }
-    function shade(x, y) {                                       // light from the top left
-      var d = ((x - size * 0.3) + (y - size * 0.25)) / size;     // -0.5 … 1.2
-      var g = Math.round(250 - Math.max(0, d) * 70 - Math.random() * 22);
-      return "rgb(" + g + "," + (g - 2) + "," + (g - 7) + ")";
+    function nearest(p, list) { return list.slice().sort(function (A, B) { return Math.hypot(A.x - p.x, A.y - p.y) - Math.hypot(B.x - p.x, B.y - p.y); }); }
+    for (var r = 0; r < 3; r++) {
+      var outer = ringPts(r), inner = r < 2 ? ringPts(r + 1) : ringPts(3);
+      outer.forEach(function (p, k) {
+        var q = outer[(k + 1) % outer.length], a = nearest(p, inner)[0], b = nearest(q, inner)[0];
+        tri(p, q, a); if (a !== b) tri(q, b, a);
+      });
     }
-    function tri(p, q, r) {
-      var mx = (p[0] + q[0] + r[0]) / 3, my = (p[1] + q[1] + r[1]) / 3;
-      svg += '<polygon points="' + [p, q, r].map(function (v) { return v[0].toFixed(1) + "," + v[1].toFixed(1); }).join(" ") +
-             '" fill="' + shade(mx, my) + '" stroke="rgba(0,0,0,.10)" stroke-width=".6"/>';
-    }
-    svg += '<polygon points="' + outer.map(function (v) { return v[0].toFixed(1) + "," + v[1].toFixed(1); }).join(" ") + '" fill="rgb(214,211,204)"/>';   // no gaps between facets
-    for (var o = 0; o < n; o++) {                                // outer ring to the nearest inner points
-      var p = outer[o], q = outer[(o + 1) % n];
-      var near = inner.slice().sort(function (A, B) { return Math.hypot(A[0] - p[0], A[1] - p[1]) - Math.hypot(B[0] - p[0], B[1] - p[1]); })[0];
-      tri(p, q, near);
-      var near2 = inner.slice().sort(function (A, B) { return Math.hypot(A[0] - q[0], A[1] - q[1]) - Math.hypot(B[0] - q[0], B[1] - q[1]); })[0];
-      if (near2 !== near) tri(q, near, near2);
-    }
-    for (var m = 0; m < inner.length; m++) tri(inner[m], inner[(m + 1) % inner.length], [cx + (Math.random() - .5) * size * .1, cy + (Math.random() - .5) * size * .1]);
-    return '<svg class="rc-ball" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" aria-hidden="true">' + svg + '</svg>';
+    var outline = ringPts(0).map(function (v) { return v.x.toFixed(1) + "," + v.y.toFixed(1); }).join(" ");
+    return '<svg class="rc-ball" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" aria-hidden="true">' +
+           '<polygon points="' + outline + '" fill="rgb(222,220,214)"/>' + svg + '</svg>';
   }
   function crumple(it) {
     if (it.el.classList.contains("crumpled")) return;
     var paper = it.el.querySelector(".rc-paper");
     if (paper && !reduceMotion && paper.animate) {
-      // cut the paper into a grid of pieces; each folds toward the centre with its own twist
-      var W = paper.offsetWidth, H = paper.offsetHeight, cols = 2, rows = 10;
-      var holder = document.createElement("div");
-      holder.className = "rc-pieces";
-      holder.style.width = W + "px"; holder.style.height = H + "px";
-      for (var rr = 0; rr < rows; rr++) for (var cc = 0; cc < cols; cc++) {
-        var piece = paper.cloneNode(true);
-        piece.classList.add("rc-piece");
-        var l = cc / cols * 100, t = rr / rows * 100;
-        piece.style.clipPath = "inset(" + t + "% " + (100 - l - 100 / cols) + "% " + (100 - t - 100 / rows) + "% " + l + "%)";
-        holder.appendChild(piece);
-        var px = (cc + .5) / cols * W, py = (rr + .5) / rows * H;
-        var dx = W / 2 - px, dy = H * 0.55 - py;
-        // strips fold like a fan (alternating up/down), squeezed toward the middle, a little twisted
-        var sgn = rr % 2 ? 1 : -1, sgx = cc ? 1 : -1;
-        var rx = sgn * (28 + Math.random() * 22), ry = sgx * (18 + Math.random() * 22), rz = (Math.random() * 2 - 1) * 35;
-        piece.animate([
-          { transform: "none", filter: "brightness(1)" },
-          { transform: "translate(" + dx * .82 + "px," + dy * .88 + "px) rotateX(" + rx * .6 + "deg) rotateY(" + ry * .5 + "deg) rotate(" + rz * .6 + "deg) scale(.62)", filter: "brightness(" + (0.82 + Math.random() * .25) + ")", offset: .42 },
-          { transform: "translate(" + dx + "px," + dy + "px) rotateX(" + rx + "deg) rotateY(" + ry + "deg) rotate(" + rz + "deg) scale(.3)", filter: "brightness(" + (0.72 + Math.random() * .3) + ")" }
-        ], { duration: 620, easing: "cubic-bezier(.55,0,.3,1)", fill: "forwards", delay: Math.abs(rr - rows / 2) * 12 });
-      }
-      paper.style.visibility = "hidden";
-      paper.parentNode.appendChild(holder);
+      // like the reference: the paper is squeezed from the sides, pinched in the middle (a bow-tie),
+      // twisted, then it snaps into a ball
+      paper.style.transformOrigin = "50% 50%";
+      paper.animate([
+        { transform: "none", clipPath: "polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%, 0 50%)", filter: "brightness(1)" },
+        { transform: "scale(.8, .62) rotate(-4deg)", clipPath: "polygon(0 0, 100% 0, 78% 50%, 100% 100%, 0 100%, 22% 50%)", filter: "brightness(.97)", offset: .35 },
+        { transform: "scale(.5, .36) rotate(8deg) rotateY(35deg)", clipPath: "polygon(6% 0, 94% 4%, 58% 50%, 98% 96%, 4% 100%, 42% 50%)", filter: "brightness(.92)", offset: .7 },
+        { transform: "scale(.22, .16) rotate(-15deg) rotateY(70deg)", clipPath: "polygon(20% 10%, 80% 8%, 55% 50%, 82% 92%, 18% 90%, 45% 50%)", filter: "brightness(.88)" }
+      ], { duration: 420, easing: "cubic-bezier(.6,0,.3,1)", fill: "forwards" });
     }
     it.el.classList.add("crumpled");
     setTimeout(function () {
@@ -2224,7 +2211,7 @@
       it.el.style.width = size + "px"; it.el.style.height = size + "px";
       it.el.classList.add("balled");
       place(it, cx - size / 2, cy - size / 2);
-    }, reduceMotion ? 0 : 600);
+    }, reduceMotion ? 0 : 400);
   }
   function toBin(it, done) {
     var b = it.bin && it.bin.getBoundingClientRect();

@@ -1104,7 +1104,7 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 }
 .item.receipt.balled .inner { width: 100%; height: 100%; animation: rc-pop .35s cubic-bezier(.2,1.6,.4,1) both; }
 .rc-ball { display: block; filter: drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
-@keyframes rc-pop { from { transform: scale(.6) rotate(-30deg); } to { transform: none; } }
+@keyframes rc-pop { from { transform: scale(.55) rotate(-25deg); } 70% { transform: scale(1.06) rotate(4deg); } to { transform: none; } }
 
 /* BIN for the paper ball */
 .rc-bin { position: absolute; width: 64px; color: var(--primary); pointer-events: none; animation: pop-in 420ms cubic-bezier(.2,1.6,.4,1) 1.6s both; }
@@ -1300,3 +1300,6 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .item.pfolder.pf-pop .inner { animation: pfpop 420ms cubic-bezier(.2,1.5,.4,1) both; }
 @keyframes pfpop { 0% { opacity: 0; transform: scale(.3) translateY(20%); } 100% { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .pf-out > .item.pf-card { transition: none; } .item.pfolder.pf-pop .inner { animation: none; } }
+
+.rc-creases { position: absolute; inset: 0; background-size: 100% 100%; pointer-events: none; opacity: 0; mix-blend-mode: normal; }
+.pf-out > .item.pf-card.pf-back-in { transition: transform 520ms cubic-bezier(.5,0,.75,.4); }

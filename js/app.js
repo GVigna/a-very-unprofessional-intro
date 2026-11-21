@@ -135,18 +135,25 @@
 
   // ---- the halfway "you made it this far" alert (once per visit)
   var midShown = false;
-  function maybeMidAlert() {
-    var C = window.CONTACT || {}, at = C.midAlertAt || Math.round(STORY.length / 2);
-    if (midShown || FAST || step < at) return;
+  // the "wanna chat?" alert: only when someone has done nothing for a while (once per visit),
+  // and only after they've seen a bit of the story
+  var lastAct = Date.now();
+  ["pointerdown", "keydown", "wheel", "touchstart"].forEach(function (ev) {
+    window.addEventListener(ev, function () { lastAct = Date.now(); }, { passive: true, capture: true });
+  });
+  function maybeMidAlert() {}
+  setInterval(function () {
+    var C = window.CONTACT || {};
+    var after = C.midAlertAfter != null ? C.midAlertAfter : 6, idle = (C.midAlertIdle || 12) * 1000;
+    if (midShown || FAST || step < after || step >= STORY.length || Date.now() - lastAct < idle) return;
+    var box = document.getElementById("midalert");
+    if (!box || popupOpen() || document.hidden) return;
+    if (Array.prototype.some.call(document.querySelectorAll("audio"), function (a) { return !a.paused; })) return;  // not over the music
     midShown = true;
-    setTimeout(function () {
-      var box = document.getElementById("midalert");
-      if (!box || popupOpen()) return;
-      document.getElementById("midalert-yes").href = "mailto:" + (C.chatEmail || C.email || "");
-      box.hidden = false;
-      document.getElementById("midalert-no").focus({ preventScroll: true });
-    }, 2600);
-  }
+    document.getElementById("midalert-yes").href = "mailto:" + (C.chatEmail || C.email || "");
+    box.hidden = false;
+    document.getElementById("midalert-no").focus({ preventScroll: true });
+  }, 1000);
   function closeMid() { var box = document.getElementById("midalert"); if (box) box.hidden = true; stage.focus({ preventScroll: true }); }
 
   // ---- the CV / portfolio viewer
@@ -1529,8 +1536,31 @@
         '<path d="M5 71h90M5 73.4h90" stroke="#5DA3E2" stroke-opacity=".45" stroke-width=".6"/></svg>';
       var out = s.inner.querySelector(".pf-out");
       var fcx = spot.x, fcy = spot.y + bh / 2 - fh / 2;              // the folder sits at the bottom of the spot
+      if (beat.leaveNext !== false) diesAt = Math.min(diesAt, step + 1);   // gone at the next tap, to make room
       var fit = addItem(s.el, fcx, fcy, diesAt);
       if (!reduceMotion) s.el.classList.add("pf-pop");
+      fit.pfCards = [];
+      // at the next tap the cards slide back into the folder, then the folder goes
+      fit.pfClose = function () {
+        var back = fit.pfCards.filter(function (c) { return !c.dead; }), d = reduceMotion ? 0 : 110, mv = reduceMotion ? 0 : 520;
+        back.forEach(function (c) { c.diesAt = Infinity; });
+        back.forEach(function (c, i) {
+          later(function () {
+            if (c.dead || fit.dead) { if (!c.dead) removeItem(c, true); return; }
+            var el = c.el, cw = el.offsetWidth, ch = el.offsetHeight;
+            c.dead = true; var li = live.indexOf(c); if (li >= 0) live.splice(li, 1);
+            if (drag && drag.item === c) drag = null;
+            el.classList.add("pf-card", "pf-back-in");
+            el.style.left = (c.x - fit.x) + "px"; el.style.top = (c.y - fit.y) + "px";
+            el.style.transform = "translate(0,0) scale(1)";
+            out.appendChild(el);
+            void el.offsetWidth;
+            el.style.transform = "translate(" + (fit.x + fw / 2 - (c.x + cw / 2)) + "px," + (fit.y + fh * 0.75 - (c.y + ch / 2)) + "px) scale(.3)";
+            later(function () { el.remove(); }, mv);
+          }, i * d);
+        });
+        later(function () { removeItem(fit); }, back.length * d + mv + 60);
+      };
 
       var gap = reduceMotion ? 0 : (beat.interval || 260), dur = reduceMotion ? 0 : 720;
       cards.forEach(function (spec, k) {
@@ -1560,8 +1590,8 @@
             el.classList.remove("pf-card");
             el.style.left = ""; el.style.top = ""; el.style.transform = "";
             out.removeChild(el);
-            if (step >= diesAt) return;
-            addItem(el, r.left - st.left, r.top - st.top, diesAt, "topleft");
+            if (step >= diesAt || fit.dead) return;
+            fit.pfCards.push(addItem(el, r.left - st.left, r.top - st.top, Infinity, "topleft"));
           }, dur + 40);
         }, (reduceMotion ? 0 : 380) + k * gap);
       });
@@ -2135,6 +2165,7 @@
   function expire() {
     live.slice().forEach(function (item) {
       if (step >= item.diesAt) {
+        if (item.pfClose) { item.diesAt = Infinity; item.pfClose(); return; }
         if (item.leaveHow) {
           // stacked photos leave one after the other, the top one first
           var d = (item.group.length - 1 - item.idx) * (reduceMotion ? 0 : 220);
@@ -2263,7 +2294,7 @@
     function tri(a, b, c) {
       var mx = (a.x + b.x + c.x) / 3, my = (a.y + b.y + c.y) / 3;
       svg += '<polygon points="' + [a, b, c].map(function (v) { return v.x.toFixed(1) + "," + v.y.toFixed(1); }).join(" ") +
-             '" fill="' + shade(mx, my) + '" stroke="rgba(0,0,0,.07)" stroke-width=".5" stroke-linejoin="round"/>';
+             '" fill="' + shade(mx, my) + '" fill-opacity=".8" stroke="rgba(0,0,0,.08)" stroke-width=".5" stroke-linejoin="round"/>';
     }
     function nearest(p, list) { return list.slice().sort(function (A, B) { return Math.hypot(A.x - p.x, A.y - p.y) - Math.hypot(B.x - p.x, B.y - p.y); }); }
     for (var r = 0; r < 3; r++) {
@@ -2274,34 +2305,72 @@
       });
     }
     var outline = ringPts(0).map(function (v) { return v.x.toFixed(1) + "," + v.y.toFixed(1); }).join(" ");
+    // scraps of the printed text, crumpled in every direction, peeking through the facets
+    var ink = "", cid = "rcb" + Math.floor(Math.random() * 1e6);
+    for (var t = 0; t < 26; t++) {
+      var tx = size * (.18 + Math.random() * .64), ty = size * (.18 + Math.random() * .64), tl = size * (.05 + Math.random() * .13);
+      ink += '<rect x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" width="' + tl.toFixed(1) + '" height="' + (size * .022).toFixed(1) +
+             '" fill="#2a2a2a" opacity="' + (.35 + Math.random() * .4).toFixed(2) + '" transform="rotate(' + Math.round(Math.random() * 180) + ' ' + tx.toFixed(1) + ' ' + ty.toFixed(1) + ')"/>';
+    }
     return '<svg class="rc-ball" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" aria-hidden="true">' +
-           '<polygon points="' + outline + '" fill="rgb(222,220,214)"/>' + svg + '</svg>';
+           '<defs><clipPath id="' + cid + '"><polygon points="' + outline + '"/></clipPath></defs>' +
+           '<polygon points="' + outline + '" fill="rgb(236,235,231)"/><g clip-path="url(#' + cid + ')">' + ink + '</g>' + svg + '</svg>';
+  }
+  // crease pattern for the paper while it's being crushed: random facets, light and dark
+  function creaseSVG(w, h) {
+    var s = "", cols = 5, rows = Math.max(6, Math.round(h / w * 5)), P = [];
+    for (var j = 0; j <= rows; j++) for (var i = 0; i <= cols; i++) {
+      var edge = i === 0 || j === 0 || i === cols || j === rows;
+      P.push({ x: (i / cols) * w + (edge ? 0 : (Math.random() - .5) * w / cols * .8),
+               y: (j / rows) * h + (edge ? 0 : (Math.random() - .5) * h / rows * .8) });
+    }
+    function at(i, j) { return P[j * (cols + 1) + i]; }
+    function poly(a, b, c) {
+      var dark = Math.random() < .55, al = (dark ? .05 + Math.random() * .2 : .2 + Math.random() * .45).toFixed(2);
+      s += '<polygon points="' + [a, b, c].map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ") +
+           '" fill="' + (dark ? "rgba(40,40,50," + al + ")" : "rgba(255,255,255," + al + ")") + '"/>';
+    }
+    for (var j2 = 0; j2 < rows; j2++) for (var i2 = 0; i2 < cols; i2++) {
+      var p00 = at(i2, j2), p10 = at(i2 + 1, j2), p01 = at(i2, j2 + 1), p11 = at(i2 + 1, j2 + 1);
+      if (Math.random() < .5) { poly(p00, p10, p11); poly(p00, p11, p01); } else { poly(p00, p10, p01); poly(p10, p11, p01); }
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + " " + h + '" preserveAspectRatio="none">' + s + "</svg>";
   }
   function crumple(it) {
     if (it.el.classList.contains("crumpled")) return;
     var paper = it.el.querySelector(".rc-paper");
+    var D = 380;                                                   // like the reference: all over in ~0.4 s
     if (paper && !reduceMotion && paper.animate) {
-      // like the reference: the paper is squeezed from the sides, pinched in the middle (a bow-tie),
-      // twisted, then it snaps into a ball
+      // 1) a little squeeze  2) creases show up, the corners give  3) crushed into a twisted lump
+      // 4) a small spiky wad  5) it pops into a round paper ball (still showing bits of the print)
+      var pw = paper.offsetWidth, ph = paper.offsetHeight;
+      var cr = document.createElement("div");
+      cr.className = "rc-creases";
+      cr.style.backgroundImage = 'url("data:image/svg+xml;utf8,' + encodeURIComponent(creaseSVG(pw, ph)) + '")';
+      paper.appendChild(cr);
+      cr.animate([{ opacity: 0 }, { opacity: 0, offset: .18 }, { opacity: .9, offset: .4 }, { opacity: 1 }],
+                 { duration: D, fill: "forwards" });
       paper.style.transformOrigin = "50% 50%";
       paper.animate([
-        { transform: "none", clipPath: "polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%, 0 50%)", filter: "brightness(1)" },
-        { transform: "scale(.8, .62) rotate(-4deg)", clipPath: "polygon(0 0, 100% 0, 78% 50%, 100% 100%, 0 100%, 22% 50%)", filter: "brightness(.97)", offset: .35 },
-        { transform: "scale(.5, .36) rotate(8deg) rotateY(35deg)", clipPath: "polygon(6% 0, 94% 4%, 58% 50%, 98% 96%, 4% 100%, 42% 50%)", filter: "brightness(.92)", offset: .7 },
-        { transform: "scale(.22, .16) rotate(-15deg) rotateY(70deg)", clipPath: "polygon(20% 10%, 80% 8%, 55% 50%, 82% 92%, 18% 90%, 45% 50%)", filter: "brightness(.88)" }
-      ], { duration: 420, easing: "cubic-bezier(.6,0,.3,1)", fill: "forwards" });
+        { transform: "none", clipPath: "polygon(0 0,50% 0,100% 0,100% 50%,100% 100%,50% 100%,0 100%,0 50%)", easing: "ease-out" },
+        { transform: "scale(.95)", clipPath: "polygon(0 0,50% 0,100% 0,100% 50%,100% 100%,50% 100%,0 100%,0 50%)", offset: .2 },
+        { transform: "scale(.88,.9) skewY(-3deg)", clipPath: "polygon(4% 3%,48% 1%,97% 0,99% 48%,96% 98%,52% 100%,3% 97%,1% 52%)", offset: .4 },
+        { transform: "scale(.5,.42) rotate(14deg)", clipPath: "polygon(22% 6%,55% 16%,86% 2%,74% 44%,96% 70%,62% 80%,48% 98%,30% 74%,6% 88%,18% 46%)", offset: .64 },
+        { transform: "scale(.26,.2) rotate(-8deg)", clipPath: "polygon(30% 0,46% 30%,78% 8%,62% 42%,100% 52%,64% 64%,74% 100%,44% 72%,8% 94%,30% 56%,0 30%,34% 34%)", offset: .84 },
+        { transform: "scale(.22,.17) rotate(-20deg)", clipPath: "polygon(36% 14%,52% 30%,72% 18%,62% 44%,86% 52%,62% 62%,66% 86%,46% 70%,24% 82%,34% 56%,14% 36%,38% 38%)" }
+      ], { duration: D, easing: "cubic-bezier(.55,0,.35,1)", fill: "forwards" });
     }
     it.el.classList.add("crumpled");
     setTimeout(function () {
       if (it.dead) return;
       var r = it.el.getBoundingClientRect(), size = 74;
-      var cx = r.left + r.width / 2, cy = r.top + r.height * 0.55;
+      var cx = r.left + r.width / 2, cy = r.top + r.height * 0.5;
       var inner = it.el.querySelector(".inner");
       inner.innerHTML = paperBall(size);
       it.el.style.width = size + "px"; it.el.style.height = size + "px";
       it.el.classList.add("balled");
       place(it, cx - size / 2, cy - size / 2);
-    }, reduceMotion ? 0 : 400);
+    }, reduceMotion ? 0 : D - 20);
   }
   function toBin(it, done) {
     var b = it.bin && it.bin.getBoundingClientRect();

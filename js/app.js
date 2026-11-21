@@ -1543,7 +1543,7 @@
       // at the next tap the cards slide back into the folder, then the folder goes
       fit.pfClose = function () {
         var back = fit.pfCards.filter(function (c) { return !c.dead; }), d = reduceMotion ? 0 : 110, mv = reduceMotion ? 0 : 520;
-        back.forEach(function (c) { c.diesAt = Infinity; });
+        back.forEach(function (c) { c.diesAt = Infinity; c.leaving = true; });   // their space is free already
         back.forEach(function (c, i) {
           later(function () {
             if (c.dead || fit.dead) { if (!c.dead) removeItem(c, true); return; }
@@ -2005,7 +2005,7 @@
 
   function mediaRects() {
     return live.filter(function (it) {
-      return it.el.classList.contains("media") && !it.dead;
+      return it.el.classList.contains("media") && !it.dead && !it.leaving;
     }).map(function (it) {
       var r = { l: it.x, t: it.y, r: it.x + it.el.offsetWidth, b: it.y + it.el.offsetHeight };
       var y = it.el.querySelector(".book-year");           // a book's year sits above it

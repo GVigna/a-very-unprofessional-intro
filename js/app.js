@@ -1273,6 +1273,56 @@
       addItem(s.el, spot.x, spot.y, diesAt);
     },
 
+    // AUDIOCARD — a photo with a mini audio player under it (time, progress bar, controls)
+    audiocard: function (beat, x, y, diesAt) {
+      var w = Math.round(mediaWidth(beat.size || "m", beat.ratio || 0.62, beat.scale) * (beat._fit || 1));
+      var s = shell("audiocard media", beat.tilt != null ? beat.tilt : -2);
+      s.el.style.width = w + "px";
+      s.inner.innerHTML =
+        '<img class="ac-photo" alt="" draggable="false">' +
+        '<div class="ac-player">' +
+          '<div class="ac-row"><span class="ac-now">0:00</span><span class="ac-bar"><i></i><b></b></span><span class="ac-left">-0:00</span></div>' +
+          '<div class="ac-row ac-ctrl">' +
+            '<button class="ac-btn ac-vol" type="button" aria-label="Mute"><svg viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>' +
+            '<span class="ac-dots">···</span>' +
+            '<button class="ac-btn ac-rw" type="button" aria-label="Back 5 seconds"><svg viewBox="0 0 24 24"><path d="M11 6v12l-8-6zM21 6v12l-8-6z"/></svg></button>' +
+            '<button class="ac-btn ac-play" type="button" aria-label="Play or pause"><svg class="i-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><svg class="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>' +
+            '<button class="ac-btn ac-ff" type="button" aria-label="Forward 5 seconds"><svg viewBox="0 0 24 24"><path d="M3 6v12l8-6zM13 6v12l8-6z"/></svg></button>' +
+            '<span class="ac-sp"></span>' +
+          '</div>' +
+        '</div>';
+      var img = s.inner.querySelector(".ac-photo"); img.src = beat.src;
+      img.style.aspectRatio = String(beat.photoRatio || 0.8);   // known height before the image loads (placement)
+      var au = new Audio(beat.audio); au.preload = "auto";
+      var start = beat.startAt || 0;
+      var now = s.inner.querySelector(".ac-now"), left = s.inner.querySelector(".ac-left");
+      var fill = s.inner.querySelector(".ac-bar i"), knob = s.inner.querySelector(".ac-bar b");
+      function fmt(t) { t = Math.max(0, Math.round(t)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
+      function draw() {
+        var d = au.duration || 0, t = au.currentTime || 0, p = d ? t / d : 0;
+        now.textContent = fmt(t); left.textContent = "-" + fmt(d - t);
+        fill.style.width = (p * 100) + "%"; knob.style.left = (p * 100) + "%";
+        s.el.classList.toggle("playing", !au.paused);
+      }
+      ["timeupdate", "play", "pause", "loadedmetadata", "ended"].forEach(function (ev) { au.addEventListener(ev, draw); });
+      au.addEventListener("ended", function () { au.currentTime = start; draw(); });
+      var raf; (function tick() { if (!au.paused) draw(); raf = requestAnimationFrame(tick); })();
+      function play() { au.play().then(function () { s.el.classList.remove("needs-tap"); }).catch(function () { s.el.classList.add("needs-tap"); }); }
+      s.inner.querySelector(".ac-play").addEventListener("click", function (e) { e.stopPropagation(); if (au.paused) play(); else au.pause(); });
+      s.inner.querySelector(".ac-rw").addEventListener("click", function (e) { e.stopPropagation(); au.currentTime = Math.max(start, au.currentTime - 5); draw(); });
+      s.inner.querySelector(".ac-ff").addEventListener("click", function (e) { e.stopPropagation(); au.currentTime = Math.min((au.duration || 0) - 0.1, au.currentTime + 5); draw(); });
+      var vol = s.inner.querySelector(".ac-vol");
+      vol.addEventListener("click", function (e) { e.stopPropagation(); au.muted = !au.muted; vol.classList.toggle("off", au.muted); });
+      s.inner.querySelectorAll(".ac-btn").forEach(function (bt) { bt.addEventListener("pointerdown", function (e) { e.stopPropagation(); }); });
+      s.el.setAttribute("aria-label", beat.alt || "Photo with audio");
+      var it = addItem(s.el, x, y, diesAt);
+      if (beat._bleed) { it.bleed = true; place(it, x - s.el.offsetWidth / 2, y - s.el.offsetHeight / 2); }
+      it.onRemove = function () { au.pause(); cancelAnimationFrame(raf); };
+      au.addEventListener("loadedmetadata", function () { au.currentTime = start; draw(); }, { once: true });
+      try { au.currentTime = start; } catch (e) {}
+      play();
+    },
+
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
     deck: function (beat, x, y, diesAt) {
       var cards = beat.cards || [];
@@ -1756,6 +1806,7 @@
   }
 
   function freeSpotFor(beat) {
+    if (beat.phoneSize && isPhone()) beat.size = beat.phoneSize;   // phones: a smaller size for this one
     if (beat.type === "book") {
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7, beat.scale), bh0 = bw0 / (beat.ratio || 0.7);
       var yfs = Math.min(96, Math.max(34, viewport().w * 0.095));       // the large text size
@@ -1786,6 +1837,7 @@
   }
 
   function playBeat(beat, x, y, atStep, anchor) {
+    if (beat.phoneSize && isPhone()) beat.size = beat.phoneSize;
     var diesAt = beat.lifespan != null ? atStep + 1 + beat.lifespan : Infinity;
     var play = players[beat.type];
     if (play) play(beat, x, y, diesAt, anchor);
@@ -1828,6 +1880,7 @@
   // how = undefined (pop out) | true/"fast" (quick pop) | "stack" (slides up and away)
   function removeItem(item, how) {
     if (item.dead) return;
+    if (item.onRemove) { try { item.onRemove(); } catch (e) {} }
     item.dead = true;
     live.splice(live.indexOf(item), 1);
     if (drag && drag.item === item) drag = null;
@@ -1891,7 +1944,7 @@
   // ======================================================================
   stage.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 && e.pointerType === "mouse") return;
-    if (e.target.closest(".sound, a")) return; // let buttons and links do their job
+    if (e.target.closest(".sound, a, .ac-btn")) return; // let buttons and links do their job
     var itemEl = e.target.closest(".item");
 
     // a second finger lands: cancel any pending tap (no accidental reveals)

@@ -540,9 +540,14 @@ window.STORY = [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
         bold: ["DOCCIA FREDDA"],
         text: "Meet DOCCIA FREDDA, our new podcast about love, heartbreak and questionable romantic decisions.\n\nBecause apparently, we still have a lot to talk about." },
-      { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: -3, delay: 900, label: "REEL 1 — video coming" },
-      { free: "all", type: "image", ratio: 0.5625, size: "m", tilt: 4, delay: 1200, label: "REEL 2 — video coming" },
-      { free: "all", type: "image", ratio: 1, size: "s", tilt: -2, delay: 1500, label: "AUDIO — coming" }
+      // two Instagram Reels, muted, looping
+      { free: "all", type: "video", src: "media/08_CAPITOLO_8/doccia_fredda_1.mp4", poster: "media/08_CAPITOLO_8/doccia_fredda_1_poster.jpg",
+        ratio: 0.5625, size: "m", phoneSize: "s", tilt: -3, delay: 900 },
+      { free: "all", type: "video", src: "media/08_CAPITOLO_8/doccia_fredda_2.mp4", poster: "media/08_CAPITOLO_8/doccia_fredda_2_poster.jpg",
+        ratio: 0.5625, size: "m", phoneSize: "s", tilt: 4, delay: 1200 },
+      // a photo with a little audio player under it; the audio starts where the sound starts (1.35 s in)
+      { free: "all", type: "audiocard", src: "media/08_CAPITOLO_8/audio_foto.webp", audio: "media/08_CAPITOLO_8/audio_audio.mp3",
+        ratio: 0.53, photoRatio: 0.8, size: "m", tilt: -2, delay: 1600, startAt: 1.35, alt: "Doccia Fredda — audio clip" }
     ]
   },
 

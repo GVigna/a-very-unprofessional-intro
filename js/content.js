@@ -513,7 +513,7 @@ window.STORY = [
               { src: "media/06_CAPITOLO_6/press/rollingstone.webp", ratio: 0.7407, alt: "Rolling Stone Italia article on Megazinne" }
           ]}
         ],
-        text: "My childhood BFF Ilena Ilardo (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
+        text: "My childhood BFF Ilena Ilardo\n(we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
     ]
   },
 

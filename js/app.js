@@ -1183,6 +1183,9 @@
           parts.forEach(function (p) { var sp = document.createElement("span"); sp.textContent = p; b.appendChild(sp); });
           paper.appendChild(b);
         }
+        else if (/^ {3,}\S/.test(ln) && ln.trim().length < 26) {      // an indented line → centred
+          var cl = document.createElement("span"); cl.className = "rc-center"; cl.textContent = ln.trim(); paper.appendChild(cl);
+        }
         else paper.appendChild(document.createTextNode(ln));
       });
       s.inner.appendChild(paper);
@@ -1249,6 +1252,9 @@
       function turn(fromSrc, toSrc, plainFront, done) {
         var leaf = document.createElement("div"); leaf.className = "fb-leaf";
         leaf.style.animationDuration = speed + "ms";
+        leaf.style.setProperty("--fbd", speed + "ms");
+        R.style.setProperty("--fbd", speed + "ms");
+        R.classList.remove("under"); void R.offsetWidth; R.classList.add("under");
         var f = document.createElement("div"), k = document.createElement("div");
         f.className = "fb-face fb-front" + (plainFront ? " plain" : ""); k.className = "fb-face fb-back";
         if (!plainFront) bg(f, fromSrc, "right center");
@@ -1311,15 +1317,42 @@
 
     // MAILICON — a little envelope pops up; tap it to write an email
     mailicon: function (beat, x, y, diesAt) {
-      var s = shell("mailicon", beat.tilt != null ? beat.tilt : -6);
+      // pixel grid: . empty, o outline, p paper, f flap, h heart, w wing, s wing shade
+      var G = [
+        "os.................so",
+        "oss...............sso",
+        ".osssooooooooooossso.",
+        "..ossofpppppppfosso..",
+        "...osopfpppppfposo...",
+        "....ooppfhphfppoo....",
+        ".....opphhhhhppo.....",
+        ".....oppphhhpppo.....",
+        ".....opppphppppo.....",
+        ".....opppppppppo.....",
+        ".....ooooooooooo....."
+      ];
+      var COL = { o: "#2A1A5E", p: "#FFF6E8", f: "#D9C9B0", h: "#FF5500", s: "#CBB8FF" };
+      var cell = 6, rects = "", wingL = "", wingR = "";
+      G.forEach(function (row, y) {
+        row.split("").forEach(function (ch, x) {
+          if (!COL[ch]) return;
+          var r = '<rect x="' + x * cell + '" y="' + y * cell + '" width="' + cell + '" height="' + cell + '" fill="' + COL[ch] + '"/>';
+          if (x < 5) wingL += r; else if (x > 15) wingR += r;
+          else rects += r;
+        });
+      });
+      var W = 21 * cell, H = G.length * cell;
+      var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges" aria-hidden="true">' +
+                '<g class="mi-wing mi-wl">' + wingL + '</g><g class="mi-wing mi-wr">' + wingR + '</g>' + rects + '</svg>';
+      var s = shell("mailicon", 0);
       var a = document.createElement("a");
       a.className = "mi-link";
       a.href = "mailto:" + beat.email + (beat.subject ? "?subject=" + encodeURIComponent(beat.subject) : "");
-      a.setAttribute("aria-label", "Email " + beat.email);
-      a.innerHTML = '<svg viewBox="0 0 64 46" aria-hidden="true"><rect x="2" y="2" width="60" height="42" rx="6" fill="#FFFFFF" stroke="currentColor" stroke-width="3.5"/><path d="M5 7l27 21L59 7" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/></svg>' +
-                    '<span class="mi-dot">1</span>';
+      a.setAttribute("aria-label", "Write an email to " + beat.email);
+      a.innerHTML = svg + '<span class="mi-note">write me!</span>';
       s.inner.appendChild(a);
-      var spot = clearSpot(110, 90, textRects().concat(mediaRects()), { x: x, y: y }, 1) || { x: x, y: y };
+      a.addEventListener("click", function () { s.el.classList.add("flyaway"); });
+      var vv = viewport(), spot = clearSpot(200, 170, textRects().concat(mediaRects()), { x: vv.w * 0.7, y: vv.h * 0.55 }, 0.8) || { x: x, y: y };
       addItem(s.el, spot.x, spot.y, diesAt);
     },
 
@@ -1666,7 +1699,16 @@
     // extra things that come with the same tap ("also"):
     //   below/above → stuck to the main item; otherwise offset from the tap
     var v = viewport(), unit = Math.min(v.w, v.h);
-    (beat.also || []).forEach(function (extra) {
+    // alsoShuffle: the "also" items from index `from` on come one at a time, in a random order
+    var alsoList = (beat.also || []).slice();
+    if (beat.alsoShuffle) {
+      var S = beat.alsoShuffle, tail = alsoList.slice(S.from || 0);
+      for (var q = tail.length - 1; q > 0; q--) { var r = Math.floor(Math.random() * (q + 1)), t = tail[q]; tail[q] = tail[r]; tail[r] = t; }
+      alsoList = alsoList.slice(0, S.from || 0).concat(tail.map(function (e, n) {
+        return Object.assign({}, e, { delay: (S.start || 1000) + n * (S.gap || 1400) });
+      }));
+    }
+    alsoList.forEach(function (extra) {
       var off = extra.offset || [0, 0];
       var at = step;
       later(function () {
@@ -2067,6 +2109,33 @@
   }
   function crumple(it) {
     if (it.el.classList.contains("crumpled")) return;
+    var paper = it.el.querySelector(".rc-paper");
+    if (paper && !reduceMotion && paper.animate) {
+      // cut the paper into a grid of pieces; each folds toward the centre with its own twist
+      var W = paper.offsetWidth, H = paper.offsetHeight, cols = 2, rows = 10;
+      var holder = document.createElement("div");
+      holder.className = "rc-pieces";
+      holder.style.width = W + "px"; holder.style.height = H + "px";
+      for (var rr = 0; rr < rows; rr++) for (var cc = 0; cc < cols; cc++) {
+        var piece = paper.cloneNode(true);
+        piece.classList.add("rc-piece");
+        var l = cc / cols * 100, t = rr / rows * 100;
+        piece.style.clipPath = "inset(" + t + "% " + (100 - l - 100 / cols) + "% " + (100 - t - 100 / rows) + "% " + l + "%)";
+        holder.appendChild(piece);
+        var px = (cc + .5) / cols * W, py = (rr + .5) / rows * H;
+        var dx = W / 2 - px, dy = H * 0.55 - py;
+        // strips fold like a fan (alternating up/down), squeezed toward the middle, a little twisted
+        var sgn = rr % 2 ? 1 : -1, sgx = cc ? 1 : -1;
+        var rx = sgn * (28 + Math.random() * 22), ry = sgx * (18 + Math.random() * 22), rz = (Math.random() * 2 - 1) * 35;
+        piece.animate([
+          { transform: "none", filter: "brightness(1)" },
+          { transform: "translate(" + dx * .82 + "px," + dy * .88 + "px) rotateX(" + rx * .6 + "deg) rotateY(" + ry * .5 + "deg) rotate(" + rz * .6 + "deg) scale(.62)", filter: "brightness(" + (0.82 + Math.random() * .25) + ")", offset: .42 },
+          { transform: "translate(" + dx + "px," + dy + "px) rotateX(" + rx + "deg) rotateY(" + ry + "deg) rotate(" + rz + "deg) scale(.3)", filter: "brightness(" + (0.72 + Math.random() * .3) + ")" }
+        ], { duration: 620, easing: "cubic-bezier(.55,0,.3,1)", fill: "forwards", delay: Math.abs(rr - rows / 2) * 12 });
+      }
+      paper.style.visibility = "hidden";
+      paper.parentNode.appendChild(holder);
+    }
     it.el.classList.add("crumpled");
     setTimeout(function () {
       if (it.dead) return;
@@ -2077,7 +2146,7 @@
       it.el.style.width = size + "px"; it.el.style.height = size + "px";
       it.el.classList.add("balled");
       place(it, cx - size / 2, cy - size / 2);
-    }, reduceMotion ? 0 : 560);
+    }, reduceMotion ? 0 : 600);
   }
   function toBin(it, done) {
     var b = it.bin && it.bin.getBoundingClientRect();

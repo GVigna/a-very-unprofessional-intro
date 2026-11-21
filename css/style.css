@@ -942,11 +942,29 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
 .fb-l.blank { visibility: hidden; }
 .fb-gutter { position: absolute; left: 47%; width: 6%; top: 0; height: 100%; pointer-events: none;
   background: linear-gradient(90deg, transparent, rgba(0,0,0,.18) 45%, rgba(0,0,0,.22) 50%, rgba(0,0,0,.18) 55%, transparent); }
-.fb-leaf { left: 50%; transform-origin: 0 50%; transform-style: preserve-3d; animation: fb-turn linear both; z-index: 2; }
+.fb-leaf { left: 50%; transform-origin: 0 50%; transform-style: preserve-3d; animation: fb-turn cubic-bezier(.42,0,.38,1) both; z-index: 2; }
 .fb-face { position: absolute; inset: 0; background: #F7F5F0 no-repeat; background-size: 200% 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .fb-face.plain { background: #EDEAE2; }
 .fb-back { transform: rotateY(180deg); }
-@keyframes fb-turn { from { transform: rotateY(0); } to { transform: rotateY(-180deg); } }
+@keyframes fb-turn {
+  0%   { transform: rotateY(0deg) translateZ(0); }
+  15%  { transform: rotateY(-14deg) translateZ(2px); }
+  50%  { transform: rotateY(-90deg) translateZ(14px); }
+  85%  { transform: rotateY(-166deg) translateZ(2px); }
+  100% { transform: rotateY(-180deg) translateZ(0); }
+}
+/* light and shadow travelling across the turning page */
+.fb-face::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.fb-front::after { background: linear-gradient(90deg, rgba(0,0,0,.28), rgba(0,0,0,0) 40%); }
+.fb-back::after  { background: linear-gradient(270deg, rgba(0,0,0,.28), rgba(255,255,255,.12) 50%, rgba(0,0,0,0)); }
+.fb-leaf .fb-front::after { animation: fb-shade-f var(--fbd, 450ms) ease-in both; }
+.fb-leaf .fb-back::after  { animation: fb-shade-b var(--fbd, 450ms) ease-out both; }
+@keyframes fb-shade-f { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fb-shade-b { from { opacity: 1; } to { opacity: 0; } }
+/* the page underneath gets a soft moving shadow */
+.fb-r.under::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,.25), transparent 60%); animation: fb-under var(--fbd, 450ms) ease-out both; pointer-events: none; }
+.fb-r { position: absolute; }
+@keyframes fb-under { from { opacity: 1; } to { opacity: 0; } }
 
 /* FLICK pile */
 .item.flick .inner { width: 100%; height: 100%; box-shadow: 0 6px 16px rgba(0,0,0,.18); }
@@ -1050,12 +1068,21 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .ly-swing.out { animation: ly-out .75s cubic-bezier(.5,0,.8,.4) both; }
 @keyframes ly-out { from { transform: rotate(0deg); } to { transform: rotate(95deg); } }
 
-/* MAILICON — envelope with a notification dot; a real mailto link */
-.item.mailicon .inner { background: none; overflow: visible; animation: pop-in 420ms cubic-bezier(.2,1.6,.4,1) both, mi-wiggle 2.4s ease-in-out 1s infinite; }
-.mi-link { display: block; position: relative; width: 84px; color: var(--primary); touch-action: manipulation; }
-.mi-link svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
-.mi-dot { position: absolute; right: -8px; top: -10px; width: 26px; height: 26px; border-radius: 50%; background: var(--secondary); color: #FFFFFF; font: 700 14px/26px var(--font); text-align: center; }
-@keyframes mi-wiggle { 0%, 80%, 100% { rotate: 0deg; } 85% { rotate: -9deg; } 90% { rotate: 7deg; } 95% { rotate: -4deg; } }
+/* MAILICON — a pixel letter with flapping wings, bobbing; tap → it flies off (mailto) */
+.item.mailicon .inner { background: none; overflow: visible; animation: mi-in .6s cubic-bezier(.2,1.4,.4,1) both; }
+.mi-link { display: block; position: relative; width: clamp(130px, 14vw, 180px); touch-action: manipulation; text-decoration: none; animation: mi-bob 1.6s ease-in-out .6s infinite; }
+.mi-link svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 6px 0 rgba(42,26,94,.15)); }
+.mi-wing { transform-box: fill-box; animation: mi-flap .32s steps(2, jump-none) infinite alternate; }
+.mi-wl { transform-origin: 100% 100%; }
+.mi-wr { transform-origin: 0% 100%; animation-name: mi-flap-r; }
+@keyframes mi-flap { from { transform: rotate(0); } to { transform: rotate(-22deg) translateY(-2px); } }
+@keyframes mi-flap-r { from { transform: rotate(0); } to { transform: rotate(22deg) translateY(-2px); } }
+@keyframes mi-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes mi-in { from { transform: translate(-60vw, 30vh) rotate(-20deg); } to { transform: none; } }
+.mi-note { position: absolute; left: 50%; top: 100%; transform: translateX(-50%) rotate(-4deg); margin-top: 6px; white-space: nowrap;
+  font: 700 var(--fs-s)/1 var(--font); color: var(--secondary); }
+.item.mailicon.flyaway .inner { animation: mi-away .9s cubic-bezier(.5,0,.8,.4) forwards; }
+@keyframes mi-away { to { transform: translate(60vw, -70vh) rotate(18deg) scale(.6); } }
 
 /* receipt total: bigger on its own line */
 .rc-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 1.55em; line-height: 1.15; margin: .15em 0; }
@@ -1065,7 +1092,7 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .item.receipt.crumpled .rc-paper {
   -webkit-mask: none; mask: none;
   transform-origin: 50% 55%;
-  animation: rc-fold .56s cubic-bezier(.6,0,.4,1) forwards;
+  animation: none;
   transition: none;
 }
 @keyframes rc-fold {
@@ -1176,3 +1203,8 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .vo-short { display: none; }
 @media (max-width: 600px) { .vo-long { display: none; } .vo-short { display: inline; } .viewer-bar { font-size: 18px; } }
 .ios-btns > *:focus { outline: none; } .ios-btns > *:focus-visible { background: rgba(0,0,0,.06); }
+
+.rc-center { display: block; text-align: center; height: 1.25em; }
+
+.rc-pieces { position: absolute; left: 0; top: 0; perspective: 700px; transform-style: preserve-3d; pointer-events: none; }
+.rc-piece { position: absolute; left: 0; top: 0; margin: 0; animation: none !important; -webkit-mask: none !important; mask: none !important; box-shadow: none; backface-visibility: visible; }

@@ -135,7 +135,7 @@ window.CONTACT = {
   cv: "media/00_OPENING/Cv_GiuliaVigna_2026.pdf",  // → CV (next to ACTUAL PORTFOLIO)
   cvPages: ["media/00_OPENING/cv_page_1.webp"],     // the CV shown inside the site, with a way back
   chatEmail: "giu.vigna@gmail.com",                 // the halfway "wanna chat?" alert
-  midAlertAt: 12                                    // after this step
+  midAlertAt: 16                                    // after this step (Megazinne begins)
 
 };
 
@@ -232,11 +232,11 @@ window.STORY = [
         loop: false,          // plays once (with its sound), then stops on the last frame
         sound: true,          // tries to play with audio; if the browser blocks it → muted + SOUND ON button
         subs: [               // subtitles (seconds from the start of the clip)
-          { from: 1,  to: 3,  text: "I don't wanna freak you out" },
-          { from: 3,  to: 5,  text: "but I think that I may be" },
-          { from: 5,  to: 7,  text: "the voice of my generation" },
-          { from: 7,  to: 11, text: "or at least, a voice" },
-          { from: 12, to: 13, text: "of a generation" }
+          { from: 0.1,  to: 2.05,  text: "I don't wanna freak you out" },
+          { from: 2.05, to: 4.05,  text: "but I think that I may be" },
+          { from: 4.05, to: 6.05,  text: "the voice of my generation" },
+          { from: 6.05, to: 10.05, text: "or at least, a voice" },
+          { from: 11.05, to: 12.05, text: "of a generation" }
         ] }
     ]
   },
@@ -469,7 +469,7 @@ window.STORY = [
     also: [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
         bold: ["How could I say no?"],
-        text: "My childhood BFF Ilena (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
+        text: "My childhood BFF Ilena Ilardo (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }
     ]
   },
 
@@ -479,7 +479,7 @@ window.STORY = [
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
     // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
     also: [
-      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 2", spreads: [
+      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -494,7 +494,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -510,7 +510,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 450, interval: 700, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",
@@ -538,7 +538,7 @@ window.STORY = [
 
   /* ===== DOCCIA FREDDA ===== */
   // tap: everything goes. Videos and audio will come from Giulia — for now, placeholders in Reel format (9:16)
-  { clear: true, bg: "default",          // new chapter: back to white
+  { clear: true, bg: "default", alsoShuffle: { from: 1, start: 1200, gap: 1500 },          // new chapter: back to white
     type: "text", text: "2026 — WE'RE BACK.", style: "big", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
@@ -549,9 +549,9 @@ window.STORY = [
         ratio: 0.5625, size: "m", phoneSize: "s", tilt: -3, delay: 900 },
       { free: "all", type: "video", src: "media/08_CAPITOLO_8/doccia_fredda_2.mp4", poster: "media/08_CAPITOLO_8/doccia_fredda_2_poster.jpg",
         ratio: 0.5625, size: "m", phoneSize: "s", tilt: 4, delay: 1200 },
-      // a photo with a little audio player under it; the audio starts where the sound starts (1.35 s in)
-      { free: "all", type: "audiocard", src: "media/08_CAPITOLO_8/audio_foto.webp", audio: "media/08_CAPITOLO_8/audio_audio.mp3",
-        ratio: 0.53, photoRatio: 0.8, size: "m", tilt: -2, delay: 1600, startAt: 1.35, alt: "Doccia Fredda — audio clip" }
+      // a photo with a little audio player under it (audio trimmed to start on the sound, 25 s)
+      { free: "all", type: "audiocard", src: "media/08_CAPITOLO_8/audio_foto.webp", audio: "media/08_CAPITOLO_8/audio_nuovo.mp3",
+        ratio: 0.53, photoRatio: 0.8, size: "m", tilt: -2, delay: 1600, startAt: 0, alt: "Doccia Fredda — audio clip" }
     ]
   },
 
@@ -615,7 +615,7 @@ window.STORY = [
       { free: true, type: "text", text: "2026 — Back to school.\nAgain.", style: "big", typing: true, speed: 30, tilt: 0, delay: 1300,
         then: [
           { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 400,
-            text: "Went back to university.\nCurrently in my second year of a BA in Art History at Sapienza University of Rome.\nBecause having several jobs and projects clearly wasn't enough." }
+            text: "Went back to University.\n\nCurrently in my second year of a BA in Art History at Sapienza University of Rome.\n\nBecause having several jobs and projects clearly wasn't enough." }
         ] }
     ]
   },
@@ -634,17 +634,21 @@ window.STORY = [
     text: "I'd also love to work more with younger generations, share what I've learned, and hopefully learn twice as much in return.\n\nI'd rather be in a room where everyone has something to share than be the smartest person in it." },
 
   /* ===== CLOSING ===== */
-  // tap: everything goes
+  // tap: everything goes; title + first block
   { clear: true, bg: "default",
     type: "text", text: "WHAT'S NEXT?", style: "big", tilt: 0,
     also: [
       { below: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0, gap: 14, delay: 500,
-        bold: ["YES, PLEASE.", "GOT SOMETHING IN MIND?", "HMU ↗"],
-        links: { "HMU ↗": "mailto:giu.vigna@gmail.com" }, linkHint: false,
-        text: "More art?\nMore design?\nMore people doing weird things together?\nYES, PLEASE.\n\nFreelance projects, collaborations, teaching, workshops, collective experiments, unexpected ideas.\nGOT SOMETHING IN MIND?\nHMU ↗",
-        // when it's all typed, a little mail icon pops up: tap it to write to Giulia
-        then: [ { type: "mailicon", email: "giu.vigna@gmail.com", delay: 300 } ] }
+        bold: ["YES, PLEASE."],
+        text: "More art?\nMore design?\nMore people doing weird things together?\nYES, PLEASE." }
     ]
   },
+
+  // tap: the second block in the free space; when it's typed, a little winged letter flies in
+  { free: true, type: "text", style: "body", typing: true, speed: 40, tilt: 0,
+    bold: ["GOT SOMETHING IN MIND?", "HMU ↗"],
+    links: { "HMU ↗": "mailto:giu.vigna@gmail.com" }, linkHint: false,
+    text: "Freelance projects, collaborations, teaching, workshops, collective experiments, unexpected ideas.\n\nGOT SOMETHING IN MIND?\nHMU ↗",
+    then: [ { type: "mailicon", email: "giu.vigna@gmail.com", delay: 300 } ] },
 
 ];

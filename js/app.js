@@ -1027,11 +1027,15 @@
       photos.forEach(function (spec, n) {
         later(function () {
           if (step >= diesAt) return;
-          var r = spec.ratio || 1, w = Math.min(areaW, areaH * r), h = w / r;
+          // a little bigger or smaller each time (straight, never tilted), and not all on the same spot
+          var k = beat.vary === false ? 1 : 0.74 + Math.random() * 0.26;
+          var r = spec.ratio || 1, w = Math.min(areaW, areaH * r) * k, h = w / r;
           var s = shell("slide", 0);
           s.el.style.width = Math.round(w) + "px"; s.el.style.height = Math.round(h) + "px";
           s.inner.appendChild(makeImg(spec.src, "pic"));
-          addItem(s.el, cx, cy, diesAt);
+          var full = v.h - B.t - B.b, sx = Math.max(0, (areaW - w) / 2), sy = Math.max(0, (full - h) / 2);
+          var px = cx + (Math.random() * 2 - 1) * sx * 0.85, py = cy + (Math.random() * 2 - 1) * sy * 0.85;
+          addItem(s.el, px, py, diesAt);
         }, n * gap);
       });
     },

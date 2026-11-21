@@ -1143,7 +1143,23 @@
       var spot = clearSpot(w * 1.08, h * 1.02, textRects().concat(mediaRects()), { x: x, y: y }, 0.6) || freeSpot(w, h, textRects());
       if (spot.scale && spot.scale < 1) paper.style.fontSize = (fs * spot.scale).toFixed(2) + "px";
       var it = addItem(s.el, spot.x, spot.y, diesAt);
-      it.onTap = function () { s.el.classList.add("crumpled"); };   // tap: crumples into a paper ball
+      // a little bin in the bottom corner, opposite the receipt
+      var Bb = bands(), binW = 64, binX = spot.x < v.w / 2 ? v.w - binW - 18 : 18;
+      var bin = document.createElement("div");
+      bin.className = "rc-bin";
+      bin.style.left = binX + "px"; bin.style.bottom = (Bb.b + 10) + "px";
+      bin.innerHTML = '<svg viewBox="0 0 64 76" aria-hidden="true"><path d="M8 18h48l-5 52a4 4 0 0 1-4 4H17a4 4 0 0 1-4-4z" fill="#FFFFFF" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M4 18h56M24 18v-6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6M24 30l2 34M32 30v34M40 30l-2 34" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>';
+      bin.setAttribute("aria-hidden", "true");
+      stage.appendChild(bin);
+      var binItem = { el: bin, x: 0, y: 0, diesAt: diesAt, fixed: true };
+      bin._item = binItem; bin.style.zIndex = ++z; live.push(binItem);
+      it.bin = bin;
+      it.onTap = function () { crumple(it); };                 // tap: crumples into a paper ball
+      it.onDrop = function () {                                // dropped on the bin → in it goes
+        if (!it.el.classList.contains("crumpled")) return;
+        var a = it.el.getBoundingClientRect(), b = bin.getBoundingClientRect();
+        if (a.right > b.left - 10 && a.left < b.right + 10 && a.bottom > b.top - 20 && a.top < b.bottom) toBin(it);
+      };
     },
 
     // FLIPBOOK — an open magazine seen from above: it opens in a flash (no cover), then the
@@ -1495,8 +1511,13 @@
 
     // a receipt on screen crumples into a ball first, then the page moves on
     if (beat.clear && !FAST) {
-      var rc = live.filter(function (it) { return !it.dead && it.el.classList.contains("receipt") && !it.el.classList.contains("crumpled"); })[0];
-      if (rc) { rc.el.classList.add("crumpled"); setTimeout(function () { reveal(x, y); }, reduceMotion ? 0 : 750); return; }
+      var rc = live.filter(function (it) { return !it.dead && it.el.classList.contains("receipt"); })[0];
+      if (rc) {                                              // crumple (if needed), into the bin, then move on
+        var wasFlat = !rc.el.classList.contains("crumpled");
+        if (wasFlat) crumple(rc);
+        setTimeout(function () { toBin(rc, function () { setTimeout(function () { reveal(x, y); }, 150); }); }, wasFlat && !reduceMotion ? 700 : 0);
+        return;
+      }
     }
     taps[step] = { x: x, y: y };
 
@@ -1900,6 +1921,70 @@
     }
   });
 
+  // RECEIPT: fold up, then swap the paper for a faceted paper ball (item shrinks to the ball)
+  function paperBall(size) {
+    var n = 16, cx = size / 2, cy = size / 2, outer = [], svg = "";
+    for (var i = 0; i < n; i++) {
+      var a = i / n * Math.PI * 2, r = size * (0.42 + Math.random() * 0.08);
+      outer.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    var inner = [];
+    for (var k = 0; k < 7; k++) {
+      var a2 = k / 7 * Math.PI * 2 + Math.random(), r2 = size * (0.14 + Math.random() * 0.14);
+      inner.push([cx + Math.cos(a2) * r2, cy + Math.sin(a2) * r2]);
+    }
+    function shade(x, y) {                                       // light from the top left
+      var d = ((x - size * 0.3) + (y - size * 0.25)) / size;     // -0.5 … 1.2
+      var g = Math.round(250 - Math.max(0, d) * 70 - Math.random() * 22);
+      return "rgb(" + g + "," + (g - 2) + "," + (g - 7) + ")";
+    }
+    function tri(p, q, r) {
+      var mx = (p[0] + q[0] + r[0]) / 3, my = (p[1] + q[1] + r[1]) / 3;
+      svg += '<polygon points="' + [p, q, r].map(function (v) { return v[0].toFixed(1) + "," + v[1].toFixed(1); }).join(" ") +
+             '" fill="' + shade(mx, my) + '" stroke="rgba(0,0,0,.10)" stroke-width=".6"/>';
+    }
+    svg += '<polygon points="' + outer.map(function (v) { return v[0].toFixed(1) + "," + v[1].toFixed(1); }).join(" ") + '" fill="rgb(214,211,204)"/>';   // no gaps between facets
+    for (var o = 0; o < n; o++) {                                // outer ring to the nearest inner points
+      var p = outer[o], q = outer[(o + 1) % n];
+      var near = inner.slice().sort(function (A, B) { return Math.hypot(A[0] - p[0], A[1] - p[1]) - Math.hypot(B[0] - p[0], B[1] - p[1]); })[0];
+      tri(p, q, near);
+      var near2 = inner.slice().sort(function (A, B) { return Math.hypot(A[0] - q[0], A[1] - q[1]) - Math.hypot(B[0] - q[0], B[1] - q[1]); })[0];
+      if (near2 !== near) tri(q, near, near2);
+    }
+    for (var m = 0; m < inner.length; m++) tri(inner[m], inner[(m + 1) % inner.length], [cx + (Math.random() - .5) * size * .1, cy + (Math.random() - .5) * size * .1]);
+    return '<svg class="rc-ball" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" aria-hidden="true">' + svg + '</svg>';
+  }
+  function crumple(it) {
+    if (it.el.classList.contains("crumpled")) return;
+    it.el.classList.add("crumpled");
+    setTimeout(function () {
+      if (it.dead) return;
+      var r = it.el.getBoundingClientRect(), size = 74;
+      var cx = r.left + r.width / 2, cy = r.top + r.height * 0.55;
+      var inner = it.el.querySelector(".inner");
+      inner.innerHTML = paperBall(size);
+      it.el.style.width = size + "px"; it.el.style.height = size + "px";
+      it.el.classList.add("balled");
+      place(it, cx - size / 2, cy - size / 2);
+    }, reduceMotion ? 0 : 560);
+  }
+  function toBin(it, done) {
+    var b = it.bin && it.bin.getBoundingClientRect();
+    if (!b || it.dead) { done && done(); return; }
+    var el = it.el, tx = b.left + b.width / 2 - el.offsetWidth / 2, ty = b.top - el.offsetHeight * 0.2;
+    it.dead = true;
+    el.style.pointerEvents = "none";
+    el.style.transition = reduceMotion ? "none" : "transform .55s cubic-bezier(.3,-0.35,.6,1)";
+    el.style.transform = "translate3d(" + tx + "px," + ty + "px,0) rotate(220deg)";
+    setTimeout(function () {
+      el.style.transition = "transform .25s ease-in, opacity .25s";
+      el.style.transform = "translate3d(" + tx + "px," + (b.top + b.height * 0.35) + "px,0) scale(.6)";
+      el.style.opacity = "0";
+      it.bin.classList.add("got");
+    }, reduceMotion ? 0 : 560);
+    setTimeout(function () { el.remove(); var k = live.indexOf(it); if (k >= 0) live.splice(k, 1); done && done(); }, reduceMotion ? 0 : 900);
+  }
+
   // throw an item off the screen (with a spin), then forget it
   function fling(item, vx, vy) {
     if (item.dead) return;
@@ -1918,6 +2003,7 @@
       drag.item.el.classList.remove("dragging");
       // a tap (no real movement) on an item that reacts to taps, e.g. the zine turns a page
       var moved = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy);
+      if (!cancelled && moved > TAP_SLOP && drag.item.onDrop) drag.item.onDrop();
       if (!cancelled && drag.item.onTap && moved <= TAP_SLOP) drag.item.onTap();
       else if (!cancelled && moved <= TAP_SLOP && !drag.item.flick) {     // a tap (not a drag) on a photo/magazine/etc → next
         var tp = { x: e.clientX, y: e.clientY };

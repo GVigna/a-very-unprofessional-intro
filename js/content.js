@@ -172,7 +172,7 @@ window.STORY = [
     also: [
       { above: true, type: "text", text: "2010", style: "note", tilt: 0, gap: 6, delay: 350 },
       { below: true, type: "text", style: "body", typing: true, typeFrom: "Some of it", speed: 45, tilt: 0, gap: 14, delay: 700,
-        text: "At 18, I decided to study Fashion Design at IED in Rome.\nI learned a lot.\nSome of it I even remember.",
+        text: "I decided to study Fashion Design at IED in Rome.\nI learned a lot.\nSome of it I even remember.",
         // as soon as the typing ends: burst of IED photos (no tap needed); they stay
         then: [
           { type: "burst", size: "s", speed: 110, spread: 0.45, delay: 400, photos: [   // they stay

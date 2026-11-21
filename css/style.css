@@ -1071,7 +1071,7 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 /* MAILICON — a pixel letter with flapping wings, bobbing; tap → it flies off (mailto) */
 .item.mailicon .inner { background: none; overflow: visible; animation: mi-in .6s cubic-bezier(.2,1.4,.4,1) both; }
 .mi-link { display: block; position: relative; width: clamp(130px, 14vw, 180px); touch-action: manipulation; text-decoration: none; animation: mi-bob 1.6s ease-in-out .6s infinite; }
-.mi-link svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 6px 0 rgba(42,26,94,.15)); }
+.mi-link svg { display: block; width: 100%; height: auto; overflow: visible; image-rendering: pixelated; }
 .mi-wing { transform-box: fill-box; animation: mi-flap .32s steps(2, jump-none) infinite alternate; }
 .mi-wl { transform-origin: 100% 100%; }
 .mi-wr { transform-origin: 0% 100%; animation-name: mi-flap-r; }

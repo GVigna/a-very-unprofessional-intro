@@ -1352,23 +1352,24 @@
       var G = [
         "os.................so",
         "oss...............sso",
-        ".osssooooooooooossso.",
-        "..ossofpppppppfosso..",
+        ".osss.ooooooooo.ssso.",
+        "..ossooqqqqqqqoosso..",
         "...osopfpppppfposo...",
-        "....ooppfhphfppoo....",
-        ".....opphhhhhppo.....",
-        ".....oppphhhpppo.....",
-        ".....opppphppppo.....",
-        ".....opppppppppo.....",
-        ".....ooooooooooo....."
+        "....ooppfkphfppoo....",
+        ".....opphhhhhppod....",
+        ".....oppphhhpppod....",
+        ".....opppphppppod....",
+        ".....ooeeeeeeeood....",
+        "......ooooooooodd....",
+        ".......ddddddddd....."
       ];
-      var COL = { o: "#2A1A5E", p: "#FFF6E8", f: "#D9C9B0", h: "#FF5500", s: "#CBB8FF" };
+      var COL = { o: "#2A1A5E", p: "#FFF6E8", q: "#FFFFFF", e: "#EADFCB", f: "#D9C9B0", h: "#FF5500", k: "#FFB27A", s: "#CBB8FF", d: "rgba(42,26,94,.18)" };
       var cell = 6, rects = "", wingL = "", wingR = "";
       G.forEach(function (row, y) {
         row.split("").forEach(function (ch, x) {
           if (!COL[ch]) return;
           var r = '<rect x="' + x * cell + '" y="' + y * cell + '" width="' + cell + '" height="' + cell + '" fill="' + COL[ch] + '"/>';
-          if (x < 5) wingL += r; else if (x > 15) wingR += r;
+          if (ch !== "d" && x < 5) wingL += r; else if (ch !== "d" && x > 15) wingR += r;
           else rects += r;
         });
       });

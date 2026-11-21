@@ -396,10 +396,10 @@ window.STORY = [
     cues: {
       19: { type: "book", free: true, size: "s", alt: "The Long Way Home of Ivan Putnik, Truck Driver (2021)",
             front: "media/04_CAPITOLO_4/ivan_front.webp", back: "media/04_CAPITOLO_4/ivan_back.webp",
-            ratio: 0.6667, depth: 0.08, spine: "#7c5634", rest: -40, tilt: -3, lifespan: 1, year: "2021" },
+            ratio: 0.6667, depth: 0.08, spine: "#7c5634", rest: -40, tilt: -3, lifespan: 0, year: "2021" },
       39: { type: "book", free: true, size: "s", alt: "How to make Jam (2023)",
             front: "media/04_CAPITOLO_4/jam_front.webp", back: "media/04_CAPITOLO_4/jam_back.webp",
-            ratio: 0.7533, depth: 0.12, spine: "#4a1519", rest: -40, scale: 1.13, tilt: 4, lifespan: 1, year: "2023" }
+            ratio: 0.7533, depth: 0.12, spine: "#4a1519", rest: -40, scale: 1.13, tilt: 4, lifespan: 0, year: "2023" }
     }
   },
 

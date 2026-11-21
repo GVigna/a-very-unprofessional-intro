@@ -513,9 +513,9 @@ window.STORY = [
         // the little cursor clicks MEGAZINNE → a blue folder pops up and the press cards slide out of it
         hintThen: [
           { type: "folder", size: "l", fan: 0.42, interval: 300, alt: "A folder of press articles about Megazinne", cards: [
+              { src: "media/06_CAPITOLO_6/press/rollingstone.webp", ratio: 0.7407, alt: "Rolling Stone Italia article on Megazinne" },
               { src: "media/06_CAPITOLO_6/press/elle.webp", ratio: 1.3115, alt: "ELLE Italia article on Megazinne" },
-              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.9576, alt: "Il Messaggero article on Megazinne" },
-              { src: "media/06_CAPITOLO_6/press/rollingstone.webp", ratio: 0.7407, alt: "Rolling Stone Italia article on Megazinne" }
+              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.9576, alt: "Il Messaggero article on Megazinne" }
           ]}
         ],
         text: "My childhood BFF Ilena Ilardo\n(we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }

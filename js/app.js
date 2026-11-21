@@ -102,7 +102,7 @@
     var p = clamp(item, x, y);
     item.x = p.x;
     item.y = p.y;
-    item.el.style.transform = "translate3d(" + p.x + "px," + p.y + "px,0)";
+    item.el.style.transform = "translate3d(" + p.x + "px," + p.y + "px,0)" + (item.scale && item.scale !== 1 ? " scale(" + item.scale.toFixed(3) + ")" : "");
   }
 
   // re-clamp after an item changed size (typing text, growing chat)
@@ -1802,7 +1802,7 @@
             if (step >= diesAt || fit.dead) return;
             var ci = addItem(el, fx, fy, Infinity, "topleft"); ci.pfOwner = fit; fit.pfCards.push(ci);
           }, dur + 40);
-        }, (reduceMotion ? 0 : 380) + k * gap);
+        }, (reduceMotion ? 0 : 460) + k * gap);          // after the folder's pop has finished
       });
     },
 
@@ -2465,6 +2465,17 @@
   // ======================================================================
   // Pointer handling (mouse + touch + pen, all the same code)
   // ======================================================================
+  // iPhone sometimes pauses one muted video when another (or the audio player) starts:
+  // every second, any looping clip still on screen that got paused is started again
+  setInterval(function () {
+    if (reduceMotion || document.hidden) return;
+    Array.prototype.forEach.call(stage.querySelectorAll("video"), function (vd) {
+      var host = vd.closest(".item");
+      if (!host || !host._item || host._item.dead || vd.dataset.userPaused) return;
+      if (vd.paused && vd.loop && vd.readyState >= 2) { vd.muted = true; var pr = vd.play(); if (pr && pr.catch) pr.catch(function () {}); }
+    });
+  }, 1000);
+  var pts = {}, pinch = null;       // fingers on screen; an active two-finger pinch
   stage.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 && e.pointerType === "mouse") return;
     if (e.target.closest(".sound, a, .ac-btn")) return; // let buttons and links do their job
@@ -2473,6 +2484,15 @@
     // a second finger lands: cancel any pending tap (no accidental reveals)
     if (tap && tap.id !== e.pointerId) { tap = null; }
 
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    // a second finger while dragging: pinch to make that thing bigger / smaller
+    if (drag && drag.id !== e.pointerId && !pinch && !drag.item.fixed) {
+      var p0 = pts[drag.id] || { x: drag.sx, y: drag.sy };
+      pinch = { item: drag.item, a: drag.id, b: e.pointerId, d0: Math.max(20, Math.hypot(e.clientX - p0.x, e.clientY - p0.y)), s0: drag.item.scale || 1 };
+      drag.pinched = true;
+      e.preventDefault();
+      return;
+    }
     if (itemEl && itemEl._item && !itemEl._item.dead) {
       // ---- start dragging an item ----
       if (drag) return; // one drag at a time
@@ -2490,6 +2510,15 @@
   });
 
   stage.addEventListener("pointermove", function (e) {
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    if (pinch && (e.pointerId === pinch.a || e.pointerId === pinch.b)) {
+      var A = pts[pinch.a], Bp = pts[pinch.b];
+      if (A && Bp) {
+        pinch.item.scale = Math.min(3.5, Math.max(0.35, pinch.s0 * Math.hypot(A.x - Bp.x, A.y - Bp.y) / pinch.d0));
+        place(pinch.item, pinch.item.x, pinch.item.y);
+      }
+      return;
+    }
     if (drag && drag.id === e.pointerId) {
       place(drag.item, e.clientX - drag.dx, e.clientY - drag.dy);
     } else if (tap && tap.id === e.pointerId) {
@@ -2647,6 +2676,15 @@
   }
 
   function endPointer(e, cancelled) {
+    delete pts[e.pointerId];
+    if (pinch && (e.pointerId === pinch.a || e.pointerId === pinch.b)) {
+      // lifting a finger ends the pinch; nothing is revealed
+      var pi = pinch.item; pinch = null;
+      if (drag) { drag.item.el.classList.remove("dragging"); drag = null; }
+      tap = null;
+      return;
+    }
+    if (drag && drag.pinched && drag.id === e.pointerId) { drag.item.el.classList.remove("dragging"); drag = null; return; }
     if (drag && drag.id === e.pointerId) {
       drag.item.el.classList.remove("dragging");
       // a tap (no real movement) on an item that reacts to taps, e.g. the zine turns a page
@@ -2671,6 +2709,17 @@
     }
   }
   stage.addEventListener("pointerup", function (e) { endPointer(e, false); });
+  // mouse wheel / trackpad pinch over something: bigger / smaller (desktop version of the pinch)
+  stage.addEventListener("wheel", function (e) {
+    var it = e.target.closest && e.target.closest(".item");
+    it = it && it._item;
+    if (!it || it.dead || it.fixed) return;
+    e.preventDefault();
+    var k = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
+    it.scale = Math.min(3.5, Math.max(0.35, (it.scale || 1) * k));
+    toFront(it);
+    place(it, it.x, it.y);
+  }, { passive: false });
   stage.addEventListener("pointercancel", function (e) { endPointer(e, true); });
 
   // stop the browser's own gestures/menus inside the canvas

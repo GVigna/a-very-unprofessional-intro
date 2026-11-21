@@ -425,8 +425,19 @@ window.STORY = [
     text: "Meanwhile, I've been freelancing for 10 years now!\nA few projects:",
     // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
-      { type: "laptop", delay: 200, image: "media/00_OPENING/giuliavigna_site.webp", alt: "giuliavigna.com scrolling on a laptop",
-        scroll: false, holdEnd: 2000,   // the site stays still, then the lid closes
+      { type: "laptop", delay: 200, alt: "Giulia's Behance profile on a laptop: 19,191 project views, 1,429 appreciations, 350 followers",
+        scroll: false, holdEnd: 4200,   // stays open long enough to read, then the lid closes
+        // a simplified Behance profile (numbers from Giulia's profile, Nov 2026); covers loaded from Behance
+        profile: { name: "Giulia Vigna", role: "Graphic & Motion Designer · Rome", initials: "GV",
+          stats: [ ["project views", "19,191"], ["appreciations", "1,429"], ["followers", "350"] ],
+          covers: [
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/8a4e8d214429615.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/a98548204945815.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7ade7e204420103.Y3JvcCwxMzgwLDEwODAsMjcwLDA.png",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/faef14196842089.Y3JvcCwxNjExLDEyNjAsNDc0LDg3.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0e3855185106913.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/320c72184890177.Y3JvcCwxODAwLDE0MDcsMCwxNw.jpg"
+          ] },
         // Behance gallery features, as ribbons on the screen
         awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
                   { label: "Xd", bg: "#470137", fg: "#FF61F6" } ] }

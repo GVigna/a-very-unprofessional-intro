@@ -1087,7 +1087,9 @@
       var H = v.h - B.t - B.b;
       var W = Math.min(v.w * (v.w > v.h ? (beat.share || 0.42) : 0.7), H * 0.75);   // laptop width
       var boxW = W * 1.45, boxH = W * 1.05;
-      var spot = clearSpot(boxW, boxH, textRects(), { x: x, y: y }, 0.55);
+      // the open lid rises above the box: reserve extra room on top
+      var spot = clearSpot(boxW, boxH * 1.35, textRects(), { x: x, y: y }, 0.55);
+      if (spot) spot.y += boxH * 0.17;
       if (!spot) { var fb = freeSpot(boxW, boxH, textRects()); spot = fb; }
       var sc = Math.min(1, spot.scale || 1); W *= sc; boxW *= sc; boxH *= sc;
       var D = W * 0.68;                                        // depth of the base = height of the lid
@@ -1103,7 +1105,16 @@
           '</div>' +
         '</div>';
       var img = s.inner.querySelector(".lt-site"), screen = s.inner.querySelector(".lt-screen");
-      img.src = beat.image;
+      if (beat.profile) {                         // a simplified profile page drawn in HTML on the screen
+        var P = beat.profile, html = '<div class="lp">' +
+          '<div class="lp-head"><div class="lp-av">' + (P.initials || "") + '</div><div><div class="lp-name"></div><div class="lp-role"></div></div></div>' +
+          '<div class="lp-stats">' + (P.stats || []).map(function (st) { return '<div><b>' + st[1] + '</b><span>' + st[0] + '</span></div>'; }).join("") + '</div>' +
+          '<div class="lp-grid">' + (P.covers || []).map(function (src) { return '<i style="background-image:url(&quot;' + src + '&quot;)"></i>'; }).join("") + '</div></div>';
+        screen.innerHTML = html;
+        screen.querySelector(".lp-name").textContent = P.name || "";
+        screen.querySelector(".lp-role").textContent = P.role || "";
+        screen.style.setProperty("--W", W + "px");
+      } else img.src = beat.image;
       (beat.awards || []).forEach(function (a, i) {
         var r = document.createElement("span");
         r.className = "lt-ribbon"; r.textContent = a.label;

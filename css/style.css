@@ -1278,10 +1278,6 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .pc-name.flat { text-shadow: none; }
 .item.pc-wait { visibility: hidden; }
 .item.pc-wait .inner { animation-play-state: paused; }
-/* licensed postcard fonts: drop the files into media/fonts/ with these names and they're used automatically */
-@font-face { font-family: "Kino 40"; src: url("../media/fonts/Kino40.woff2") format("woff2"), url("../media/fonts/Kino40.otf") format("opentype"); font-display: swap; }
-@font-face { font-family: "Bazook"; src: url("../media/fonts/Bazook.woff2") format("woff2"), url("../media/fonts/Bazook.otf") format("opentype"); font-display: swap; }
-@font-face { font-family: "Sunday Club"; src: url("../media/fonts/SundayClub.woff2") format("woff2"), url("../media/fonts/SundayClub.otf") format("opentype"); font-display: swap; }
 
 /* FLIPBOOK paper look (like the reference: open book from above, fast flicking) */
 .fb-edges { position: absolute; left: -6px; right: -6px; top: 3px; bottom: -4px; pointer-events: none;

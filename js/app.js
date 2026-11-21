@@ -1490,6 +1490,79 @@
     },
 
     // DECK — cards dealt from a point (x, y), fanning out in the free space nearby
+    // FOLDER — a blue desktop folder pops up where the link was clicked, then the cards
+    // (press screenshots) slide up out of it one by one and fan out above it. All draggable.
+    folder: function (beat, x, y, diesAt) {
+      var cards = beat.cards || [];
+      if (!cards.length) return;
+      var n = cards.length, size = beat.size || "m";
+      var phoneK = isPhone() ? 0.62 : 1;
+      var W = mediaWidth(size, 1) * 0.82 * phoneK;                  // every card gets the same width
+      var maxH = 0; cards.forEach(function (c) { maxH = Math.max(maxH, W / (c.ratio || 1)); });
+      var B = bands(), v = viewport(), room = (v.h - B.t - B.b) * 0.92;
+      var fw0 = W * 0.6, fh0 = fw0 * 0.8;
+      if (maxH * 0.8 + fh0 > room) { var k0 = room / (maxH * 0.8 + fh0); W *= k0; maxH *= k0; fw0 *= k0; fh0 *= k0; }
+      var offs = W * (beat.fan != null ? beat.fan : 0.5);
+      var bw = (W + offs * (n - 1)) * 1.06, bh = maxH * 0.8 + fh0;
+      var spot = clearSpot(bw, bh, textRects().concat(mediaRects()), { x: x, y: y }, isPhone() ? 0.7 : 0.35);
+      if (!spot && isPhone()) spot = sideSpot(bw, bh, 0.05, 0.72);
+      if (!spot) { var fb = freeSpot(bw, bh, textRects()); spot = { x: fb.x, y: fb.y, scale: Math.min(fb.scale, 0.7) }; }
+      var sc = spot.scale; W *= sc; maxH *= sc; offs *= sc;
+      var fw = Math.round(fw0 * sc), fh = Math.round(fh0 * sc);
+
+      var s = shell("pfolder", 0);
+      s.el.style.width = fw + "px"; s.el.style.height = fh + "px";
+      s.el.setAttribute("role", "img"); s.el.setAttribute("aria-label", beat.alt || "A folder of press articles");
+      s.inner.innerHTML =
+        '<svg class="pf-back" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true"><defs>' +
+        '<linearGradient id="pfb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4F9BE2"/><stop offset="1" stop-color="#3B83D1"/></linearGradient></defs>' +
+        '<path fill="url(#pfb)" d="M7 4h25c2.6 0 4.2.9 5.6 2.6L41.5 11H93a6 6 0 0 1 6 6v55a6 6 0 0 1-6 6H7a6 6 0 0 1-6-6V10a6 6 0 0 1 6-6z"/></svg>' +
+        '<div class="pf-out"></div>' +
+        '<svg class="pf-front" viewBox="0 0 100 80" preserveAspectRatio="none" aria-hidden="true"><defs>' +
+        '<linearGradient id="pff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93CEF8"/><stop offset="1" stop-color="#72B7EF"/></linearGradient></defs>' +
+        '<rect x="1" y="21" width="98" height="57" rx="6" fill="url(#pff)"/>' +
+        '<path d="M6 21.7h88" stroke="#fff" stroke-opacity=".55" stroke-width=".9"/>' +
+        '<path d="M5 71h90M5 73.4h90" stroke="#5DA3E2" stroke-opacity=".45" stroke-width=".6"/></svg>';
+      var out = s.inner.querySelector(".pf-out");
+      var fcx = spot.x, fcy = spot.y + bh / 2 - fh / 2;              // the folder sits at the bottom of the spot
+      var fit = addItem(s.el, fcx, fcy, diesAt);
+      if (!reduceMotion) s.el.classList.add("pf-pop");
+
+      var gap = reduceMotion ? 0 : (beat.interval || 260), dur = reduceMotion ? 0 : 720;
+      cards.forEach(function (spec, k) {
+        later(function () {
+          if (step >= diesAt || fit.dead) return;
+          var rel = k - (n - 1) / 2;
+          var tilt = spec.tilt != null ? spec.tilt : rel * (beat.spread || 6);
+          var ratio = spec.ratio || 1, h = W / ratio;
+          var fitK = W / mediaWidth(spec.size || size, ratio, spec.scale);
+          var el = buildMedia(Object.assign({}, spec, { _fit: fitK }), "image", size, tilt);
+          el.classList.add("card", "pf-card");
+          var cw = el.style.width ? parseFloat(el.style.width) : W, ch = el.style.height ? parseFloat(el.style.height) : h;
+          // where it ends: fanned above the folder, its bottom tucked a little behind the folder's top
+          var top = fit.y + fh * 0.32 - ch, mid = fit.x + fw / 2 + rel * offs;
+          var minTop = B.t + 4; if (top < minTop) top = minTop;
+          var left = Math.min(Math.max(mid - cw / 2, EDGE), v.w - EDGE - cw);
+          el.style.left = (left - fit.x) + "px"; el.style.top = (top - fit.y) + "px";
+          // where it starts: inside the folder, small
+          var sx = fit.x + fw / 2 - (left + cw / 2), sy = fit.y + fh * 0.7 - (top + ch / 2);
+          el.style.transform = "translate(" + sx + "px," + sy + "px) scale(.35)";
+          out.appendChild(el);
+          void el.offsetWidth;
+          el.style.transform = "translate(0,0) scale(1)";
+          later(function () {
+            // out of the folder: becomes a free, draggable card on the page
+            var r = el.getBoundingClientRect(), st = stage.getBoundingClientRect();
+            el.classList.remove("pf-card");
+            el.style.left = ""; el.style.top = ""; el.style.transform = "";
+            out.removeChild(el);
+            if (step >= diesAt) return;
+            addItem(el, r.left - st.left, r.top - st.top, diesAt, "topleft");
+          }, dur + 40);
+        }, (reduceMotion ? 0 : 380) + k * gap);
+      });
+    },
+
     deck: function (beat, x, y, diesAt) {
       var cards = beat.cards || [];
       if (!cards.length) return;

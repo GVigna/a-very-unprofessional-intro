@@ -2713,9 +2713,9 @@
   stage.addEventListener("wheel", function (e) {
     var it = e.target.closest && e.target.closest(".item");
     it = it && it._item;
-    if (!it || it.dead || it.fixed) return;
+    if (!it || it.dead || it.fixed || !e.ctrlKey) return;      // only a trackpad pinch (ctrl+wheel): a normal swipe/scroll does nothing
     e.preventDefault();
-    var k = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
+    var k = Math.exp(-e.deltaY * 0.01);
     it.scale = Math.min(3.5, Math.max(0.35, (it.scale || 1) * k));
     toFront(it);
     place(it, it.x, it.y);

@@ -1593,7 +1593,32 @@
                              flip: 150, interval: 70, loop: true, alt: spec.alt || "Comic pages flipping" }, x, y, diesAt);
           return live.length > before ? live[live.length - 1] : null;
         }
-        if (spec.spin) {                                          // a little garment turning round (front / back)
+        if (spec.ig) {                                            // the post as it looked in the feed, on a phone
+          var ig = spec.ig;
+          tw = R.w * (phone ? 0.5 : 0.3);
+          var phH = tw / 0.49;
+          if (phH > R.h * 0.92) { phH = R.h * 0.92; tw = phH * 0.49; }
+          var q = shell("igphone media", rand(-9, 9));
+          q.el.style.width = Math.round(tw) + "px"; q.el.style.height = Math.round(phH) + "px";
+          q.el.style.fontSize = (tw / 24).toFixed(1) + "px";
+          var I = '<svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+          q.inner.innerHTML =
+            '<div class="ig-island"></div>' +
+            '<div class="ig-head"><span class="ig-av">' + (ig.avatarText || "") + '</span><b>' + ig.user + '</b><span class="ig-dots">•••</span></div>' +
+            '<div class="ig-pic" style="aspect-ratio:' + (ratio || 1) + '"></div>' +
+            '<div class="ig-act">' +
+              '<svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" fill="#E8394A"/></svg>' +
+              I + '<path d="M20 11.5a8 8 0 1 1-3.2-6.4A8 8 0 0 1 20 11.5zM20 20l-2.6-3"/></svg>' +
+              I + '<path d="M21 3 10 13M21 3l-7 18-4-8-8-4z"/></svg>' +
+              '<span class="ig-sp"></span>' + I + '<path d="M6 3h12v18l-6-5-6 5z"/></svg></div>' +
+            '<div class="ig-cap"><b>' + ig.user + '</b> ' + (ig.caption || "") + '</div>' +
+            '<div class="ig-nav">' + I + '<path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z"/></svg>' + I + '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>' +
+              I + '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>' + I + '<path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>' +
+              '<span class="ig-me"></span></div>';
+          q.inner.querySelector(".ig-pic").appendChild(makeImg(spec.src, "pic"));
+          q.el.setAttribute("role", "img"); q.el.setAttribute("aria-label", "Instagram post by " + ig.user + (ig.caption ? ": " + ig.caption : ""));
+          el = q.el;
+        } else if (spec.spin) {                                   // a little garment turning round (front / back)
           tw = R.w * (phone ? 0.3 : 0.2);
           var f = spec.spin[0], b = spec.spin[1] || spec.spin[0], h0 = tw / (f.ratio || 1);
           var s = shell("wv-spin media", rand(-8, 8));

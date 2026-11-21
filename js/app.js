@@ -1910,12 +1910,15 @@
       return live[live.length - 1];
     });
     var total = made.reduce(function (h, it) { return h + it.el.offsetHeight; }, 0) + gap * (made.length - 1);
-    var y = intro.center ? (v.h - total) / 2 : (intro.y || 0.1) * v.h;
+    // the "click anywhere" starburst goes in the white space under the intro: centre both together
+    var hb = document.getElementById("hint"), hbH = hb ? hb.offsetHeight : 0, hbGap = hbH ? Math.max(18, v.h * 0.03) : 0;
+    var B = bands(), y = intro.center ? B.t + (v.h - B.t - B.b - total - hbGap - hbH) / 2 : (intro.y || 0.1) * v.h;
     made.forEach(function (it) {
       var x = intro.center ? (v.w - it.el.offsetWidth) / 2 : (intro.x || 0.05) * v.w;
       place(it, x, y);
       y += it.el.offsetHeight + gap;
     });
+    if (hb) hb.style.top = (y - gap + hbGap + hbH / 2) + "px";
   }
 
   // remove any item whose lifespan ran out

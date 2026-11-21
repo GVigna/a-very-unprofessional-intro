@@ -404,17 +404,23 @@ window.STORY = [
 
   // tap: the books go; the work photos slide in one after another, big, on top of everything,
   //      straight (no tilt, no shadow). They stay.
-  { type: "slides", interval: 650, photos: [
+  { type: "slides", interval: 550, photos: [
       { src: "media/04_CAPITOLO_4/work_0.webp", ratio: 0.7503 },
-      { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 0.75 },
-      { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_1.webp", ratio: 1.3333 },
+      { src: "media/04_CAPITOLO_4/work_2.webp", ratio: 1.3333 },
       { src: "media/04_CAPITOLO_4/work_3.webp", ratio: 0.75 },
       { src: "media/04_CAPITOLO_4/work_4.webp", ratio: 0.75 },
-      { src: "media/04_CAPITOLO_4/work_5.webp", ratio: 1.8289 },
-      { src: "media/04_CAPITOLO_4/work_6.webp", ratio: 0.737 },
-      { src: "media/04_CAPITOLO_4/work_7.webp", ratio: 1.4993 },
-      { src: "media/04_CAPITOLO_4/work_8.webp", ratio: 0.812 },
-      { src: "media/04_CAPITOLO_4/work_9.webp", ratio: 1.0 }
+      { src: "media/04_CAPITOLO_4/work_5.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_6.webp", ratio: 0.8119 },
+      { src: "media/04_CAPITOLO_4/work_7.webp", ratio: 1.3333 },
+      { src: "media/04_CAPITOLO_4/work_8.webp", ratio: 0.7369 },
+      { src: "media/04_CAPITOLO_4/work_9.webp", ratio: 1.3333 },
+      { src: "media/04_CAPITOLO_4/work_10.webp", ratio: 0.75 },
+      { src: "media/04_CAPITOLO_4/work_11.webp", ratio: 1.3333 },
+      { src: "media/04_CAPITOLO_4/work_12.webp", ratio: 0.6663 },
+      { src: "media/04_CAPITOLO_4/work_13.webp", ratio: 0.6663 },
+      { src: "media/04_CAPITOLO_4/work_14.webp", ratio: 1.0804 },
+      { src: "media/04_CAPITOLO_4/work_15.webp", ratio: 1.0804 }
   ]},
 
   /* ===== FREELANCE ===== */

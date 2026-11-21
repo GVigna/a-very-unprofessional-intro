@@ -470,6 +470,8 @@ window.STORY = [
       "Roma Lazio Film Commission • Rome",
       "House of Ronin • Milan",
       "Anclude",
+      "Textbroker • Berlin",
+      "T—Weiss • Berlin",
       "Pacifico"
     ]
   },

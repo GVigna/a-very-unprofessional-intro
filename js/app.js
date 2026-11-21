@@ -1444,7 +1444,7 @@
           face("bb-bottom", F.bottom) + face("bb-front", F.front) + face("bb-back", F.back) +
           face("bb-left", F.left) + face("bb-right", F.right) + face("bb-inner") +
           '<div class="bb-pop">' + burger + '</div>' +
-          '<div class="bb-lid">' + face("bb-top", F.top) + face("bb-lidin") + '</div>' +
+          '<div class="bb-lid"><div class="bb-hinge">' + face("bb-top", F.top) + face("bb-lidin") + '</div></div>' +
         '</div></div>';
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Burger box opening, a burger pops out");

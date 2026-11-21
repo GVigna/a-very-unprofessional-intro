@@ -1910,10 +1910,16 @@
       yfs = Math.min(29, Math.max(19, viewport().w * 0.053));            // medium size
       var yearH = beat.year ? yfs * 1.5 : 0, yearW = beat.year ? yfs * (0.75 * String(beat.year).length + 1.1) : 0;
       var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
-      var fb = clearSpot(needW, needH, textRects().concat(mediaRects()), null, 0.9)
-            // no room? the book may overlap the chat, but never texts, the CV or other books
-            || clearSpot(needW, needH, textRects(true).concat(mediaRects()), null, 0.9)
-            || clearSpot(needW, needH, textRects(true), null, 0.9)          // may sit over the other book
+      // the other books (with their year labels), padded so they never touch even while turning
+      var books = live.filter(function (it) { return !it.dead && it.el.classList.contains("book"); }).map(function (it) {
+        var r = it.el.getBoundingClientRect(), pad = r.width * 0.25;
+        return { l: r.left - pad, t: r.top - 60, r: r.right + pad, b: r.bottom + 10 };
+      });
+      var fb = clearSpot(needW, needH, textRects().concat(mediaRects(), books), null, 0.9)
+            // no room? the book may overlap the chat, but never texts, the CV or the other book
+            || clearSpot(needW, needH, textRects(true).concat(mediaRects(), books), null, 0.9)
+            || clearSpot(needW, needH, textRects(true).concat(books), null, 0.6)
+            || clearSpot(needW, needH, books, null, 0.5)                    // last resort: over a text, never over a book
             || freeSpot(bw0, bh0, textRects());
       if (yearH) fb.y += yearH / 2;            // the book sits below its year
       beat._fit = fb.scale;

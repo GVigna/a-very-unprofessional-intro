@@ -210,12 +210,13 @@
 
   // a rectangle whose edges are gentle waves (amp = wave height, wl = wavelength), as SVG
   function wavySVG(w, h) {
-    var amp = Math.max(2.5, Math.min(w, h) * 0.012), wl = Math.max(10, Math.min(w, h) * 0.055), m = amp * 1.2;
-    var pts = [], x, y;
-    for (x = 0; x <= w; x += 2) pts.push([x, m + amp * Math.sin(2 * Math.PI * x / wl)]);
-    for (y = 0; y <= h; y += 2) pts.push([w - m + amp * Math.sin(2 * Math.PI * y / wl), y]);
-    for (x = w; x >= 0; x -= 2) pts.push([x, h - m + amp * Math.sin(2 * Math.PI * x / wl)]);
-    for (y = h; y >= 0; y -= 2) pts.push([m + amp * Math.sin(2 * Math.PI * y / wl), y]);
+    // postage-stamp / pinking-shears edge: small regular teeth, pointed tips and round valleys
+    var tooth = Math.max(7, Math.min(w, h) * 0.034), depth = tooth * 0.42, pts = [], x, y;
+    function e(t) { var f = (t / tooth) % 1; return depth * (1 - Math.abs(Math.sin(Math.PI * f))); }   // 0 at the tips
+    for (x = 0; x <= w; x += 1.5) pts.push([x, e(x)]);
+    for (y = 0; y <= h; y += 1.5) pts.push([w - e(y), y]);
+    for (x = w; x >= 0; x -= 1.5) pts.push([x, h - e(x)]);
+    for (y = h; y >= 0; y -= 1.5) pts.push([e(y), y]);
     var d = "M" + pts.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join("L") + "Z";
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><path d="' + d + '" fill="#000"/></svg>';
   }
@@ -265,6 +266,8 @@
       name.style.color = pc.fill || "#F7D046";
       name.style.setProperty("--shade", pc.shade || "#E5432A");
       if (pc.upper) name.style.textTransform = "uppercase";
+      if (pc.spacing) name.style.letterSpacing = pc.spacing;
+      if (pc.noShadow) name.classList.add("flat");
       // size the name to the card: longer names get smaller
       var len = Math.max(4, (pc.city || "").length);
       var base = Math.min(h * 0.42, (w * (pc.scale || 1.55)) / len);
@@ -280,6 +283,13 @@
       }
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", "Postcard from " + (pc.city || ""));
+      // appear in one go: wait for the photo and the font (max ~1.2 s), not frame → photo → text
+      s.el.classList.add("pc-wait");
+      var im = pic.querySelector("img"), ready = [];
+      if (im) ready.push(im.decode ? im.decode().catch(function () {}) : Promise.resolve());
+      if (document.fonts && document.fonts.load) ready.push(document.fonts.load("1em " + (pc.font || "serif")).catch(function () {}));
+      var shown = false, show = function () { if (shown) return; shown = true; s.el.classList.remove("pc-wait"); fitNames(s.el); };
+      Promise.all(ready).then(show); setTimeout(show, 1200);
       return s.el;
     }
 

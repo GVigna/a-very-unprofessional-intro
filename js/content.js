@@ -268,15 +268,15 @@ window.STORY = [
         // the bar photo pops out of "bartending" as an iMessage photo bubble, right of the text box
         "bartending": { beside: true, bubble: true, type: "image", src: "media/03_CAPITOLO_3/bartending.webp", ratio: 1.3313, size: "s", tilt: -2 },
         "Istanbul": { type: "image", src: "media/03_CAPITOLO_3/pc_istanbul.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
-          postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Shrikhand', cursive", fill: "#FFE3EC", shade: "#1F4E79" } },
+          postcard: { city: "Istanbul", shape: "rect", frame: "#F7C6D3", font: "'Sunday Club', 'Fraunces', serif", fill: "#FFF1C9", shade: "#C2410C" } },
         "Milan": { type: "image", src: "media/03_CAPITOLO_3/pc_milan.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
           postcard: { city: "Milan", shape: "wavy", frame: "#F6EEE3", font: "'Alfa Slab One', serif", fill: "#9FD3F2", shade: "#1B1B1B", upper: true } },
         "Copenhagen": { type: "image", src: "media/03_CAPITOLO_3/pc_copenhagen.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
-          postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bungee Inline', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
+          postcard: { city: "Copenhagen", shape: "rect", frame: "#D8642C", font: "'Bazook', 'Righteous', sans-serif", fill: "#FFFFFF", shade: "#1F6FA8", upper: true, scale: 1.25 } },
         "Paris": { type: "image", src: "media/03_CAPITOLO_3/pc_paris.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
-          postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1 } },
+          postcard: { city: "Paris", shape: "wavy", frame: "#F6EEE3", font: "'Pinyon Script', cursive", fill: "#FBE1C6", shade: "#3E4A6B", scale: 2.1, spacing: "-0.035em" } },
         "Florence": { type: "image", src: "media/03_CAPITOLO_3/pc_florence.webp", ratio: 1.5, size: "l", scale: 1.05, bleed: true, corner: true,
-          postcard: { city: "Florence", shape: "rect", frame: "#2F6FB0", font: "'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F" } }
+          postcard: { city: "Florence", shape: "rect", frame: "#E2A72E", font: "'Kino 40', 'Shrikhand', cursive", fill: "#F4E9DA", shade: "#B5532F", noShadow: true } }
     }
   },
 

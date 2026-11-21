@@ -135,7 +135,7 @@ window.CONTACT = {
   cv: "media/00_OPENING/Cv_GiuliaVigna_2026.pdf",  // → CV (next to ACTUAL PORTFOLIO)
   cvPages: ["media/00_OPENING/cv_page_1.webp"],     // the CV shown inside the site, with a way back
   chatEmail: "giu.vigna@gmail.com",                 // the halfway "wanna chat?" alert
-  midAlertAt: 16                                    // after this step (Megazinne begins)
+  midAlertAt: 20                                    // after this step (after Doccia Fredda)
 
 };
 
@@ -426,17 +426,31 @@ window.STORY = [
     // then a big laptop opens and giuliavigna.com scrolls slowly on its screen (live site in an iframe).
     then: [
       { type: "laptop", delay: 200, alt: "Giulia's Behance profile on a laptop: 19,191 project views, 1,429 appreciations, 350 followers",
-        scroll: false, holdEnd: 4200,   // stays open long enough to read, then the lid closes
+        scroll: false, holdEnd: 14500,  // stays open while all the projects scroll by, then the lid closes
         // a simplified Behance profile (numbers from Giulia's profile, Nov 2026); covers loaded from Behance
         profile: { name: "Giulia Vigna", role: "Graphic & Motion Designer · Rome", initials: "GV",
+          avatar: "https://pps.services.adobe.com/api/profile/FE4F424F4E7B8A800A490D44@AdobeID/image/2f150e72-148b-4124-89cd-230663cfdf4e/276",
           stats: [ ["project views", "19,191"], ["appreciations", "1,429"], ["followers", "350"] ],
+          scrollTime: 14,   // seconds to scroll through all the projects
           covers: [
             "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/8a4e8d214429615.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
             "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/a98548204945815.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
             "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/7ade7e204420103.Y3JvcCwxMzgwLDEwODAsMjcwLDA.png",
             "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/faef14196842089.Y3JvcCwxNjExLDEyNjAsNDc0LDg3.jpg",
             "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/0e3855185106913.Y3JvcCwxMDA3LDc4OCwxOTcsMA.jpg",
-            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/320c72184890177.Y3JvcCwxODAwLDE0MDcsMCwxNw.jpg"
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/320c72184890177.Y3JvcCwxODAwLDE0MDcsMCwxNw.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/b03783152641725.Y3JvcCwxMzQyLDEwNTAsMjksMA.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/413af3128639515.Y3JvcCwxODM0LDE0MzQsMCwxOTk.png",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/3dea8095366789.Y3JvcCwxNTAwLDExNzMsMCwzMjY.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/fdbfaf94733593.Y3JvcCwxNDAwLDEwOTUsMCwxMzg.png",
+            "https://mir-s3-cdn-cf.behance.net/projects/max_808_webp/8a654894414573.Y3JvcCw0NTAwLDM1MTksMCw0Njc.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/404/2d73f993996177.Y3JvcCwxNDAwLDEwOTUsMCww.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/404/d1079993855165.Y3JvcCwxMDIyLDc5OSwxNzcsMTY5.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/808/6da3aa92471113.Y3JvcCwxMDQ1LDgxNywxOCww.jpg",
+            "https://mir-s3-cdn-cf.behance.net/projects/808/a8099988149447.Y3JvcCw5OTcsNzgwLDEwMSww.gif",
+            "https://mir-s3-cdn-cf.behance.net/projects/808/bdfa9d86978347.Y3JvcCw4MDgsNjMyLDAsMA.png",
+            "https://mir-s3-cdn-cf.behance.net/projects/808/dc4f8886978049.Y3JvcCw5NTgsNzUwLDEyMSww.png",
+            "https://mir-s3-cdn-cf.behance.net/projects/808/e1c5c086977717.Y3JvcCw5NTgsNzUwLDEyMSww.jpg"
           ] },
         // Behance gallery features, as ribbons on the screen
         awards: [ { label: "UI", bg: "#A69259", fg: "#FFFFFF" },
@@ -493,7 +507,7 @@ window.STORY = [
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
     // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
     also: [
-      { type: "flipbook", delay: 200, share: 0.62, side: "right", tilt: 2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 2", spreads: [
+      { type: "flipbook", delay: 200, share: 0.62, side: "random", tilt: 2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -508,7 +522,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 500, share: 0.62, side: "bottom", tilt: -2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 500, share: 0.62, side: "random", tilt: -2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -524,7 +538,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 800, share: 0.4, side: "topleft", tilt: -4, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 800, share: 0.4, side: "random", tilt: -4, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",

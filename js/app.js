@@ -1118,9 +1118,11 @@
       var img = s.inner.querySelector(".lt-site"), screen = s.inner.querySelector(".lt-screen");
       if (beat.profile) {                         // a simplified profile page drawn in HTML on the screen
         var P = beat.profile, html = '<div class="lp">' +
-          '<div class="lp-head"><div class="lp-av">' + (P.initials || "") + '</div><div><div class="lp-name"></div><div class="lp-role"></div></div></div>' +
+          '<div class="lp-head"><div class="lp-av">' + (P.avatar ? '<img src="' + P.avatar + '" alt="">' : (P.initials || "")) + '</div><div><div class="lp-name"></div><div class="lp-role"></div></div></div>' +
           '<div class="lp-stats">' + (P.stats || []).map(function (st) { return '<div><b>' + st[1] + '</b><span>' + st[0] + '</span></div>'; }).join("") + '</div>' +
-          '<div class="lp-grid">' + (P.covers || []).map(function (src) { return '<i style="background-image:url(&quot;' + src + '&quot;)"></i>'; }).join("") + '</div></div>';
+          '<div class="lp-win"><div class="lp-grid" style="animation-duration:' + (P.scrollTime || 14) + 's">' +
+            (P.covers || []).map(function (src) { return '<i style="background-image:url(&quot;' + src + '&quot;)"></i>'; }).join("") +
+          '</div></div></div>';
         screen.innerHTML = html;
         screen.querySelector(".lp-name").textContent = P.name || "";
         screen.querySelector(".lp-role").textContent = P.role || "";
@@ -1248,14 +1250,20 @@
       var w = Math.min(v.w * (v.w > v.h ? 0.62 : 0.94), H * 0.8 * ratio) * share, h = w / ratio;
       // a preferred side of the screen, so several magazines spread out
       var SIDES = { left: [0.22, 0.6], right: [0.78, 0.55], top: [0.6, 0.25], bottom: [0.45, 0.82], topleft: [0.25, 0.3], bottomright: [0.75, 0.8] };
-      var pref = beat.side && SIDES[beat.side] ? { x: SIDES[beat.side][0] * v.w, y: B.t + SIDES[beat.side][1] * H } : { x: x, y: y };
+      if (beat.side === "random") {                     // a side not used by another magazine right now
+        var used = live.filter(function (it) { return !it.dead && it.side; }).map(function (it) { return it.side; });
+        var free = Object.keys(SIDES).filter(function (k) { return used.indexOf(k) < 0; });
+        beat._side2 = free[Math.floor(Math.random() * free.length)] || "left";
+      }
+      var sideKey = beat._side2 || beat.side;
+      var pref = sideKey && SIDES[sideKey] ? { x: SIDES[sideKey][0] * v.w, y: B.t + SIDES[sideKey][1] * H } : { x: x, y: y };
       var avoid = textRects().concat(mediaRects());
       var spot = clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.5)
               || clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.3)
               || clearSpot(w * 1.06, h * 1.1, mediaRects(), pref, 0.3)      // at worst over a text, never over another magazine
               || { x: pref.x, y: pref.y, scale: 0.5 };
       if (isPhone() && (spot.scale || 1) < 0.8) {          // phones: big enough to see, at a side, over old texts if needed
-        var ss = sideSpot(w, h, 0.04, beat.share && beat.share < 0.5 ? 0.55 : 0.8);
+        var ss = sideSpot(w, h, 0.04, beat.share && beat.share < 0.5 ? 0.42 : 0.6);
         if (ss) spot = ss;
       }
       if (spot.scale && spot.scale < 1) { w *= spot.scale; h = w / ratio; }
@@ -1269,6 +1277,7 @@
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Magazine pages flipping");
       var it = addItem(s.el, spot.x, spot.y, diesAt);
+      it.side = sideKey; beat._side2 = null;
       var speed = reduceMotion ? 900 : (beat.flip || 230), pause = reduceMotion ? 900 : (beat.interval || 300);
       // a leaf turning: front = the old right page, back = the new left page
       function turn(fromSrc, toSrc, plainFront, done) {
@@ -1791,6 +1800,7 @@
     step++;
     updateProgress();
     trackStep();
+    preloadAhead();
     expire();
   }
 
@@ -2326,17 +2336,28 @@
   if (window.visualViewport) window.visualViewport.addEventListener("resize", reclamp);
 
   // preload every photo so it's ready the moment it's needed
+  var kept = [];                                   // keep preloaded images alive until shown
+  function img(src) { var i = new Image(); i.decoding = "async"; i.src = src; kept.push(i); if (kept.length > 400) kept.shift(); }
   function preload(list) {
     (list || []).forEach(function (b) {
-      if (b.src) new Image().src = b.src;
-      if (b.reveal && b.reveal.mask) new Image().src = b.reveal.mask;
+      if (!b) return;
+      if (b.src) img(b.src);
+      if (b.reveal && b.reveal.mask) img(b.reveal.mask);
       preload(b.photos); preload(b.also); preload(b.then); preload(b.cards); preload(b.hintThen);
-      if (b.front) { new Image().src = b.front; if (b.back) new Image().src = b.back; }
-      if (b.spreads) b.spreads.forEach(function (src) { new Image().src = src; });
+      if (b.front) { img(b.front); if (b.back) img(b.back); }
+      if (b.spreads) b.spreads.forEach(img);
+      if (b.faces) Object.keys(b.faces).forEach(function (k) { img(b.faces[k]); });
       if (b.cues && b.type === "code") preload(Object.keys(b.cues).map(function (k) { return b.cues[k]; }));
     });
   }
-  preload(STORY);
+  // load only what's coming next (the next 3 steps), not the whole story at once
+  var preloadedTo = -1;
+  function preloadAhead() {
+    var to = Math.min(STORY.length - 1, step + 3);
+    for (var i = preloadedTo + 1; i <= to; i++) preload([STORY[i]]);
+    preloadedTo = Math.max(preloadedTo, to);
+  }
+  preloadAhead();
 
   // contact links in the corner (hidden until filled in, in content.js → CONTACT)
   (function () {

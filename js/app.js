@@ -122,6 +122,17 @@
     maybeMidAlert();
   }
 
+  // ---- analytics: how far people get in the story (Foliaire custom event; each step counted once per visit)
+  var trackedMax = 0;
+  function trackStep() {
+    if (FAST || step <= trackedMax) return;
+    trackedMax = step;
+    try {
+      if (window.foliaire && window.foliaire.track)
+        window.foliaire.track("story_step", { storyStep: step, storyTotal: STORY.length, storyEnd: step >= STORY.length });
+    } catch (e) {}
+  }
+
   // ---- the halfway "you made it this far" alert (once per visit)
   var midShown = false;
   function maybeMidAlert() {
@@ -1779,6 +1790,7 @@
 
     step++;
     updateProgress();
+    trackStep();
     expire();
   }
 

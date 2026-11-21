@@ -601,7 +601,7 @@ body:not(.dark-page) .codecol { color: var(--primary); }
   position: absolute;
   left: 50%;
   bottom: 100%;
-  margin-bottom: .18em;
+  margin-bottom: .9em;
   translate: -50% 0;                             /* composes with the pop-in animation */
   font: 700 var(--fs-m)/1 var(--font);           /* site font, medium size */
   color: var(--primary);

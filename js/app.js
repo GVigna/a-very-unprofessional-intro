@@ -1957,7 +1957,7 @@
       var bw0 = mediaWidth(beat.size || "s", beat.ratio || 0.7, beat.scale), bh0 = bw0 / (beat.ratio || 0.7);
       var yfs = Math.min(96, Math.max(34, viewport().w * 0.095));       // the large text size
       yfs = Math.min(29, Math.max(19, viewport().w * 0.053));            // medium size
-      var yearH = beat.year ? yfs * 1.5 : 0, yearW = beat.year ? yfs * (0.75 * String(beat.year).length + 1.1) : 0;
+      var yearH = beat.year ? yfs * 2.3 : 0, yearW = beat.year ? yfs * (0.75 * String(beat.year).length + 1.1) : 0;
       var needW = Math.max(bw0 * 1.3, yearW + 30), needH = bh0 * 1.1 + yearH;
       // the other books (with their year labels), padded so they never touch even while turning
       var books = live.filter(function (it) { return !it.dead && it.el.classList.contains("book"); }).map(function (it) {

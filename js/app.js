@@ -1562,7 +1562,11 @@
       function region() {
         var v = viewport(), B = bands(), col = live.filter(function (it) { return !it.dead && it.el.classList.contains("codecol") && it.el.classList.contains("half"); })[0];
         var r = { l: EDGE, r: v.w - EDGE, t: B.t + 6, b: v.h - B.b - 6 };
-        if (col) { if (col.el.classList.contains("left")) r.l = v.w / 2 + EDGE; else r.r = v.w / 2 - EDGE; }
+        if (col) {
+          var left = col.el.classList.contains("left");
+          if (beat.onCode) left = !left;                 // onCode: fall over the (faint) list instead of over the texts
+          if (left) r.l = v.w / 2 + EDGE; else r.r = v.w / 2 - EDGE;
+        }
         r.w = r.r - r.l; r.h = r.b - r.t; return r;
       }
       function rand(a, b) { return a + Math.random() * (b - a); }

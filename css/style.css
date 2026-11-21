@@ -531,10 +531,9 @@ body {
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  transform-origin: left center;
   will-change: transform;
-  animation: marquee linear infinite;
 }
+.marquee .mq-scale { transform-origin: left center; white-space: nowrap; will-change: transform; }
 @keyframes marquee {
   from { transform: translateX(var(--from)) scaleY(var(--sy)); }
   to   { transform: translateX(var(--to))   scaleY(var(--sy)); }
@@ -737,7 +736,6 @@ body.dark-page .item.text.box-light .inner.caret::after { background: var(--prim
 
 @media (prefers-reduced-motion: reduce) {
   .book3d { animation: none; transform: rotateX(8deg) rotateY(var(--rest)); }
-  .marquee span { animation: none; transform: translateX(4vw) scaleY(var(--sy)); }
   .wash { display: none; }
   .inner, .item.leaving .inner, .item.leaving-fast .inner, .item.leaving-stack .inner, .item.dealt .inner, .bubble,
   .bubble.dots i, .inner.caret::after, .video .bar, .ui-progress.bump {

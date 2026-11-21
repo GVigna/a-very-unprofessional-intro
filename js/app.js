@@ -1845,22 +1845,34 @@
       el.className = "marquee";
       if (beat.color) el.classList.add("color-" + beat.color);
       var span = document.createElement("span");
-      el.appendChild(span);
+      var scaler = document.createElement("div");                 // the tall stretch lives here, as a plain inline style
+      scaler.className = "mq-scale";                              // (iOS Safari ignored var() inside the keyframes → letters stayed short)
+      scaler.appendChild(span);
+      el.appendChild(scaler);
       stage.appendChild(el);
-      var v = viewport();
+      var v, unit, speed = beat.speed || 650, anim = null;
+      function layout() {                                       // measure + start; again once the fonts are in
+        v = viewport();
       var stretch = (beat.stretch || 3.2) * (v.h > v.w ? 1.6 : 1);   // tall phone screens: even taller, narrower letters
       span.style.fontSize = (v.h / (0.72 * stretch)) * 0.96 + "px";   // capitals fill the height
-      span.style.setProperty("--sy", stretch);
+      scaler.style.transform = "scaleY(" + stretch + ")";
       // one endless line: "SPOILER ALERT SPOILER ALERT …" — measure one phrase (+ its space), repeat it
       var phrase = (beat.text || "") + "\u00a0";
       span.textContent = phrase;
-      var unit = span.getBoundingClientRect().width, speed = beat.speed || 650;   // px per second
+      unit = span.getBoundingClientRect().width;   // px per second
       var copies = Math.ceil((v.w * 2) / Math.max(1, unit)) + 2;
       span.textContent = new Array(copies + 1).join(phrase);
       var dir = beat.direction === "right" ? 1 : -1;
-      span.style.setProperty("--from", (dir < 0 ? 0 : -unit) + "px");
-      span.style.setProperty("--to", (dir < 0 ? -unit : 0) + "px");
-      span.style.animationDuration = unit / speed + "s";   // one phrase per cycle → no seam
+      var from = (dir < 0 ? 0 : -unit), to = (dir < 0 ? -unit : 0);
+      if (!reduceMotion && span.animate) {
+        // one phrase per cycle → no seam; explicit pixels, so every browser does the same
+        if (anim) anim.cancel();
+        anim = span.animate([{ transform: "translateX(" + from + "px)" }, { transform: "translateX(" + to + "px)" }],
+                     { duration: (unit / speed) * 1000, iterations: Infinity, easing: "linear" });
+      } else span.style.transform = "translateX(" + Math.round(v.w * 0.04) + "px)";
+      }
+      layout();
+      if (document.fonts && document.fonts.status !== "loaded") document.fonts.ready.then(function () { if (!item.dead) layout(); });
       var tw = unit;
       var item = { el: el, x: 0, y: 0, diesAt: diesAt, fixed: true };
       el._item = item;

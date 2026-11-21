@@ -112,11 +112,61 @@
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
 
-  var backBtn = document.getElementById("back");
+  var backBtn = document.getElementById("back"), nextBtn = document.getElementById("next");
+  var hint = document.getElementById("hint");
   function updateProgress() {
     progress.textContent = pad(step) + "/" + pad(STORY.length);
     if (backBtn) backBtn.hidden = step <= 0;
+    if (nextBtn) nextBtn.hidden = step >= STORY.length;
+    if (hint) hint.classList.toggle("gone", step > 0);
+    maybeMidAlert();
   }
+
+  // ---- the halfway "you made it this far" alert (once per visit)
+  var midShown = false;
+  function maybeMidAlert() {
+    var C = window.CONTACT || {}, at = C.midAlertAt || Math.round(STORY.length / 2);
+    if (midShown || FAST || step < at) return;
+    midShown = true;
+    setTimeout(function () {
+      var box = document.getElementById("midalert");
+      if (!box || popupOpen()) return;
+      document.getElementById("midalert-yes").href = "mailto:" + (C.chatEmail || C.email || "");
+      box.hidden = false;
+      document.getElementById("midalert-no").focus({ preventScroll: true });
+    }, 2600);
+  }
+  function closeMid() { var box = document.getElementById("midalert"); if (box) box.hidden = true; stage.focus({ preventScroll: true }); }
+
+  // ---- the CV / portfolio viewer
+  function openViewer(kind) {
+    var C = window.CONTACT || {}, v = document.getElementById("viewer"), body = document.getElementById("viewer-body");
+    body.innerHTML = "";
+    var open = document.getElementById("viewer-open");
+    if (kind === "cv") {
+      open.href = C.cv;
+      (C.cvPages || []).forEach(function (src) { var im = document.createElement("img"); im.src = src; im.alt = "CV"; body.appendChild(im); });
+      body.className = "viewer-body cv";
+    } else {
+      open.href = C.portfolio;
+      var f = document.createElement("iframe"); f.src = C.portfolio; f.title = "Portfolio";
+      body.appendChild(f); body.className = "viewer-body site";
+    }
+    v.hidden = false;
+    document.getElementById("viewer-back").focus({ preventScroll: true });
+  }
+  function closeViewer() { var v = document.getElementById("viewer"); v.hidden = true; document.getElementById("viewer-body").innerHTML = ""; stage.focus({ preventScroll: true }); }
+
+  // ---- the starburst shape (zigzag polygon)
+  (function () {
+    var poly = document.getElementById("hint-shape"); if (!poly) return;
+    var pts = [], n = 22;
+    for (var i = 0; i < n * 2; i++) {
+      var a = i / (n * 2) * Math.PI * 2, r = i % 2 ? 0.74 : 1;
+      pts.push((100 + Math.cos(a) * 96 * r).toFixed(1) + "," + (70 + Math.sin(a) * 66 * r).toFixed(1));
+    }
+    poly.setAttribute("points", pts.join(" "));
+  })()
 
   function nudgeProgress() {
     progress.classList.remove("bump");
@@ -1548,7 +1598,12 @@
   // ======================================================================
   // Reveal / disappear
   // ======================================================================
+  function popupOpen() {
+    var m = document.getElementById("midalert"), v = document.getElementById("viewer");
+    return (m && !m.hidden) || (v && !v.hidden);
+  }
   function reveal(x, y) {
+    if (popupOpen()) return;
     if (step >= STORY.length) { nudgeProgress(); return; }
 
     var beat = STORY[step];
@@ -2095,6 +2150,26 @@
   restartBtn.addEventListener("click", function () {
     restart();
     stage.focus({ preventScroll: true });
+  });
+  if (nextBtn) nextBtn.addEventListener("click", function () {
+    var v = viewport(), B = bands();
+    reveal(v.w * (0.35 + Math.random() * 0.3), B.t + (v.h - B.t - B.b) * (0.35 + Math.random() * 0.3));
+    stage.focus({ preventScroll: true });
+  });
+  document.getElementById("midalert-no").addEventListener("click", closeMid);
+  document.getElementById("midalert-yes").addEventListener("click", function () { setTimeout(closeMid, 300); });
+  document.getElementById("viewer-back").addEventListener("click", closeViewer);
+  ["link-cv", "link-portfolio"].forEach(function (id) {
+    var el = document.getElementById(id); if (!el) return;
+    el.addEventListener("click", function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;     // cmd-click: a real new tab
+      e.preventDefault(); openViewer(id === "link-cv" ? "cv" : "site");
+    });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!document.getElementById("viewer").hidden) closeViewer();
+    else if (!document.getElementById("midalert").hidden) closeMid();
   });
   if (backBtn) backBtn.addEventListener("click", function () {
     goBack();

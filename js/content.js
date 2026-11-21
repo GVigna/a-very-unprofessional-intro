@@ -132,7 +132,11 @@
 window.CONTACT = {
   portfolio: "https://giuliavigna.com/",     // → ACTUAL PORTFOLIO
   email: "info.gommastudio@gmail.com",       // → EMAIL ME
-  cv: "media/00_OPENING/Cv_GiuliaVigna_2026.pdf"   // → CV (next to ACTUAL PORTFOLIO)
+  cv: "media/00_OPENING/Cv_GiuliaVigna_2026.pdf",  // → CV (next to ACTUAL PORTFOLIO)
+  cvPages: ["media/00_OPENING/cv_page_1.webp"],     // the CV shown inside the site, with a way back
+  chatEmail: "giu.vigna@gmail.com",                 // the halfway "wanna chat?" alert
+  midAlertAt: 12                                    // after this step
+
 };
 
 /* ---------- already on screen when the site opens (draggable, always stay) */

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bungee+Inline&family=Pinyon+Script&family=Shrikhand&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=1795273088">
+  <link rel="stylesheet" href="css/style.css?v=1795276562">
 </head>
 <body>
   <!-- The canvas: every tap on empty space here reveals the next beat -->
@@ -28,7 +28,27 @@
   <button class="ui ui-restart" id="restart" type="button">RESTART</button>
   <button class="ui ui-back" id="back" type="button" aria-label="Back one step" hidden><svg viewBox="0 0 40 24" aria-hidden="true"><path d="M38 12H3M13 2 3 12l10 10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 
-  <script src="js/content.js?v=1795273088"></script>
-  <script src="js/app.js?v=1795273088"></script>
+  <button class="ui ui-next" id="next" type="button" aria-label="Next step"><svg viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12h35M27 2l10 10-10 10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+  <!-- "click anywhere" starburst, shown until the first tap -->
+  <div class="hint-burst" id="hint" aria-hidden="true"><svg viewBox="0 0 200 140"><polygon id="hint-shape"/></svg><span>CLICK<br>ANYWHERE</span></div>
+
+  <!-- iPhone-style alert, halfway through -->
+  <div class="ios-alert-wrap" id="midalert" hidden>
+    <div class="ios-alert" role="alertdialog" aria-modal="true" aria-labelledby="midalert-t" aria-describedby="midalert-m">
+      <p class="ios-t" id="midalert-t">You made it this far!</p>
+      <p class="ios-m" id="midalert-m">Wanna shoot an email and have a chat?</p>
+      <div class="ios-btns"><button type="button" id="midalert-no">No, continue</button><a id="midalert-yes" href="#">Send email</a></div>
+    </div>
+  </div>
+
+  <!-- CV / portfolio viewer, with a way back to the site -->
+  <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Viewer">
+    <div class="viewer-bar"><button type="button" id="viewer-back">← BACK TO THE SITE</button><a id="viewer-open" target="_blank" rel="noopener"><span class="vo-long">OPEN IN A NEW TAB ↗</span><span class="vo-short">NEW TAB ↗</span></a></div>
+    <div class="viewer-body" id="viewer-body"></div>
+  </div>
+
+  <script src="js/content.js?v=1795276562"></script>
+  <script src="js/app.js?v=1795276562"></script>
 </body>
 </html>

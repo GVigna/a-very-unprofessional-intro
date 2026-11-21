@@ -1379,7 +1379,7 @@
               if (it.dead) return;
               if (!ready[spreads[i]]) { later(go, 80); return; }        // wait for the page, don't flip onto a blank
               turn(spreads[i - 1 < 0 ? spreads.length - 1 : i - 1], spreads[i], false, next);
-            }, pause);
+            }, pause * (0.6 + Math.random() * 0.9));   // not like a metronome
           })();
         });
       }, 450);
@@ -1907,7 +1907,7 @@
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Book");
       addItem(s.el, x, y, diesAt);
-      if (yr) requestAnimationFrame(function () { nudgeYear(yr, s.el); });
+      // the year stays right above its book, always (no nudging sideways)
     },
 
     // message bubbles that appear one by one, with "typing…" dots
@@ -2666,6 +2666,7 @@
       if (b.front) { img(b.front); if (b.back) img(b.back); }
       if (b.spreads) b.spreads.forEach(img);
       if (b.groups && b.groups[0]) preload(b.groups[0].items);   // waves: the first project
+      if (b.profile) { if (b.profile.avatar) img(b.profile.avatar); (b.profile.covers || []).forEach(img); }   // Behance laptop
       if (b.faces) Object.keys(b.faces).forEach(function (k) { img(b.faces[k]); });
       if (b.cues && b.type === "code") preload(Object.keys(b.cues).map(function (k) { return b.cues[k]; }));
     });

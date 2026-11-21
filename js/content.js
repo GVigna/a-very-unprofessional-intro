@@ -543,7 +543,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 1150, share: 0.62, side: "random", tilt: -2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 1150, share: 0.62, side: "random", tilt: -2, flip: 240, interval: 180, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -559,7 +559,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 1400, share: 0.4, side: "random", tilt: -4, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 1400, share: 0.4, side: "random", tilt: -4, flip: 110, interval: 30, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",

@@ -517,7 +517,7 @@ window.STORY = [
     // the magazines (issues 2 and 3, no covers): it opens in a flash, then the spreads flip by fast
     // the three magazines (no covers), each on its own side, never overlapping: issue 1 smaller
     also: [
-      { type: "flipbook", delay: 200, share: 0.62, side: "random", tilt: 2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 2", spreads: [
+      { type: "flipbook", delay: 200, share: 0.62, side: "random", tilt: 2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 2", spreads: [
         "media/06_CAPITOLO_6/mz2_00.webp",
         "media/06_CAPITOLO_6/mz2_01.webp",
         "media/06_CAPITOLO_6/mz2_02.webp",
@@ -532,7 +532,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz2_11.webp",
         "media/06_CAPITOLO_6/mz2_12.webp"
       ] },
-      { type: "flipbook", delay: 500, share: 0.62, side: "random", tilt: -2, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 3", spreads: [
+      { type: "flipbook", delay: 500, share: 0.62, side: "random", tilt: -2, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 3", spreads: [
         "media/06_CAPITOLO_6/mz3_00.webp",
         "media/06_CAPITOLO_6/mz3_01.webp",
         "media/06_CAPITOLO_6/mz3_02.webp",
@@ -548,7 +548,7 @@ window.STORY = [
         "media/06_CAPITOLO_6/mz3_12.webp",
         "media/06_CAPITOLO_6/mz3_13.webp"
       ] },
-      { type: "flipbook", delay: 800, share: 0.4, side: "random", tilt: -4, flip: 620, interval: 650, loop: true, alt: "Megazinne issue 1", spreads: [
+      { type: "flipbook", delay: 800, share: 0.4, side: "random", tilt: -4, flip: 150, interval: 70, loop: true, alt: "Megazinne issue 1", spreads: [
         "media/06_CAPITOLO_6/mz1_00.webp",
         "media/06_CAPITOLO_6/mz1_01.webp",
         "media/06_CAPITOLO_6/mz1_02.webp",

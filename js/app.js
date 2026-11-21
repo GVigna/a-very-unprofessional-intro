@@ -1283,6 +1283,9 @@
       L.className = "fb-half fb-l"; R.className = "fb-half fb-r";
       s.inner.appendChild(L); s.inner.appendChild(R);
       var gutter = document.createElement("div"); gutter.className = "fb-gutter"; s.inner.appendChild(gutter);
+      // paper: stacked page edges on the outer sides + grain and soft light on top of everything
+      var edges = document.createElement("div"); edges.className = "fb-edges"; s.inner.insertBefore(edges, s.inner.firstChild);
+      var paper = document.createElement("div"); paper.className = "fb-paper"; s.inner.appendChild(paper);
       function bg(el, src, side) { el.style.backgroundImage = src ? 'url("' + src + '")' : "none"; el.style.backgroundPosition = side; }
       s.el.setAttribute("role", "img");
       s.el.setAttribute("aria-label", beat.alt || "Magazine pages flipping");
@@ -1300,7 +1303,7 @@
         f.className = "fb-face fb-front" + (plainFront ? " plain" : ""); k.className = "fb-face fb-back";
         if (!plainFront) bg(f, fromSrc, "right center");
         bg(k, toSrc, "left center");
-        leaf.appendChild(f); leaf.appendChild(k); s.inner.appendChild(leaf);
+        leaf.appendChild(f); leaf.appendChild(k); s.inner.insertBefore(leaf, paper);
         bg(R, toSrc, "right center");                      // the new right page is underneath
         later(function () { bg(L, toSrc, "left center"); leaf.remove(); done && done(); }, speed);
       }

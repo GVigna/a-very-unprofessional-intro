@@ -1345,3 +1345,12 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .ig-cap b { font-weight: 700; }
 .ig-nav { margin-top: auto; display: flex; justify-content: space-around; align-items: center; padding: .7em .5em 1.2em; border-top: 1px solid #eee; }
 .ig-me { width: 1.5em; height: 1.5em; border-radius: 50%; background: #000; }
+
+/* 3D plate (wave card) */
+.item.wv-plate .inner, .item.card.wv-plate .inner { width: 100%; height: 100%; background: none; box-shadow: none; overflow: visible; perspective: 900px; perspective-origin: 50% 30%; }
+.plate3d { position: absolute; inset: 0; transform-style: preserve-3d; animation: plate-spin linear infinite; }
+.plate-layer { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; backface-visibility: visible; }
+.plate-layer.rim { filter: brightness(.78) contrast(1.1); }
+.plate-shadow { position: absolute; left: 12%; right: 12%; top: 58%; height: 30%; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.28), rgba(0,0,0,0)); filter: blur(4px); }
+@keyframes plate-spin { 0% { transform: rotateX(58deg) rotateZ(0deg); } 50% { transform: rotateX(50deg) rotateZ(180deg); } 100% { transform: rotateX(58deg) rotateZ(360deg); } }
+@media (prefers-reduced-motion: reduce) { .plate3d { animation: none; transform: rotateX(55deg); } }

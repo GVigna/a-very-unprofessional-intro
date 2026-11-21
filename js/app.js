@@ -1572,7 +1572,7 @@
       function rand(a, b) { return a + Math.random() * (b - a); }
       function preload(g) {
         (g.items || []).forEach(function (s) {
-          var src = s.src || s.poster || (s.spin && s.spin[0].src) || (s.flipbook && s.flipbook[0]);
+          var src = s.src || s.poster || s.plate || (s.spin && s.spin[0].src) || (s.flipbook && s.flipbook[0]);
           if (src) { var im = new Image(); im.src = src; }
         });
       }
@@ -1615,9 +1615,31 @@
             '<div class="ig-nav">' + I + '<path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z"/></svg>' + I + '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>' +
               I + '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>' + I + '<path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg>' +
               '<span class="ig-me"></span></div>';
-          q.inner.querySelector(".ig-pic").appendChild(makeImg(spec.src, "pic"));
+          var picBox = q.inner.querySelector(".ig-pic");
+          if (spec.video) {                                       // a video post: muted loop
+            var iv = document.createElement("video");
+            iv.src = spec.video; if (spec.poster) iv.poster = spec.poster;
+            iv.muted = true; iv.defaultMuted = true; iv.loop = true; iv.autoplay = !reduceMotion; iv.playsInline = true;
+            iv.setAttribute("muted", ""); iv.setAttribute("playsinline", ""); iv.className = "pic";
+            picBox.appendChild(iv);
+          } else picBox.appendChild(makeImg(spec.src, "pic"));
           q.el.setAttribute("role", "img"); q.el.setAttribute("aria-label", "Instagram post by " + ig.user + (ig.caption ? ": " + ig.caption : ""));
           el = q.el;
+        } else if (spec.plate) {                                  // a real plate: tilted, spinning slowly, with a rim and a shadow
+          tw = R.w * (phone ? 0.42 : 0.3);
+          var pl = shell("wv-plate media", 0);
+          pl.el.style.width = Math.round(tw) + "px"; pl.el.style.height = Math.round(tw) + "px";
+          var disc = document.createElement("div"); disc.className = "plate3d";
+          disc.style.animationDuration = rand(7, 10).toFixed(1) + "s";
+          var shadow = document.createElement("div"); shadow.className = "plate-shadow";
+          pl.inner.appendChild(shadow);
+          for (var L2 = 6; L2 >= 1; L2--) {                       // the rim: thin layers under the top
+            var layer = makeImg(spec.plate, "plate-layer rim"); layer.style.transform = "translateZ(" + (-L2 * tw / 160).toFixed(2) + "px)"; disc.appendChild(layer);
+          }
+          disc.appendChild(makeImg(spec.plate, "plate-layer top"));
+          pl.inner.appendChild(disc);
+          pl.el.setAttribute("role", "img"); pl.el.setAttribute("aria-label", spec.alt || "Plate with the Banchi 1470 logo");
+          el = pl.el;
         } else if (spec.spin) {                                   // a little garment turning round (front / back)
           tw = R.w * (phone ? 0.3 : 0.2);
           var f = spec.spin[0], b = spec.spin[1] || spec.spin[0], h0 = tw / (f.ratio || 1);

@@ -499,11 +499,12 @@ window.STORY = [
         bold: ["How could I say no?"],
         links: { "MEGAZINNE": "https://www.instagram.com/megazinne/" },
         // the little cursor clicks MEGAZINNE → press cards (articles, with the newspapers' logos) are dealt
-        // Rolling Stone and ELLE screenshots to add when Giulia sends them
+        // ELLE screenshot to add when Giulia sends it
         hintThen: [
           { type: "deck", size: "m", fan: 0.75, interval: 160, cards: [
               { src: "media/06_CAPITOLO_6/press/blam.webp", ratio: 0.9926 },
-              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.4722 }
+              { src: "media/06_CAPITOLO_6/press/messaggero.webp", ratio: 1.4722 },
+              { src: "media/06_CAPITOLO_6/press/rollingstone.webp", ratio: 0.8387 }
           ]}
         ],
         text: "My childhood BFF Ilena Ilardo (we met at a school run by nuns, btw) has an idea: a magazine about boobs.\n\nCalled MEGAZINNE. (The joke makes sense only in Italian, sorry.)\n\nHow could I say no? 🍐" }

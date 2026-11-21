@@ -22,7 +22,7 @@
   var SIZE = { xxs: 0.13, xs: 0.2, s: 0.30, m: 0.46, l: 0.66 }; // share of the screen's short side…
   var SIZE_CAP = { xxs: 100, xs: 150, s: 220, m: 340, l: 520 };  // …but never wider than this (px)
   var TYPE_SPEED = 45;      // ms per letter for typed text
-  var TYPE_FACTOR = 0.85;   // global typing pace (0.85 = 15% faster)
+  var TYPE_FACTOR = 0.765;   // all typing faster (0.85 → another 10% faster)
   var TYPE_PAUSE = 900;     // ms of silence before a "typeFrom" phrase starts typing
   var CHAT_PAUSE = 500;     // ms between chat messages
   var CHAT_TYPING = 900;    // ms the "…" dots show before a message
@@ -1845,7 +1845,7 @@
       });
       live.push(item);
 
-      var lines = beat.lines || [], speed = reduceMotion ? 0 : (beat.speed || 120), at = step;
+      var lines = beat.lines || [], speed = reduceMotion ? 0 : (beat.speed || 120) * 0.9, at = step;   // 10% faster
       // "accel": the first lines at reading pace, then faster and faster, all done in about total ms
       var times = lines.map(function (_, n) { return n * speed; });
       if (beat.accel && !reduceMotion) {

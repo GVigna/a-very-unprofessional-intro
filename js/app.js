@@ -1593,7 +1593,7 @@
             el.style.left = ""; el.style.top = ""; el.style.transform = "";
             out.removeChild(el);
             if (step >= diesAt || fit.dead) return;
-            fit.pfCards.push(addItem(el, fx, fy, Infinity, "topleft"));
+            var ci = addItem(el, fx, fy, Infinity, "topleft"); ci.pfOwner = fit; fit.pfCards.push(ci);
           }, dur + 40);
         }, (reduceMotion ? 0 : 380) + k * gap);
       });
@@ -1850,6 +1850,7 @@
       }
     }
     taps[step] = { x: x, y: y };
+    placingNext = true;           // while this beat is laid out, photos that go at this tap don't take up room
 
     // "bg": change the whole background colour (stays until another bg or restart)
     if (beat.bg) setBg(beat.bg);
@@ -1921,6 +1922,7 @@
     });
 
     step++;
+    placingNext = false;
     updateProgress();
     trackStep();
     preloadAhead();
@@ -2003,9 +2005,10 @@
     });
   }
 
+  var placingNext = false;
   function mediaRects() {
     return live.filter(function (it) {
-      return it.el.classList.contains("media") && !it.dead && !it.leaving;
+      return it.el.classList.contains("media") && !it.dead && !it.leaving && !(placingNext && (it.pfOwner ? it.pfOwner.diesAt : it.diesAt) <= step + 1);
     }).map(function (it) {
       var r = { l: it.x, t: it.y, r: it.x + it.el.offsetWidth, b: it.y + it.el.offsetHeight };
       var y = it.el.querySelector(".book-year");           // a book's year sits above it

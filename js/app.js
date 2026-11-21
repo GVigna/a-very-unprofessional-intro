@@ -1558,7 +1558,7 @@
     waves: function (beat, x, y, diesAt) {
       var groups = beat.groups || [];
       if (!groups.length) return;
-      var gi = 0, current = [], STAG = reduceMotion ? 0 : (beat.stagger || 150);
+      var gi = 0, current = [], STAG = reduceMotion ? 0 : (beat.stagger || 380);
       function region() {
         var v = viewport(), B = bands(), col = live.filter(function (it) { return !it.dead && it.el.classList.contains("codecol") && it.el.classList.contains("half"); })[0];
         var r = { l: EDGE, r: v.w - EDGE, t: B.t + 6, b: v.h - B.b - 6 };
@@ -1643,12 +1643,19 @@
         var g = groups[gi], old = current; current = [];
         leave(old);
         preload(groups[(gi + 1) % groups.length]);
+        // one folder = one wave: its pieces keep falling in one after the other; when too many are
+        // on screen, the oldest of them falls away (a rolling pile), until the next folder comes
+        var MAXON = beat.maxOn || (isPhone() ? 5 : 8);
         (g.items || []).forEach(function (spec, k) {
-          later(function () { if (step < diesAt) { var it = card(spec); if (it) current.push(it); } }, (old.length ? 260 : 0) + k * STAG);
+          later(function () {
+            if (step >= diesAt) return;
+            var it = card(spec); if (it) current.push(it);
+            if (current.length > MAXON) leave([current.shift()]);
+          }, (old.length ? 260 : 0) + k * STAG);
         });
         gi = (gi + 1) % groups.length;
         if (gi === 0 && beat.loop === false) return;
-        later(next, (beat.period || 3400) + (g.items || []).length * STAG);
+        later(next, (beat.period || 2600) + (g.items || []).length * STAG);
       })();
     },
 
@@ -1740,7 +1747,7 @@
             // out of the folder: becomes a free, draggable card on the page
             // (computed, not measured: a transition may not have run in a background tab)
             var fx = fit.x + relL, fy = fit.y + relT;
-            el.classList.remove("pf-card");
+            el.classList.remove("pf-card"); el.classList.add("pf-done");   // no second pop-in
             el.style.left = ""; el.style.top = ""; el.style.transform = "";
             out.removeChild(el);
             if (step >= diesAt || fit.dead) return;

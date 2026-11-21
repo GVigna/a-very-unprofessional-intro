@@ -1310,7 +1310,7 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 
 /* WAVES — work cards falling in */
 .item.wv { will-change: transform; }
-.item.wv-spin .inner { width: 100%; height: 100%; perspective: 700px; background: none; overflow: visible; }
+.item.wv-spin .inner, .item.card.wv-spin .inner { width: 100%; height: 100%; perspective: 700px; background: none; overflow: visible; box-shadow: none; }
 .wv-spin3d { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: wv-spin linear infinite; }
 .wv-face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; backface-visibility: hidden; -webkit-backface-visibility: hidden;
   filter: drop-shadow(0 6px 8px rgba(0,0,0,.18)); pointer-events: none; }
@@ -1321,3 +1321,6 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .item.phone .inner { position: relative; }
 .item.phone .inner::before { content: ""; position: absolute; z-index: 2; top: 2.4%; left: 50%; width: 30%; height: 3.2%; transform: translateX(-50%);
   background: #111; border-radius: 99px; pointer-events: none; }
+
+/* press cards: they only slide out of the folder (no pop-in, neither inside nor once out); wave cards only fall */
+.item.pf-card .inner, .item.pf-done .inner, .item.wv .inner { animation: none; }

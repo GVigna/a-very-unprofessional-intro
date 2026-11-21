@@ -628,7 +628,8 @@
     if (beat.box === "light") s.el.classList.add("box-light");   // white box, violet text (on coloured pages)
     if (beat._fill) {                                             // "fill": as big as the screen allows
       s.el.classList.add("fill");
-      s.el.style.fontSize = beat._fill.f + "px";
+      s.inner.style.fontSize = beat._fill.f + "px";
+      s.inner.style.maxWidth = "none";
       s.el.style.width = beat._fill.w + "px"; s.el.style.maxWidth = beat._fill.w + "px";
     }
     if (beat.lines) {

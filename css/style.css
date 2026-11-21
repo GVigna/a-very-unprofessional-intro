@@ -1305,5 +1305,5 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .pf-out > .item.pf-card.pf-back-in { transition: transform 420ms cubic-bezier(.5,0,.75,.4); }
 
 /* the last sentence, as big as the screen */
-.item.text.fill { line-height: 1.04; letter-spacing: -0.01em; }
+.item.text.fill .inner { line-height: 1.04; letter-spacing: -0.015em; }
 .item.text.fill .inner { white-space: pre-wrap; }

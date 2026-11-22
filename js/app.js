@@ -1408,7 +1408,7 @@
       var sw = el.querySelector(".ly-swing");
       // where the card ends up at rest (not where it is mid-swing)
       item.obstacle = function () {
-        return { l: px - cw / 2 - 12, t: B.t, r: px + cw / 2 + 12, b: B.t + strap + cw * 0.13 + ch + 16 };
+        return { l: px - cw / 2 - 24, t: B.t, r: px + cw / 2 + 24, b: B.t + strap + cw * 0.13 + ch + 70 };   // padded: the card swings lower
       };
       item.leave = function () {                 // swings back out to the left, then goes
         sw.classList.remove("swing", "nudge"); sw.classList.add("out");
@@ -1569,10 +1569,33 @@
       function region() {
         var v = viewport(), B = bands(), col = live.filter(function (it) { return !it.dead && it.el.classList.contains("codecol") && it.el.classList.contains("half"); })[0];
         var r = { l: EDGE, r: v.w - EDGE, t: B.t + 6, b: v.h - B.b - 6 };
-        if (col) {
+        if (col && !beat.fullArea) {
           var left = col.el.classList.contains("left");
           if (beat.onCode) left = !left;                 // onCode: fall over the (faint) list instead of over the texts
           if (left) r.l = v.w / 2 + EDGE; else r.r = v.w / 2 - EDGE;
+        }
+        // don't fall over a title/text in this area: pick the roomiest free band around the texts
+        // (above, below, to the right or to the left of them)
+        // the real extent of the letters (a text box can be much wider than its words)
+        var ink = live.filter(function (it) { return !it.dead && it.el.classList.contains("text"); }).map(function (it) {
+          var inner = it.el.querySelector(".inner") || it.el, rg = document.createRange(); rg.selectNodeContents(inner);
+          var rs = Array.prototype.slice.call(rg.getClientRects()).filter(function (q) { return q.width > 1 && q.height > 1; });
+          if (!rs.length) { var bb = it.el.getBoundingClientRect(); rs = [bb]; }
+          return { l: Math.min.apply(null, rs.map(function (q) { return q.left; })), r: Math.max.apply(null, rs.map(function (q) { return q.right; })),
+                   t: Math.min.apply(null, rs.map(function (q) { return q.top; })), b: Math.max.apply(null, rs.map(function (q) { return q.bottom; })) };
+        });
+        var hit = ink.filter(function (tr) { return tr.r > r.l + 20 && tr.l < r.r - 20 && tr.b > r.t && tr.t < r.b; });
+        if (hit.length) {
+          var T0 = Math.min.apply(null, hit.map(function (t) { return t.t; })), B0 = Math.max.apply(null, hit.map(function (t) { return t.b; }));
+          var L0 = Math.min.apply(null, hit.map(function (t) { return t.l; })), R0 = Math.max.apply(null, hit.map(function (t) { return t.r; }));
+          var cands = [
+            { l: r.l, r: r.r, t: r.t, b: T0 - 10 }, { l: r.l, r: r.r, t: B0 + 10, b: r.b },
+            { l: R0 + 10, r: r.r, t: r.t, b: r.b }, { l: r.l, r: L0 - 10, t: r.t, b: r.b }
+          ].filter(function (c) { return c.r - c.l > 170 && c.b - c.t > 170; });
+          if (cands.length) {
+            cands.sort(function (p, q) { return Math.min(q.r - q.l, (q.b - q.t) * 0.8) - Math.min(p.r - p.l, (p.b - p.t) * 0.8); });   // the one that holds the biggest card
+            r.l = cands[0].l; r.r = cands[0].r; r.t = cands[0].t; r.b = cands[0].b;
+          }
         }
         r.w = r.r - r.l; r.h = r.b - r.t; return r;
       }
@@ -2142,16 +2165,14 @@
       timers = [];
     }
 
-    var anchorMain;
+    var anchorMain, mainScale = 1;
     if (beat.free && beat.type === "text") {
-      // a text in the free space: measure its final size, find room around everything
-      var fsz = finalSize(beat);
-      var spot = clearSpot(fsz.w, fsz.h, textRects().concat(mediaRects()), { x: x, y: y }, 1)
-              || freeSpot(fsz.w, fsz.h, textRects());
-      x = spot.x - fsz.w / 2; y = spot.y - fsz.h / 2; anchorMain = "topleft";
+      var ft = placeFreeText(beat, x, y);
+      x = ft.x; y = ft.y; anchorMain = "topleft"; mainScale = ft.k;
     } else if (beat.free) { var fm = freeSpotFor(beat); x = fm.x; y = fm.y; } // keep clear of the texts
     playBeat(beat, x, y, step, anchorMain);
     var main = live[live.length - 1];
+    if (mainScale < 1 && main) { main.scale = mainScale; place(main, main.x, main.y); }
 
     // extra things that come with the same tap ("also"):
     //   below/above → stuck to the main item; otherwise offset from the tap
@@ -2169,7 +2190,12 @@
       var off = extra.offset || [0, 0];
       var at = step;
       later(function () {
-        if (extra.free) {
+        if (extra.free && extra.type === "text") {
+          var f2 = placeFreeText(extra, v.w / 2, v.h / 2);
+          playBeat(extra, f2.x, f2.y, at, "topleft");
+          var xt = live[live.length - 1];
+          if (f2.k < 1 && xt) { xt.scale = f2.k; place(xt, xt.x, xt.y); }
+        } else if (extra.free) {
           var f1 = freeSpotFor(extra);
           playBeat(extra, f1.x, f1.y, at);
         } else if (extra.at) {
@@ -2217,6 +2243,22 @@
   }
 
   // the roomiest area around the texts that fits a w×h box: returns centre, scale, side
+  // a text in the free space: measure its final size and find room around everything on screen;
+  // if there is no room at full size, try it a bit smaller (never over another text if avoidable)
+  function placeFreeText(beat, x, y) {
+    var fsz = finalSize(beat), obst = textRects().concat(mediaRects()), ks = [1, 0.86, 0.74, 0.64];
+    for (var i = 0; i < ks.length; i++) {
+      var sp = clearSpot(fsz.w * ks[i], fsz.h * ks[i], obst, { x: x, y: y }, 1);
+      if (sp) return { x: sp.x - fsz.w / 2, y: sp.y - fsz.h / 2, k: ks[i] };
+    }
+    for (var j = 0; j < ks.length; j++) {                       // still nothing: at least keep off the other texts
+      var sp2 = clearSpot(fsz.w * ks[j], fsz.h * ks[j], textRects(), { x: x, y: y }, 1);
+      if (sp2) return { x: sp2.x - fsz.w / 2, y: sp2.y - fsz.h / 2, k: ks[j] };
+    }
+    var fb = freeSpot(fsz.w, fsz.h, textRects()), k = Math.max(0.6, Math.min(1, fb.scale));
+    return { x: fb.x - fsz.w / 2, y: fb.y - fsz.h / 2, k: k };
+  }
+
   function freeSpot(w, h, rects) {
     var v = viewport(), g = 16, BB = bands();
     if (!rects.length) return { x: v.w / 2, y: v.h / 2, scale: 1, side: "below" };

@@ -1454,20 +1454,14 @@
       var s = shell("mailicon", 0);
       var a = document.createElement("a");
       a.className = "mi-link";
-      a.draggable = false;
       a.href = "mailto:" + beat.email + (beat.subject ? "?subject=" + encodeURIComponent(beat.subject) : "");
       a.setAttribute("aria-label", "Write an email to " + beat.email);
       a.innerHTML = svg + '<span class="mi-note">write me!</span>';
       s.inner.appendChild(a);
       var vv = viewport(), spot = clearSpot(200, 170, textRects().concat(mediaRects()), { x: vv.w * 0.7, y: vv.h * 0.55 }, 0.8) || { x: x, y: y };
-      var mit = addItem(s.el, spot.x, spot.y, diesAt);
-      // draggable like everything else; a tap (no drag) opens the email
-      mit.onTap = function () {};                                // the link's own click does the job
-      mit.onDrop = function () { mit.justDragged = Date.now(); };
-      a.addEventListener("click", function (e) {
-        if (mit.justDragged && Date.now() - mit.justDragged < 600) { e.preventDefault(); return; }   // it was a drag, not a tap
-        s.el.classList.add("flyaway");
-      });
+      addItem(s.el, spot.x, spot.y, diesAt);
+      // it's a link: a tap opens the email (it isn't dragged around)
+      a.addEventListener("click", function () { s.el.classList.add("flyaway"); });
     },
 
     // AUDIOCARD — a photo with a mini audio player under it (time, progress bar, controls)
@@ -2485,7 +2479,7 @@
   var pts = {}, pinch = null;       // fingers on screen; an active two-finger pinch
   stage.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 && e.pointerType === "mouse") return;
-    if (e.target.closest(".sound, a:not(.mi-link), .ac-btn")) return; // let buttons and links do their job (the mail icon can still be dragged)
+    if (e.target.closest(".sound, a, .ac-btn")) return; // let buttons and links do their job
     var itemEl = e.target.closest(".item");
 
     // a second finger lands: cancel any pending tap (no accidental reveals)

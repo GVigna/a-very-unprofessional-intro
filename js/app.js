@@ -1318,9 +1318,10 @@
       var avoid = textRects().concat(mediaRects());
       var spot = clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.5)
               || clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.3)
+              || (isPhone() && clearSpot(w * 1.06, h * 1.1, avoid, pref, 0.2))   // phones: smaller rather than over a text
               || clearSpot(w * 1.06, h * 1.1, mediaRects(), pref, 0.3)      // at worst over a text, never over another magazine
               || { x: pref.x, y: pref.y, scale: 0.5 };
-      if (isPhone() && (spot.scale || 1) < 0.8) {          // phones: big enough to see, at a side, over old texts if needed
+      if (isPhone() && (spot.scale || 1) < 0.42) {         // phones: only when there's really no room left, go to a side (may cover old texts)
         var ss = sideSpot(w, h, 0.04, beat.share && beat.share < 0.5 ? 0.42 : 0.6);
         if (ss) spot = ss;
       }

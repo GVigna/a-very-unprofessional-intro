@@ -1600,7 +1600,45 @@
                              flip: 150, interval: 70, loop: true, alt: spec.alt || "Comic pages flipping" }, x, y, diesAt);
           return live.length > before ? live[live.length - 1] : null;
         }
-        if (spec.ig) {                                            // the post as it looked in the feed, on a phone
+        if (spec.stickers) {                                      // a sheet of stickers: slapped on one by one, side by side
+          var placed = [], made = [], sheetW = Math.max.apply(null, spec.stickers.map(function (s) { return s.w || 300; }));
+          spec.stickers.forEach(function (st, k) {
+            later(function () {
+              if (step >= diesAt) return;
+              var RR = region();
+              var w0 = RR.w * (phone ? 0.3 : 0.17) * Math.sqrt((st.w || 300) / sheetW) * 1.25, h0 = w0 / (st.ratio || 1);
+              var px2, py2, tries = 0, ok2 = false;
+              while (tries++ < 60 && !ok2) {
+                px2 = rand(RR.l, Math.max(RR.l, RR.r - w0)); py2 = rand(RR.t, Math.max(RR.t, RR.b - h0)); ok2 = true;
+                for (var q2 = 0; q2 < placed.length; q2++) {
+                  var P = placed[q2];
+                  if (px2 < P.r + 8 && px2 + w0 > P.l - 8 && py2 < P.b + 8 && py2 + h0 > P.t - 8) { ok2 = false; break; }
+                }
+              }
+              placed.push({ l: px2, t: py2, r: px2 + w0, b: py2 + h0 });
+              var sh = shell("sticker cutout media", rand(-14, 14));
+              sh.el.style.width = Math.round(w0) + "px"; sh.el.style.height = Math.round(h0) + "px";
+              sh.inner.appendChild(makeImg(st.src, "pic"));
+              var peel = document.createElement("span"); peel.className = "st-peel"; sh.inner.appendChild(peel);
+              sh.el.classList.add("card", "wv");
+              var sit = addItem(sh.el, px2, py2, diesAt, "topleft");
+              current.push(sit);
+            }, k * (reduceMotion ? 0 : 260));
+          });
+          return null;
+        }
+        if (spec.story) {                                         // a story on a real-proportion iPhone (picture fills the screen)
+          tw = R.w * (phone ? 0.42 : 0.24);
+          var sH = tw / 0.49;
+          if (sH > R.h * 0.92) { sH = R.h * 0.92; tw = sH * 0.49; }
+          var sp2 = shell("igphone story media", rand(-9, 9));
+          sp2.el.style.width = Math.round(tw) + "px"; sp2.el.style.height = Math.round(sH) + "px";
+          sp2.el.style.fontSize = (tw / 24).toFixed(1) + "px";
+          sp2.inner.innerHTML = '<div class="ig-island"></div>';
+          var simg = makeImg(spec.src, "pic"); simg.classList.add("story-pic"); sp2.inner.appendChild(simg);
+          sp2.el.setAttribute("role", "img"); sp2.el.setAttribute("aria-label", spec.alt || "Instagram story");
+          el = sp2.el;
+        } else if (spec.ig) {                                     // the post as it looked in the feed, on a phone
           var ig = spec.ig;
           tw = R.w * (phone ? 0.5 : 0.3);
           var phH = tw / 0.49;

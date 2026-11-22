@@ -1357,3 +1357,20 @@ body.fast .inner, body.fast .rc-paper, body.fast .book3d, body.fast .lt-lid { an
 .mi-note.copied { white-space: nowrap; font-size: .8em; }
 .item.mailicon.mi-tapped .mi-link svg { animation: mi-tap .45s cubic-bezier(.2,1.6,.4,1); }
 @keyframes mi-tap { 0% { transform: scale(1); } 40% { transform: scale(.86); } 100% { transform: scale(1); } }
+
+/* STICKERS — slapped on like real stickers: they come in tilted towards you, the backing peels off, they land */
+.item.sticker .inner { background: none; box-shadow: none; overflow: visible; transform-origin: 50% 60%;
+  animation: st-slap .62s cubic-bezier(.2,.9,.3,1.15) both; filter: drop-shadow(0 3px 4px rgba(0,0,0,.22)); }
+.item.sticker .pic { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+.st-peel { position: absolute; inset: -2%; pointer-events: none; border-radius: 30%;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.95) 48%, rgba(220,220,215,.9) 52%, rgba(255,255,255,0) 64%);
+  background-size: 260% 260%; animation: st-peel .62s ease-out both; mix-blend-mode: normal; }
+@keyframes st-slap {
+  0%   { opacity: 0; transform: perspective(700px) rotateX(55deg) rotateY(-25deg) scale(1.35); }
+  25%  { opacity: 1; }
+  60%  { transform: perspective(700px) rotateX(-6deg) rotateY(4deg) scale(.95); }
+  100% { transform: none; } }
+@keyframes st-peel { 0% { background-position: 100% 100%; opacity: 1; } 75% { opacity: 1; } 100% { background-position: 0% 0%; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .item.sticker .inner, .st-peel { animation: none; } .st-peel { display: none; } }
+.item.igphone.story .inner { display: block; }
+.item.igphone .story-pic { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }

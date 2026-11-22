@@ -1460,8 +1460,14 @@
       s.inner.appendChild(a);
       var vv = viewport(), spot = clearSpot(200, 170, textRects().concat(mediaRects()), { x: vv.w * 0.7, y: vv.h * 0.55 }, 0.8) || { x: x, y: y };
       addItem(s.el, spot.x, spot.y, diesAt);
-      // it's a link: a tap opens the email (it isn't dragged around)
-      a.addEventListener("click", function () { s.el.classList.add("flyaway"); });
+      // it's a link: a tap opens the email app. Phones without a mail app set up ignore mailto,
+      // so the address is also copied and shown under the letter, and the letter stays (no fly-away)
+      a.addEventListener("click", function () {
+        var note = a.querySelector(".mi-note");
+        try { if (navigator.clipboard) navigator.clipboard.writeText(beat.email).catch(function () {}); } catch (e) {}
+        if (note) { note.textContent = beat.email + " — copied!"; note.classList.add("copied"); }
+        s.el.classList.remove("mi-tapped"); void s.el.offsetWidth; s.el.classList.add("mi-tapped");
+      });
     },
 
     // AUDIOCARD — a photo with a mini audio player under it (time, progress bar, controls)

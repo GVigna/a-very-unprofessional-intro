@@ -128,8 +128,15 @@
     if (FAST || step <= trackedMax) return;
     trackedMax = step;
     try {
-      if (window.foliaire && window.foliaire.track)
-        window.foliaire.track("story_step", { storyStep: step, storyTotal: STORY.length, storyEnd: step >= STORY.length });
+      if (window.foliaire && window.foliaire.track) {
+        // each step is sent as a virtual page (/step-01 … /step-25) so it shows up in Top Pages as a funnel
+        var nn = (step < 10 ? "0" : "") + step, vp = "/step-" + nn;
+        window.foliaire.track("page_view", {
+          pagePath: vp, pageUrl: location.origin + vp,
+          pageTitle: "Step " + nn + (step >= STORY.length ? " (end)" : ""),
+          storyStep: step, storyTotal: STORY.length, storyEnd: step >= STORY.length
+        });
+      }
     } catch (e) {}
   }
 
